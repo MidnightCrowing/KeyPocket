@@ -1,0 +1,14 @@
+<Page
+    x:Class="KeyPocket.UI.HomePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:local="using:KeyPocket.UI"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+
+    <Grid Padding="12">
+        <StackPanel Spacing="12">
+            <TextBlock FontSize="20" Text="Sample Page 1" />
+            <TextBlock Text="这是第一个示例页面。" />
+        </StackPanel>
+    </Grid>
+</Page>

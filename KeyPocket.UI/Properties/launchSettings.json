@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "KeyPocket.UI (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "KeyPocket.UI (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
