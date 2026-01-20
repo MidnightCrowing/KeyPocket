@@ -145,7 +145,7 @@ public partial class SettingsHelper : ObservableSettings
 
     public ElementTheme SelectedAppTheme
     {
-        get => GetOrCreateDefault(ElementTheme.Default);
+        get => GetOrCreateDefault(ElementTheme.Dark);
         set => Set(value);
     }
 }

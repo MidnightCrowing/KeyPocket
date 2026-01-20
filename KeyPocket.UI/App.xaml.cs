@@ -44,7 +44,10 @@ namespace KeyPocket.UI
         /// <param name="args">Details about the launch request and process.</param>
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
+            InitializeServices();
+
             _window = new MainWindow();
+            MainWindow = _window;
 
             // Make the window available to helpers first so Initialize can apply the theme
             WindowHelper.SetMainWindow(_window);
@@ -53,6 +56,17 @@ namespace KeyPocket.UI
             ThemeHelper.Initialize();
 
             _window.Activate();
+        }
+
+        public static Window MainWindow { get; private set; } = null!;
+        public static KeyPocket.Core.Services.ProviderService ProviderService { get; private set; } = null!;
+
+        private void InitializeServices()
+        {
+            var storagePath = System.IO.Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, "data.json");
+            var storage = new KeyPocket.Core.Storage.JsonFileStorageProvider(storagePath);
+            var protector = new KeyPocket.Core.Crypto.DpapiSecretProtector();
+            ProviderService = new KeyPocket.Core.Services.ProviderService(storage, protector);
         }
     }
 }

@@ -45,6 +45,7 @@
             IsBackButtonVisible="Collapsed"
             IsPaneToggleButtonVisible="False"
             IsSettingsVisible="True"
+            ItemInvoked="NavigationView_ItemInvoked"
             SelectionChanged="NavigationView_SelectionChanged"
             x:Name="navView">
 
@@ -54,27 +55,37 @@
                     Tag="HomePage"
                     x:Name="homePage">
                     <NavigationViewItem.Icon>
-                        <SymbolIcon Symbol="Home" />
+                        <FontIcon Glyph="&#xE80F;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem
+                    Content="Models"
+                    Tag="ModelsPage"
+                    x:Name="modelsPageItem">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xF158;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem
+                    Content="Keys"
+                    Tag="KeysPage"
+                    x:Name="keysPageItem">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE8D7;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
 
                 <NavigationViewItemHeader Content="Providers" />
 
                 <NavigationViewItem
-                    Content="Menu Item2"
-                    SelectsOnInvoked="True"
-                    Tag="SamplePage2"
-                    x:Name="samplePage2Item">
+                    Content="Add Provider"
+                    SelectsOnInvoked="False"
+                    Tag="AddProvider"
+                    x:Name="addProviderItem">
                     <NavigationViewItem.Icon>
-                        <SymbolIcon Symbol="Save" />
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
-                <NavigationViewItem
-                    Content="Menu Item3"
-                    Tag="SamplePage3"
-                    x:Name="samplePage3Item">
-                    <NavigationViewItem.Icon>
-                        <SymbolIcon Symbol="Refresh" />
+                        <FontIcon Glyph="&#xE710;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
             </NavigationView.MenuItems>

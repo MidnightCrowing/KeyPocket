@@ -28,12 +28,12 @@ public sealed partial class SettingsPage
         
         gitHubCard.Click += (_, _) =>
         {
-            _ = Launcher.LaunchUriAsync(new Uri("https://github.com/MidnightCrowing/KeyPort"));
+            _ = Launcher.LaunchUriAsync(new Uri("https://github.com/MidnightCrowing/KeyPocket"));
         };
 
         feedbackCard.Click += (_, _) =>
         {
-            _ = Launcher.LaunchUriAsync(new Uri("https://github.com/MidnightCrowing/KeyPort/issues"));
+            _ = Launcher.LaunchUriAsync(new Uri("https://github.com/MidnightCrowing/KeyPocket/issues"));
         };
     }
 
