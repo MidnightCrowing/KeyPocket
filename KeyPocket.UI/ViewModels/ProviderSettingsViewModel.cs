@@ -58,6 +58,9 @@ public partial class ProviderSettingsViewModel : ObservableObject
         LoadKeys(_originalProvider);
         LoadModels(_originalProvider);
         HasCustomIcon = !string.IsNullOrEmpty(provider.IconPath);
+
+        ApiKeys.CollectionChanged += OnApiKeysCollectionChanged;
+        Models.CollectionChanged += OnModelsCollectionChanged;
     }
 
     // 公开 Provider 以便访问
@@ -164,8 +167,12 @@ public partial class ProviderSettingsViewModel : ObservableObject
 
         ApiKeys.Clear();
 
-        foreach (var k in _originalProvider.ApiKeys)
+        _isSyncingOrder = true;
+        try
         {
+            foreach (var k in _originalProvider.ApiKeys)
+            {
+                // ... (existing logic)
             // Decrypt the key to get the original plain text for proper masking
             string plainKey = string.Empty;
             try
@@ -200,6 +207,11 @@ public partial class ProviderSettingsViewModel : ObservableObject
             };
             InjectKeyCommands(w);
             ApiKeys.Add(w);
+        }
+        }
+        finally
+        {
+            _isSyncingOrder = false;
         }
     }
 
@@ -374,8 +386,11 @@ public partial class ProviderSettingsViewModel : ObservableObject
 
         Models.Clear();
         
-        foreach (var m in _originalProvider.Models)
+        _isSyncingOrder = true;
+        try
         {
+            foreach (var m in _originalProvider.Models)
+            {
              var w = new ModelWrapper
              {
                  Id = m.Id,
@@ -385,6 +400,11 @@ public partial class ProviderSettingsViewModel : ObservableObject
              };
              InjectModelCommands(w);
              Models.Add(w);
+        }
+        }
+        finally
+        {
+            _isSyncingOrder = false;
         }
     }
 
@@ -577,6 +597,75 @@ public partial class ProviderSettingsViewModel : ObservableObject
         // Or full reload if we trust service source of truth
     }
 
+    private bool _isSyncingOrder;
+
+    private void OnApiKeysCollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        if (_isSyncingOrder || _providerService == null) return;
+        if (_isSyncingOrder || _providerService == null) return;
+        SyncApiKeysOrder();
+    }
+
+    private void SyncApiKeysOrder()
+    {
+        try
+        {
+            _isSyncingOrder = true;
+            var newOrder = new System.Collections.Generic.List<ApiKey>();
+            foreach (var wrapper in ApiKeys)
+            {
+                if (wrapper.Id != Guid.Empty)
+                {
+                    var existing = _originalProvider.ApiKeys.FirstOrDefault(k => k.Id == wrapper.Id);
+                    if (existing != null) newOrder.Add(existing);
+                }
+            }
+            if (newOrder.Count == _originalProvider.ApiKeys.Count)
+            {
+                _originalProvider.ApiKeys = newOrder;
+                _providerService.UpdateProvider(_originalProvider);
+                WeakReferenceMessenger.Default.Send(new ProviderUpdatedMessage(_originalProvider.Id));
+            }
+        }
+        finally
+        {
+            _isSyncingOrder = false;
+        }
+    }
+
+    private void OnModelsCollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        if (_isSyncingOrder || _providerService == null) return;
+        if (_isSyncingOrder || _providerService == null) return;
+        SyncModelsOrder();
+    }
+
+    private void SyncModelsOrder()
+    {
+        try
+        {
+            _isSyncingOrder = true;
+            var newOrder = new System.Collections.Generic.List<ModelInfo>();
+            foreach (var wrapper in Models)
+            {
+                if (!string.IsNullOrEmpty(wrapper.Id))
+                {
+                    var existing = _originalProvider.Models.FirstOrDefault(m => m.Id == wrapper.Id);
+                    if (existing != null) newOrder.Add(existing);
+                }
+            }
+            if (newOrder.Count == _originalProvider.Models.Count)
+            {
+                _originalProvider.Models = newOrder;
+                _providerService.UpdateProvider(_originalProvider);
+                WeakReferenceMessenger.Default.Send(new ProviderUpdatedMessage(_originalProvider.Id));
+            }
+        }
+        finally
+        {
+            _isSyncingOrder = false;
+        }
+    }
 }
 
 public partial class KeyWrapper : ObservableObject

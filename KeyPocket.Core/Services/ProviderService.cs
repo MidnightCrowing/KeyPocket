@@ -216,6 +216,21 @@ public class ProviderService
         }
     }
 
+    public void ToggleDisableApiKey(Guid providerId, Guid keyId)
+    {
+        var config = _storage.Load();
+        var provider = config.Providers.FirstOrDefault(p => p.Id == providerId);
+        if (provider != null)
+        {
+            var key = provider.ApiKeys.FirstOrDefault(k => k.Id == keyId);
+            if (key != null)
+            {
+                key.IsDisabled = !key.IsDisabled;
+                _storage.Save(config);
+            }
+        }
+    }
+
     // --- Model Management ---
 
     public void AddModel(Guid providerId, ModelInfo model)
