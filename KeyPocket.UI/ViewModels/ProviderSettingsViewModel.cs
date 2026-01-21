@@ -81,6 +81,9 @@ public partial class ProviderSettingsViewModel : ObservableObject
 
         // Persist
         _providerService.UpdateProvider(_originalProvider);
+        
+        // Notify sidebar to update
+        WeakReferenceMessenger.Default.Send(new ProviderUpdatedMessage(_originalProvider.Id));
     }
 
     public async System.Threading.Tasks.Task UpdateIconAsync(Windows.Storage.StorageFile? file)
@@ -112,8 +115,8 @@ public partial class ProviderSettingsViewModel : ObservableObject
             // Update property
             HasCustomIcon = !string.IsNullOrEmpty(_originalProvider.IconPath);
             
-            // Notify system
-            WeakReferenceMessenger.Default.Send(new ProviderDeletedMessage(_originalProvider.Id)); 
+            // Notify sidebar to update icon
+            WeakReferenceMessenger.Default.Send(new ProviderUpdatedMessage(_originalProvider.Id)); 
         }
         catch (Exception)
         {

@@ -11,7 +11,7 @@ public class ApiKey
     public Guid Id { get; set; } = Guid.NewGuid();
 
     /// <summary>
-    /// 关联的供应商 ID。
+    /// 关联的服务商 ID。
     /// </summary>
     public Guid ProviderId { get; set; }
 

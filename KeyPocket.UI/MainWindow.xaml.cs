@@ -8,12 +8,14 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using KeyPocket.UI.Dialogs;
 using KeyPocket.UI.Helpers;
+using KeyPocket.UI.ViewModels;
 
 namespace KeyPocket.UI;
 
 public sealed partial class MainWindow
 {
     private readonly Dictionary<Type, NavigationViewItem> _pageToNavItem;
+    public MainWindowViewModel ViewModel { get; }
 
     public MainWindow()
     {
@@ -22,6 +24,9 @@ public sealed partial class MainWindow
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(titleBar);
 
+        // 初始化 ViewModel
+        ViewModel = new MainWindowViewModel(App.ProviderService);
+
         _pageToNavItem = new Dictionary<Type, NavigationViewItem>
         {
             { typeof(HomePage), homePage },
@@ -29,23 +34,65 @@ public sealed partial class MainWindow
             { typeof(KeysPage), keysPageItem }
         };
 
-        LoadProvidersToSidebar();
-
         navView.SelectedItem = homePage;
         contentFrame.Navigate(typeof(HomePage));
 
         contentFrame.Navigated += OnContentFrameNavigated;
         
-        // Register for provider deletion messages
-        WeakReferenceMessenger.Default.Register<ProviderDeletedMessage>(this, (r, m) =>
+        // 初始化侧边栏服务商列表
+        LoadProvidersToSidebar();
+        
+        // 监听 ViewModel 的 Providers 集合变化
+        ViewModel.Providers.CollectionChanged += Providers_CollectionChanged;
+        
+        // 订阅服务商创建消息以处理导航
+        WeakReferenceMessenger.Default.Register<ProviderCreatedMessage>(this, (r, m) =>
+        {
+            // 导航到新创建的服务商配置页
+            // 使用 Navigate 会添加到历史记录，但这是期望的行为
+            // 用户可以通过一次回退返回到创建前的页面
+            contentFrame.Navigate(typeof(ProviderSettingsPage), m.ProviderId.ToString());
+            SelectProviderInSidebar(m.ProviderId);
+        });
+    }
+
+    private void Providers_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        // 当 ViewModel 的 Providers 集合变化时，更新侧边栏
+        if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add && e.NewItems != null)
+        {
+            foreach (SidebarProviderItem item in e.NewItems)
+            {
+                AddProviderToSidebar(item);
+            }
+        }
+        else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove && e.OldItems != null)
+        {
+            foreach (SidebarProviderItem item in e.OldItems)
+            {
+                RemoveProviderFromSidebar(item.Id);
+            }
+        }
+        else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
         {
             LoadProvidersToSidebar();
-        });
+        }
     }
 
     private void LoadProvidersToSidebar()
     {
-        // Clear existing dynamic providers (Tag starts with Provider_)
+        // 清除现有的动态服务商项
+        ClearDynamicProviders();
+        
+        // 添加所有服务商
+        foreach (var provider in ViewModel.Providers)
+        {
+            AddProviderToSidebar(provider);
+        }
+    }
+
+    private void ClearDynamicProviders()
+    {
         var menuItems = navView.MenuItems;
         for (int i = menuItems.Count - 1; i >= 0; i--)
         {
@@ -54,56 +101,100 @@ public sealed partial class MainWindow
                 menuItems.RemoveAt(i);
             }
         }
+    }
 
-        // Find "Providers" header index
-        int insertIndex = -1;
-        for(int i=0; i<menuItems.Count; i++)
+    private void AddProviderToSidebar(SidebarProviderItem provider)
+    {
+        // 找到 "Providers" 标题的位置
+        int insertIndex = FindProvidersHeaderIndex();
+        if (insertIndex == -1) return;
+
+        // 创建图标
+        IconElement icon;
+        if (!string.IsNullOrEmpty(provider.IconPath))
         {
-            if (menuItems[i] is NavigationViewItemHeader header && header.Content?.ToString() == "Providers")
+            icon = new ImageIcon { Source = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri($"ms-appdata:///local/{provider.IconPath}")) };
+        }
+        else
+        {
+            icon = new FontIcon { Glyph = provider.DefaultIconGlyph };
+        }
+
+        // 创建导航项
+        var navItem = new NavigationViewItem
+        {
+            Content = provider.Name,
+            Tag = $"Provider_{provider.Id}",
+            Icon = icon
+        };
+
+        // 监听 provider 属性变化以更新 UI
+        provider.PropertyChanged += (s, e) =>
+        {
+            if (s is SidebarProviderItem p && navItem.Tag is string itemTag && itemTag == $"Provider_{p.Id}")
             {
-                insertIndex = i + 1;
+                if (e.PropertyName == nameof(SidebarProviderItem.Name))
+                {
+                    navItem.Content = p.Name;
+                }
+                else if (e.PropertyName == nameof(SidebarProviderItem.IconPath) || e.PropertyName == nameof(SidebarProviderItem.Type))
+                {
+                    // 更新图标
+                    if (!string.IsNullOrEmpty(p.IconPath))
+                    {
+                        navItem.Icon = new ImageIcon { Source = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri($"ms-appdata:///local/{p.IconPath}")) };
+                    }
+                    else
+                    {
+                        navItem.Icon = new FontIcon { Glyph = p.DefaultIconGlyph };
+                    }
+                }
+            }
+        };
+
+        navView.MenuItems.Insert(insertIndex, navItem);
+    }
+
+    private void RemoveProviderFromSidebar(Guid providerId)
+    {
+        var tag = $"Provider_{providerId}";
+        var menuItems = navView.MenuItems;
+        for (int i = menuItems.Count - 1; i >= 0; i--)
+        {
+            if (menuItems[i] is NavigationViewItem item && item.Tag is string itemTag && itemTag == tag)
+            {
+                menuItems.RemoveAt(i);
                 break;
             }
         }
-
-        if (insertIndex == -1) return; // Header not found
-
-        // Add Provider Items
-        var providers = App.ProviderService.GetAllProviders();
-        foreach (var p in providers)
-        {
-            IconElement icon;
-            if (!string.IsNullOrEmpty(p.IconPath))
-            {
-               icon = new ImageIcon { Source = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri($"ms-appdata:///local/{p.IconPath}")) };
-            }
-            else
-            {
-               icon = new FontIcon { Glyph = p.Type switch
-                {
-                    _ => "\uE99A" // Unified default icon
-                } };
-            }
-
-            var item = new NavigationViewItem
-            {
-                Content = p.Name,
-                Tag = $"Provider_{p.Id}",
-                Icon = icon
-            };
-            menuItems.Insert(insertIndex++, item);
-        }
     }
 
-    private string GetIconForType(string type)
+    private int FindProvidersHeaderIndex()
     {
-        return type switch
+        var menuItems = navView.MenuItems;
+        for (int i = 0; i < menuItems.Count; i++)
         {
-            "OpenAI Compatible" => "\uE80F",
-            "Anthropic" => "\uF158",
-            _ => "\uE774"
-        };
+            if (menuItems[i] is NavigationViewItemHeader header && header.Content?.ToString() == "Providers")
+            {
+                // 找到所有已存在的 Provider_ 项，插入到最后一个之后
+                int lastProviderIndex = i;
+                for (int j = i + 1; j < menuItems.Count; j++)
+                {
+                    if (menuItems[j] is NavigationViewItem item && item.Tag is string tag && tag.StartsWith("Provider_"))
+                    {
+                        lastProviderIndex = j;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                return lastProviderIndex + 1;
+            }
+        }
+        return -1;
     }
+
 
     public void SelectProviderInSidebar(Guid providerId)
     {
@@ -140,17 +231,17 @@ public sealed partial class MainWindow
                 dialog.XamlRoot = this.Content.XamlRoot;
                 var result = await dialog.ShowAsync();
                 
-                // Refresh Sidebar after adding
                 if (result == ContentDialogResult.Primary)
                 {
-                    App.ProviderService.CreateProvider(
+                    var newProvider = App.ProviderService.CreateProvider(
                         dialog.ProviderName,
                         dialog.ProviderType,
                         dialog.BaseUrl,
                         dialog.Description
                     );
                     
-                    LoadProvidersToSidebar();
+                    // 发送创建消息，触发侧边栏更新和导航
+                    WeakReferenceMessenger.Default.Send(new ProviderCreatedMessage(newProvider.Id));
                 }
             }
         }
@@ -193,10 +284,24 @@ public sealed partial class MainWindow
         var canGoBack = contentFrame?.CanGoBack ?? false;
         titleBar.IsBackButtonVisible = canGoBack;
 
+        // 同步侧边栏选中状态
         if (contentFrame?.Content is Page page)
         {
-             // Here we could try to sync selection back, but dynamic IDs are tricky.
-             // Usually irrelevant for simple back navigation in this scope.
+            var pageType = page.GetType();
+            
+            // 如果是 ProviderSettingsPage，需要根据参数选中对应的服务商
+            if (pageType == typeof(ProviderSettingsPage) && e.Parameter is string providerIdStr)
+            {
+                if (Guid.TryParse(providerIdStr, out var providerId))
+                {
+                    SelectProviderInSidebar(providerId);
+                }
+            }
+            // 如果是其他页面，同步到对应的导航项
+            else if (_pageToNavItem.TryGetValue(pageType, out var navItem))
+            {
+                navView.SelectedItem = navItem;
+            }
         }
     }
 

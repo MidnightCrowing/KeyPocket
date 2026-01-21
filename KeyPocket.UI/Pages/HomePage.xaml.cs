@@ -105,7 +105,7 @@ namespace KeyPocket.UI.Pages
         {
             if (e.ClickedItem is ViewModels.ProviderViewModel item)
             {
-                Frame.Navigate(typeof(ProviderSettingsPage), item.Id);
+                Frame.Navigate(typeof(ProviderSettingsPage), item.Id.ToString());
                 
                 // Update sidebar selection
                 var mainWindow = App.MainWindow as MainWindow;

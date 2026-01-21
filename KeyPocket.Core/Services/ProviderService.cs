@@ -28,17 +28,19 @@ public class ProviderService
         return _storage.Load().Providers;
     }
 
-    public void CreateProvider(string name, string type, string? baseUrl = null, string? description = null)
+    public Provider CreateProvider(string name, string type, string? baseUrl = null, string? description = null)
     {
         var config = _storage.Load();
-        config.Providers.Add(new Provider
+        var newProvider = new Provider
         {
             Name = name,
             Type = type,
             ApiBaseUrl = baseUrl,
             Description = description
-        });
+        };
+        config.Providers.Add(newProvider);
         _storage.Save(config);
+        return newProvider;
     }
 
     public void RemoveProvider(Guid id)
@@ -47,6 +49,26 @@ public class ProviderService
         var provider = config.Providers.FirstOrDefault(p => p.Id == id);
         if (provider != null)
         {
+            // 删除图标文件（如果存在）
+            if (!string.IsNullOrEmpty(provider.IconPath))
+            {
+                try
+                {
+                    var iconFile = System.IO.Path.Combine(
+                        Windows.Storage.ApplicationData.Current.LocalFolder.Path,
+                        provider.IconPath
+                    );
+                    if (System.IO.File.Exists(iconFile))
+                    {
+                        System.IO.File.Delete(iconFile);
+                    }
+                }
+                catch
+                {
+                    // 忽略删除图标文件的错误
+                }
+            }
+            
             config.Providers.Remove(provider);
             _storage.Save(config);
         }

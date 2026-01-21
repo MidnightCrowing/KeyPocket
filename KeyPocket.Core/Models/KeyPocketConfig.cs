@@ -13,7 +13,7 @@ public class KeyPocketConfig
     public int Version { get; set; } = 1;
 
     /// <summary>
-    /// 所有供应商。
+    /// 所有服务商。
     /// </summary>
     public List<Provider> Providers { get; set; } = new();
 }

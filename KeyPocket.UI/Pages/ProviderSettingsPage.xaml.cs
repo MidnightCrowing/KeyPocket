@@ -88,17 +88,22 @@ public sealed partial class ProviderSettingsPage : Page
         var result = await dialog.ShowAsync();
         if (result == ContentDialogResult.Primary)
         {
+            // 先执行删除
             ViewModel.DeleteProvider();
             
-            // Navigate back to home
-            if (Frame.CanGoBack)
+            // 使用 Dispatcher 确保在 UI 线程上执行导航，并稍微延迟以确保删除完成
+            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal, () =>
             {
-                Frame.GoBack();
-            }
-            else
-            {
-                Frame.Navigate(typeof(HomePage));
-            }
+                // Navigate back to home
+                if (Frame.CanGoBack)
+                {
+                    Frame.GoBack();
+                }
+                else
+                {
+                    Frame.Navigate(typeof(HomePage));
+                }
+            });
         }
     }
 
@@ -191,15 +196,32 @@ public sealed partial class ProviderSettingsPage : Page
 
     private Border CreateStickyHeaderBorder(string title, string subtitle)
     {
+        // Determine the current theme
+        var currentTheme = ThemeHelper.Theme == ElementTheme.Default 
+            ? (Application.Current.RequestedTheme == ApplicationTheme.Dark ? ElementTheme.Dark : ElementTheme.Light)
+            : ThemeHelper.Theme;
+        
         var border = new Border
         {
-            // Use the same background as the page for proper theme support
-            Background = this.Background,
             BorderThickness = new Thickness(0, 0, 0, 1),
             Padding = new Thickness(0, 12, 0, 12),
-            Width = 240, // Match the left column width
-            Height = 70 // Increased height to prevent text clipping
+            Width = 270, // Match the left column width
+            Height = 70, // Increased height to prevent text clipping
+            RequestedTheme = currentTheme
         };
+        
+        // Manually set colors based on theme
+        // These colors match WinUI 3's default theme colors
+        if (currentTheme == ElementTheme.Dark)
+        {
+            // Dark theme colors
+            border.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 32, 32, 32)); // #202020
+        }
+        else
+        {
+            // Light theme colors
+            border.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 243, 243, 243)); // #F3F3F3
+        }
 
         var stackPanel = new StackPanel { Spacing = 4 };
         
@@ -214,6 +236,20 @@ public sealed partial class ProviderSettingsPage : Page
             Text = subtitle,
             Style = (Style)Application.Current.Resources["CaptionTextBlockStyle"]
         };
+        
+        // Manually set text colors based on theme
+        if (currentTheme == ElementTheme.Dark)
+        {
+            // Dark theme text colors
+            titleBlock.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 255, 255, 255)); // White for primary text
+            subtitleBlock.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 161, 161, 161)); // #A1A1A1 for secondary text
+        }
+        else
+        {
+            // Light theme text colors
+            titleBlock.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 0, 0, 0)); // Black for primary text
+            subtitleBlock.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 96, 96, 96)); // #606060 for secondary text
+        }
 
         stackPanel.Children.Add(titleBlock);
         stackPanel.Children.Add(subtitleBlock);
