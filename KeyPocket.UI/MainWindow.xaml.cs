@@ -6,7 +6,6 @@ using KeyPocket.UI.Pages;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
-using KeyPocket.UI.Dialogs;
 using KeyPocket.UI.Helpers;
 using KeyPocket.UI.ViewModels;
 
@@ -48,11 +47,13 @@ public sealed partial class MainWindow
         // 订阅服务商创建消息以处理导航
         WeakReferenceMessenger.Default.Register<ProviderCreatedMessage>(this, (r, m) =>
         {
-            // 导航到新创建的服务商配置页
-            // 使用 Navigate 会添加到历史记录，但这是期望的行为
-            // 用户可以通过一次回退返回到创建前的页面
-            contentFrame.Navigate(typeof(ProviderSettingsPage), m.ProviderId.ToString());
-            SelectProviderInSidebar(m.ProviderId);
+            // 使用 Dispatcher 确保 Provider 已完全保存后再导航
+            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal, () =>
+            {
+                // 导航到新创建的服务商配置页
+                contentFrame.Navigate(typeof(ProviderSettingsPage), m.ProviderId.ToString());
+                SelectProviderInSidebar(m.ProviderId);
+            });
         });
     }
 
@@ -219,30 +220,17 @@ public sealed partial class MainWindow
         navView.IsPaneOpen = !navView.IsPaneOpen;
     }
 
-    private async void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
+    private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
     {
         if (args.InvokedItemContainer is NavigationViewItem item && item.Tag is string tag)
         {
             if (tag == "AddProvider")
             {
-                var dialog = new AddProviderDialog();
-                dialog.RequestedTheme = ThemeHelper.IsDarkTheme() ? ElementTheme.Dark : ElementTheme.Light;
-                dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
-                dialog.XamlRoot = this.Content.XamlRoot;
-                var result = await dialog.ShowAsync();
+                // 直接创建默认供应商
+                var newProvider = App.ProviderService.CreateProvider();
                 
-                if (result == ContentDialogResult.Primary)
-                {
-                    var newProvider = App.ProviderService.CreateProvider(
-                        dialog.ProviderName,
-                        dialog.ProviderType,
-                        dialog.BaseUrl,
-                        dialog.Description
-                    );
-                    
-                    // 发送创建消息，触发侧边栏更新和导航
-                    WeakReferenceMessenger.Default.Send(new ProviderCreatedMessage(newProvider.Id));
-                }
+                // 发送创建消息，触发侧边栏更新和导航
+                WeakReferenceMessenger.Default.Send(new ProviderCreatedMessage(newProvider.Id));
             }
         }
     }

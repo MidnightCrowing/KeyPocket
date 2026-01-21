@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 
+#pragma warning disable MVVMTK0045
+
 namespace KeyPocket.UI.ViewModels;
 
 /// <summary>
@@ -25,12 +27,7 @@ public partial class SidebarProviderItem : ObservableObject
     public bool HasCustomIcon => !string.IsNullOrEmpty(IconPath);
 
     /// <summary>
-    /// 默认图标字形（根据类型）
+    /// 默认图标字形（固定为 Robot）
     /// </summary>
-    public string DefaultIconGlyph => Type switch
-    {
-        "OpenAI Compatible" => "\uE99A", // Robot 图标
-        "Anthropic" => "\uF158",
-        _ => "\uE99A" // 统一默认图标 Robot
-    };
+    public string DefaultIconGlyph => "\uE99A"; // 统一使用 Robot 图标
 }

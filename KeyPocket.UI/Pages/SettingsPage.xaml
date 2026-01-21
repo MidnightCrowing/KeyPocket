@@ -39,7 +39,6 @@
                     Style="{StaticResource TitleTextBlockStyle}"
                     Text="Settings" />
 
-                <!--  Appearance  -->
                 <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="Appearance" />
                 <toolkit:SettingsCard Description="Select which app theme to display" Header="App theme">
                     <toolkit:SettingsCard.HeaderIcon>
@@ -47,11 +46,10 @@
                     </toolkit:SettingsCard.HeaderIcon>
                     <ComboBox
                         AutomationProperties.AutomationId="themeModeComboBox"
-                        SelectionChanged="themeMode_SelectionChanged"
-                        x:Name="themeMode">
-                        <ComboBoxItem Content="Light" Tag="Light" />
-                        <ComboBoxItem Content="Dark" Tag="Dark" />
-                        <ComboBoxItem Content="Use system setting" Tag="Default" />
+                        SelectedIndex="{x:Bind ViewModel.ThemeIndex, Mode=TwoWay}">
+                        <ComboBoxItem Content="Light" />
+                        <ComboBoxItem Content="Dark" />
+                        <ComboBoxItem Content="Use system setting" />
                     </ComboBox>
                 </toolkit:SettingsCard>
 
@@ -67,21 +65,21 @@
                     <TextBlock
                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                         IsTextSelectionEnabled="True"
-                        Text="{x:Bind Version}" />
+                        Text="{x:Bind ViewModel.Version}" />
                     <toolkit:SettingsExpander.Items>
                         <toolkit:SettingsCard
+                            Command="{x:Bind ViewModel.OpenGitHubCommand}"
                             Header="GitHub"
-                            IsClickEnabled="True"
-                            x:Name="gitHubCard">
+                            IsClickEnabled="True">
                             <toolkit:SettingsCard.ActionIcon>
                                 <FontIcon Glyph="&#xE8A7;" />
                             </toolkit:SettingsCard.ActionIcon>
                         </toolkit:SettingsCard>
 
                         <toolkit:SettingsCard
+                            Command="{x:Bind ViewModel.OpenFeedbackCommand}"
                             Header="Open an issue or pull request"
-                            IsClickEnabled="True"
-                            x:Name="feedbackCard">
+                            IsClickEnabled="True">
                             <toolkit:SettingsCard.ActionIcon>
                                 <FontIcon Glyph="&#xE8A7;" />
                             </toolkit:SettingsCard.ActionIcon>

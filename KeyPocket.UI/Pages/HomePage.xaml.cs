@@ -7,10 +7,10 @@ using Microsoft.UI.Xaml.Media;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Windows.UI;
-using KeyPocket.UI.Dialogs;
 using KeyPocket.UI.Helpers;
 using KeyPocket.UI.Messages;
 using KeyPocket.UI.ViewModels;
+using KeyPocket.UI.Controls;
 
 namespace KeyPocket.UI.Pages
 {
@@ -56,25 +56,13 @@ namespace KeyPocket.UI.Pages
             ContentGrid.Visibility = ViewModel.IsNotEmpty ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        private async void OnAddProviderClicked(object sender, RoutedEventArgs e)
+        private void OnAddProviderClicked(object sender, RoutedEventArgs e)
         {
-            var dialog = new AddProviderDialog();
-            dialog.RequestedTheme = ThemeHelper.IsDarkTheme() ? ElementTheme.Dark : ElementTheme.Light;
-            dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
-            dialog.XamlRoot = this.XamlRoot;
-            var result = await dialog.ShowAsync();
-
-            if (result == ContentDialogResult.Primary)
-            {
-                App.ProviderService.CreateProvider(
-                    dialog.ProviderName,
-                    dialog.ProviderType,
-                    dialog.BaseUrl,
-                    dialog.Description
-                );
-
-                ViewModel.Refresh();
-            }
+            // 直接创建默认供应商
+            var newProvider = App.ProviderService.CreateProvider();
+            
+            // 发送创建消息，触发侧边栏更新和导航
+            WeakReferenceMessenger.Default.Send(new ProviderCreatedMessage(newProvider.Id));
         }
 
         private void OnCopyKeyClicked(object sender, RoutedEventArgs e)
@@ -105,13 +93,60 @@ namespace KeyPocket.UI.Pages
         {
             if (e.ClickedItem is ViewModels.ProviderViewModel item)
             {
-                Frame.Navigate(typeof(ProviderSettingsPage), item.Id.ToString());
-                
-                // Update sidebar selection
-                var mainWindow = App.MainWindow as MainWindow;
-                if (mainWindow != null)
+                NavigateToProvider(item.Id);
+            }
+        }
+
+        private void OnProviderTapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
+        {
+            var senderElement = sender as FrameworkElement;
+            
+            // 如果点击的是按钮（复制按钮等），则忽略导航
+            if (e.OriginalSource is DependencyObject originalSource)
+            {
+                var element = originalSource as FrameworkElement;
+                // 向上查找可视树，看点击源是否在 Button 内部
+                while (element != null && element != senderElement)
                 {
-                    mainWindow.SelectProviderInSidebar(item.Id);
+                    if (element is Button || element is KeyPocket.UI.Controls.CopyButton)
+                    {
+                        return;
+                    }
+                    element = VisualTreeHelper.GetParent(element) as FrameworkElement;
+                }
+            }
+
+            if (senderElement?.DataContext is ViewModels.ProviderViewModel item)
+            {
+                NavigateToProvider(item.Id);
+            }
+        }
+
+        private void NavigateToProvider(Guid providerId)
+        {
+            Frame.Navigate(typeof(ProviderSettingsPage), providerId.ToString());
+            
+            // Update sidebar selection
+            var mainWindow = App.MainWindow as MainWindow;
+            if (mainWindow != null)
+            {
+                mainWindow.SelectProviderInSidebar(providerId);
+            }
+        }
+
+        private void OnCopyBaseUrlClicked(object sender, RoutedEventArgs e)
+        {
+            if (sender is FrameworkElement element && element.Tag is string baseUrl)
+            {
+                try
+                {
+                    var dataPackage = new Windows.ApplicationModel.DataTransfer.DataPackage();
+                    dataPackage.SetText(baseUrl);
+                    Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(dataPackage);
+                }
+                catch
+                {
+                    // Silently fail
                 }
             }
         }

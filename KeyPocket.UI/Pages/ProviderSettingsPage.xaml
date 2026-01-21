@@ -77,20 +77,20 @@
                     </StackPanel>
 
                     <StackPanel Spacing="8">
-                        <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Provider Type" />
-                        <ComboBox
-                            HorizontalAlignment="Stretch"
-                            ItemsSource="{x:Bind ViewModel.ProviderTypes}"
-                            SelectedItem="{x:Bind ViewModel.Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    </StackPanel>
-
-                    <StackPanel Spacing="8">
                         <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Base URL" />
                         <TextBox PlaceholderText="https://api.openai.com/v1" Text="{x:Bind ViewModel.BaseUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         <TextBlock
                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                             Style="{StaticResource CaptionTextBlockStyle}"
                             Text="The base URL of the API provider." />
+                    </StackPanel>
+
+                    <StackPanel Spacing="8">
+                        <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="API Mode" />
+                        <ComboBox
+                            HorizontalAlignment="Stretch"
+                            ItemsSource="{x:Bind ViewModel.ProviderTypes}"
+                            SelectedItem="{x:Bind ViewModel.Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
 
                     <StackPanel Spacing="8">
@@ -147,7 +147,7 @@
                                     Padding="12">
 
                                     <!--  Read Only View  -->
-                                    <Grid Visibility="{x:Bind IsReadOnly, Converter={StaticResource BoolToVisConverter}}">
+                                    <Grid Visibility="{x:Bind IsReadOnly, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
@@ -158,7 +158,7 @@
                                             FontFamily="Consolas"
                                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                             Style="{StaticResource BodyTextBlockStyle}"
-                                            Text="{x:Bind MaskedKey}"
+                                            Text="{x:Bind MaskedKey, Mode=OneWay}"
                                             VerticalAlignment="Center" />
 
                                         <!--  Right Side: Buttons  -->
@@ -208,7 +208,7 @@
                                                 Click="OnCopyKeyClicked"
                                                 Content="&#xE8C8;"
                                                 Padding="8"
-                                                Tag="{x:Bind Id}"
+                                                Tag="{x:Bind Id, Mode=OneWay}"
                                                 ToolTipService.ToolTip="Copy Key" />
                                             <Button
                                                 Background="Transparent"
@@ -237,7 +237,7 @@
                                     </Grid>
 
                                     <!--  Edit View  -->
-                                    <Grid KeyDown="OnApiKeyEditKeyDown" Visibility="{x:Bind IsEditing, Converter={StaticResource BoolToVisConverter}}">
+                                    <Grid KeyDown="OnApiKeyEditKeyDown" Visibility="{x:Bind IsEditing, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
@@ -315,7 +315,7 @@
 
                                         <TextBlock
                                             Style="{StaticResource BodyStrongTextBlockStyle}"
-                                            Text="{x:Bind Name}"
+                                            Text="{x:Bind Name, Mode=OneWay}"
                                             VerticalAlignment="Center" />
 
                                         <StackPanel
@@ -326,7 +326,7 @@
                                                 Click="OnCopyModelIdClicked"
                                                 Content="&#xE8C8;"
                                                 Padding="8"
-                                                Tag="{x:Bind Id}"
+                                                Tag="{x:Bind Id, Mode=OneWay}"
                                                 ToolTipService.ToolTip="Copy Model ID" />
                                             <Button
                                                 Background="Transparent"

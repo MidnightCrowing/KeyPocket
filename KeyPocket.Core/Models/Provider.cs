@@ -15,9 +15,9 @@ public class Provider
     public string? Description { get; set; }
     
     /// <summary>
-    /// 服务商类型 (e.g. "OpenAI Compatible", "Anthropic").
+    /// API 模式 (e.g. "OpenAI API", "Claude API", "Google Gemini API", "Custom")。
     /// </summary>
-    public string Type { get; set; } = "OpenAI Compatible";
+    public string Type { get; set; } = "OpenAI API";
 
     /// <summary>
     /// API 基础地址。

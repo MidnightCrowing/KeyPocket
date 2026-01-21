@@ -3,12 +3,12 @@
     x:Class="KeyPocket.UI.Pages.HomePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:converters="using:KeyPocket.UI.Converters"
     xmlns:custom="using:KeyPocket.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModels="using:KeyPocket.UI.ViewModels"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:converters="using:KeyPocket.UI.Converters">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Page.Resources>
         <ResourceDictionary>
@@ -94,188 +94,249 @@
         </StackPanel>
 
         <!--  Content Grid  -->
-        <GridView
-            ItemsSource="{x:Bind ViewModel.Providers}"
-            IsItemClickEnabled="True"
-            ItemClick="OnProviderItemClick"
-            Padding="12"
-            SelectionMode="None"
+        <ScrollViewer Padding="0,0,12,0">
+            <ItemsControl
+                ItemsSource="{x:Bind ViewModel.Providers}"
+                x:Name="ContentGrid">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <controls:StaggeredPanel
+                            DesiredColumnWidth="300"
+                            ColumnSpacing="12"
+                            RowSpacing="12"
+                            HorizontalAlignment="Stretch" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="viewModels:ProviderViewModel">
+                        <Grid
+                            Background="{ThemeResource LayerOnMicaBaseAltFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="16"
+                            Shadow="{StaticResource SharedShadow}"
+                            Tapped="OnProviderTapped"
+                            CanDrag="False"
+                            Translation="0,0,8">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
 
-            Visibility="Visible"
-            x:Name="ContentGrid">
-            <GridView.ItemContainerStyle>
-                <Style TargetType="GridViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                    <Setter Property="VerticalContentAlignment" Value="Stretch" />
-                    <Setter Property="Margin" Value="0,0,12,12" />
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="GridViewItem">
-                                <ContentPresenter />
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </GridView.ItemContainerStyle>
-            <GridView.ItemTemplate>
-                <DataTemplate x:DataType="viewModels:ProviderViewModel">
-                    <Grid
-                        Background="{ThemeResource LayerOnMicaBaseAltFillColorDefaultBrush}"
-                        BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
-                        BorderThickness="1"
-                        CornerRadius="8"
-                        Padding="16"
-                        Shadow="{StaticResource SharedShadow}"
-                        Translation="0,0,8"
-                        Width="320">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-
-                        <!--  Header: Icon, Name, Status  -->
-                        <Grid Grid.Row="0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <Grid Margin="0,0,12,0">
-                                <FontIcon
-                                    FontFamily="{StaticResource SymbolThemeFontFamily}"
-                                    FontSize="20"
-                                    Glyph="{x:Bind Icon}"
-                                    Visibility="{x:Bind IsCustomIcon, Converter={StaticResource NegatedBoolToVisConverter}, Mode=OneWay}" />
-                                <Image
-                                    Source="{x:Bind CustomIconSource, Mode=OneWay}"
-                                    Width="20" Height="20"
-                                    Visibility="{x:Bind IsCustomIcon, Converter={StaticResource BoolToVisConverter}, Mode=OneWay}" />
+                            <!--  Header: Icon, Name, Status  -->
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid Margin="0,0,12,0">
+                                    <FontIcon
+                                        FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                        FontSize="20"
+                                        Glyph="{x:Bind Icon}"
+                                        Visibility="{x:Bind IsCustomIcon, Converter={StaticResource NegatedBoolToVisConverter}, Mode=OneWay}" />
+                                    <Image
+                                        Height="20"
+                                        Source="{x:Bind CustomIconSource, Mode=OneWay}"
+                                        Visibility="{x:Bind IsCustomIcon, Converter={StaticResource BoolToVisConverter}, Mode=OneWay}"
+                                        Width="20" />
+                                </Grid>
+                                <TextBlock
+                                    Grid.Column="1"
+                                    IsTextSelectionEnabled="False"
+                                    Style="{StaticResource BodyStrongTextBlockStyle}"
+                                    Text="{x:Bind Name}"
+                                    VerticalAlignment="Center" />
+                                <Ellipse
+                                    Fill="{x:Bind StatusColor}"
+                                    Grid.Column="2"
+                                    Height="8"
+                                    Width="8" />
                             </Grid>
+
+                            <!--  Description  -->
                             <TextBlock
-                                Grid.Column="1"
-                                IsTextSelectionEnabled="True"
-                                Style="{StaticResource BodyStrongTextBlockStyle}"
-                                Text="{x:Bind Name}"
-                                VerticalAlignment="Center" />
-                            <Ellipse
-                                Fill="{x:Bind StatusColor}"
-                                Grid.Column="2"
-                                Height="8"
-                                Width="8" />
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Grid.Row="1"
+                                IsTextSelectionEnabled="False"
+                                Margin="0,8,0,0"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="{x:Bind Description}"
+                                TextTrimming="CharacterEllipsis"
+                                Visibility="{x:Bind HasDescription, Converter={StaticResource BoolToVisConverter}}" />
+
+                            <!--  API Mode and BaseURL  -->
+                            <StackPanel
+                                Grid.Row="2"
+                                Margin="0,8,0,0"
+                                Orientation="Horizontal"
+                                Spacing="8"
+                                Visibility="{x:Bind HasBaseUrl, Converter={StaticResource BoolToVisConverter}}">
+                                <!--  API Mode Tag  -->
+                                <Border CornerRadius="4" Padding="6,2">
+                                    <Border.Background>
+                                        <SolidColorBrush Color="{x:Bind ApiModeColor}" Opacity="0.15" />
+                                    </Border.Background>
+                                    <TextBlock
+                                        FontSize="11"
+                                        FontWeight="SemiBold"
+                                        Text="{x:Bind Type}">
+                                        <TextBlock.Foreground>
+                                            <SolidColorBrush Color="{x:Bind ApiModeColor}" />
+                                        </TextBlock.Foreground>
+                                    </TextBlock>
+                                </Border>
+
+                                <!--  BaseURL Text  -->
+                                <TextBlock
+                                    FontSize="11"
+                                    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                    MaxWidth="180"
+                                    Text="{x:Bind BaseUrl}"
+                                    TextTrimming="CharacterEllipsis"
+                                    VerticalAlignment="Center" />
+
+                                <!--  Copy BaseURL Button  -->
+                                <custom:CopyButton
+                                    Click="OnCopyBaseUrlClicked"
+                                    Content="&#xE8C8;"
+                                    FontSize="10"
+                                    Padding="4"
+                                    Tag="{x:Bind BaseUrl}"
+                                    ToolTipService.ToolTip="Copy Base URL" />
+                            </StackPanel>
+
+                            <!--  Models (Pinned)  -->
+                            <ItemsControl
+                                Grid.Row="3"
+                                ItemsSource="{x:Bind Models}"
+                                IsHitTestVisible="True"
+                                Margin="0,16,0,0">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <controls:WrapPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="viewModels:ModelItem">
+                                        <Button
+                                            Click="OnCopyModelIdClicked"
+                                            Content="{x:Bind Name}"
+                                            Margin="0,0,8,8"
+                                            Style="{StaticResource ModelTagButtonStyle}"
+                                            Tag="{x:Bind Id}"
+                                            ToolTipService.ToolTip="{x:Bind Id}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <!--  Keys  -->
+                            <ItemsControl
+                                Grid.Row="4"
+                                ItemsSource="{x:Bind Keys}"
+                                IsHitTestVisible="True"
+                                Margin="0,12,0,0">
+                                <ItemsControl.ItemTemplate>
+
+                                    <DataTemplate x:DataType="viewModels:KeyItem">
+                                        <Button
+                                            Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                            BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
+                                            BorderThickness="1"
+                                            Click="OnCopyKeyClicked"
+                                            CornerRadius="4"
+                                            HorizontalAlignment="Stretch"
+                                            HorizontalContentAlignment="Stretch"
+                                            Margin="0,0,0,8"
+                                            Padding="8,6"
+                                            Tag="{x:Bind FullKey}"
+                                            ToolTipService.ToolTip="Click to copy full key">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <!--  Tag (if exists)  -->
+                                                <Border
+                                                    Grid.Column="0"
+                                                    CornerRadius="3"
+                                                    HorizontalAlignment="Left"
+                                                    Margin="0,0,8,0"
+                                                    Padding="4,2"
+                                                    VerticalAlignment="Center"
+                                                    Visibility="{x:Bind HasTag, Converter={StaticResource BoolToVisConverter}}">
+                                                    <Border.Background>
+                                                        <SolidColorBrush Color="{x:Bind TagColor}" Opacity="0.15" />
+                                                    </Border.Background>
+                                                    <TextBlock
+                                                        FontSize="10"
+                                                        FontWeight="SemiBold"
+                                                        Text="{x:Bind Tag}">
+                                                        <TextBlock.Foreground>
+                                                            <SolidColorBrush Color="{x:Bind TagColor}" />
+                                                        </TextBlock.Foreground>
+                                                    </TextBlock>
+                                                </Border>
+
+                                                <!--  Start: sk-xxxx  -->
+                                                <TextBlock
+                                                    FontFamily="Consolas, Courier New, Monospace"
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Grid.Column="1"
+                                                    Text="{x:Bind KeyStart}"
+                                                    VerticalAlignment="Center" />
+
+                                                <!--  Middle: **** (Stretched)  -->
+                                                <TextBlock
+                                                    CharacterSpacing="200"
+                                                    FontFamily="Consolas, Courier New, Monospace"
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                                    Grid.Column="2"
+                                                    HorizontalAlignment="Stretch"
+                                                    Margin="4,4,4,0"
+                                                    MaxLines="1"
+                                                    Text="* * * * * * * * * * * * * * * * * * * *"
+                                                    TextAlignment="Center"
+                                                    TextTrimming="Clip"
+                                                    VerticalAlignment="Center" />
+
+                                                <!--  End: xxxx  -->
+                                                <TextBlock
+                                                    FontFamily="Consolas, Courier New, Monospace"
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Grid.Column="3"
+                                                    Text="{x:Bind KeyEnd}"
+                                                    VerticalAlignment="Center" />
+
+                                                <!--  Copy Button  -->
+                                                <custom:CopyButton
+                                                    Click="OnCopyKeyClicked"
+                                                    Content="&#xE8C8;"
+                                                    Grid.Column="4"
+                                                    Margin="8,0,0,0"
+                                                    Tag="{x:Bind FullKey}" />
+                                            </Grid>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+
+                            </ItemsControl>
                         </Grid>
-
-                        <!--  Description  -->
-                        <TextBlock
-                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                            Grid.Row="1"
-                            IsTextSelectionEnabled="True"
-                            Margin="0,8,0,0"
-                            Style="{StaticResource CaptionTextBlockStyle}"
-                            Text="{x:Bind Description}"
-                            TextTrimming="CharacterEllipsis"
-                            Visibility="{x:Bind HasDescription, Converter={StaticResource BoolToVisConverter}}" />
-
-                        <!--  Models (Pinned)  -->
-                        <ItemsControl
-                            Grid.Row="2"
-                            ItemsSource="{x:Bind Models}"
-                            Margin="0,16,0,0">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <controls:WrapPanel Orientation="Horizontal" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="viewModels:ModelItem">
-                                    <Button
-                                        Click="OnCopyModelIdClicked"
-                                        Content="{x:Bind Name}"
-                                        Margin="0,0,8,8"
-                                        Style="{StaticResource ModelTagButtonStyle}"
-                                        Tag="{x:Bind Id}"
-                                        ToolTipService.ToolTip="{x:Bind Id}" />
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                        <!--  Keys  -->
-                        <ItemsControl
-                            Grid.Row="3"
-                            ItemsSource="{x:Bind Keys}"
-                            Margin="0,12,0,0">
-                            <ItemsControl.ItemTemplate>
-
-                                <DataTemplate x:DataType="viewModels:KeyItem">
-                                    <Button
-                                        Background="{ThemeResource LayerFillColorDefaultBrush}"
-                                        BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
-                                        BorderThickness="1"
-                                        Click="OnCopyKeyClicked"
-                                        CornerRadius="4"
-                                        HorizontalAlignment="Stretch"
-                                        HorizontalContentAlignment="Stretch"
-                                        Margin="0,0,0,8"
-                                        Padding="8,6"
-                                        Tag="{x:Bind FullKey}"
-                                        ToolTipService.ToolTip="Click to copy full key">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-
-                                            <!--  Start: sk-xxxx  -->
-                                            <TextBlock
-                                                FontFamily="Consolas, Courier New, Monospace"
-                                                FontSize="12"
-                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                Text="{x:Bind KeyStart}"
-                                                VerticalAlignment="Center" />
-
-                                            <!--  Middle: **** (Stretched)  -->
-                                            <TextBlock
-                                                CharacterSpacing="200"
-                                                FontFamily="Consolas, Courier New, Monospace"
-                                                FontSize="12"
-                                                Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                                                Grid.Column="1"
-                                                HorizontalAlignment="Stretch"
-                                                Margin="4,4,4,0"
-                                                MaxLines="1"
-                                                Text="* * * * * * * * * * * * * * * * * * * *"
-                                                TextAlignment="Center"
-                                                TextTrimming="Clip"
-                                                VerticalAlignment="Center" />
-
-                                            <!--  End: xxxx  -->
-                                            <TextBlock
-                                                FontFamily="Consolas, Courier New, Monospace"
-                                                FontSize="12"
-                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                Grid.Column="2"
-                                                Text="{x:Bind KeyEnd}"
-                                                VerticalAlignment="Center" />
-
-                                            <!--  Copy Button  -->
-                                            <custom:CopyButton
-                                                Click="OnCopyKeyClicked"
-                                                Content="&#xE8C8;"
-                                                Grid.Column="3"
-                                                Margin="8,0,0,0"
-                                                Tag="{x:Bind FullKey}" />
-                                        </Grid>
-                                    </Button>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-
-                        </ItemsControl>
-                    </Grid>
-                </DataTemplate>
-            </GridView.ItemTemplate>
-        </GridView>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
     </Grid>
 </Page>

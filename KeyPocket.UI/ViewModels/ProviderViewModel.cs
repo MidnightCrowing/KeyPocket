@@ -6,6 +6,8 @@ using Microsoft.UI;
 using Microsoft.UI.Xaml.Media;
 using KeyPocket.Core.Models;
 using KeyPocket.Core.Services;
+using KeyPocket.UI.Helpers;
+using Microsoft.UI.Xaml;
 
 #pragma warning disable MVVMTK0045
 
@@ -27,6 +29,25 @@ public partial class ProviderViewModel : ObservableObject
     public bool HasDescription => !string.IsNullOrWhiteSpace(Description);
 
     [ObservableProperty]
+    private string _type = string.Empty;
+
+    [ObservableProperty]
+    private string? _baseUrl;
+
+    public bool HasBaseUrl => !string.IsNullOrEmpty(BaseUrl);
+
+    /// <summary>
+    /// 获取 API Mode 的颜色（根据当前主题）
+    /// </summary>
+    public string ApiModeColor => Type switch
+    {
+        "OpenAI API" => ThemeHelper.IsDarkTheme() ? "#1A7F64" : "#10A37F",
+        "Claude API" => ThemeHelper.IsDarkTheme() ? "#B85C3A" : "#D97757",
+        "Google Gemini API" => ThemeHelper.IsDarkTheme() ? "#5E97F6" : "#4285F4",
+        _ => ThemeHelper.IsDarkTheme() ? "#9CA3AF" : "#6B7280"
+    };
+
+    [ObservableProperty]
     private Brush _statusColor = new SolidColorBrush(Colors.Gray);
 
     public ObservableCollection<ModelItem> Models { get; set; } = new();
@@ -43,8 +64,8 @@ public partial class ProviderViewModel : ObservableObject
         Id = provider.Id;
         Name = provider.Name;
         Description = provider.Description;
-        Name = provider.Name;
-        Description = provider.Description;
+        Type = provider.Type;
+        BaseUrl = provider.ApiBaseUrl;
         UpdateIcon(provider.Type, provider.IconPath);
         
         // Populate favorite models
@@ -78,7 +99,8 @@ public partial class ProviderViewModel : ObservableObject
                 { 
                     KeyStart = keyStart,
                     KeyEnd = keyEnd,
-                    FullKey = decryptedKey
+                    FullKey = decryptedKey,
+                    Tag = key.Tag
                 });
             }
         }
@@ -124,4 +146,48 @@ public class KeyItem
     public string KeyStart { get; set; } = "";
     public string KeyEnd { get; set; } = "";
     public string FullKey { get; set; } = "";
+    public string? Tag { get; set; }
+    
+    public bool HasTag => !string.IsNullOrWhiteSpace(Tag);
+    
+    /// <summary>
+    /// 根据 Tag 内容返回对应的颜色（支持主题适配）
+    /// </summary>
+    public string TagColor
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(Tag)) return "#6B7280"; // 默认灰色
+            
+            var tagLower = Tag.ToLower();
+            var isDark = KeyPocket.UI.Helpers.ThemeHelper.IsDarkTheme();
+            
+            // 开发/测试相关
+            if (tagLower.Contains("dev") || tagLower.Contains("开发") || tagLower.Contains("test") || tagLower.Contains("测试"))
+                return isDark ? "#60A5FA" : "#3B82F6"; // 蓝色
+            
+            // 生产/正式相关
+            if (tagLower.Contains("prod") || tagLower.Contains("生产") || tagLower.Contains("正式") || tagLower.Contains("production"))
+                return isDark ? "#34D399" : "#10B981"; // 绿色
+            
+            // 免费相关
+            if (tagLower.Contains("free") || tagLower.Contains("免费") || tagLower.Contains("trial") || tagLower.Contains("试用"))
+                return isDark ? "#A78BFA" : "#8B5CF6"; // 紫色
+            
+            // 收费/付费相关
+            if (tagLower.Contains("paid") || tagLower.Contains("收费") || tagLower.Contains("付费") || tagLower.Contains("premium"))
+                return isDark ? "#FBBF24" : "#F59E0B"; // 黄色
+            
+            // 临时/暂存相关
+            if (tagLower.Contains("temp") || tagLower.Contains("临时") || tagLower.Contains("暂存") || tagLower.Contains("staging"))
+                return isDark ? "#FB923C" : "#F97316"; // 橙色
+            
+            // 备份相关
+            if (tagLower.Contains("backup") || tagLower.Contains("备份") || tagLower.Contains("bak"))
+                return isDark ? "#94A3B8" : "#64748B"; // 石板灰
+            
+            // 默认颜色
+            return isDark ? "#9CA3AF" : "#6B7280"; // 灰色
+        }
+    }
 }

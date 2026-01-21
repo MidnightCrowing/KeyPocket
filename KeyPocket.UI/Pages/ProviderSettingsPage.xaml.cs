@@ -10,9 +10,24 @@ using Microsoft.UI.Xaml.Media;
 
 namespace KeyPocket.UI.Pages;
 
-public sealed partial class ProviderSettingsPage : Page
+public sealed partial class ProviderSettingsPage : Page, System.ComponentModel.INotifyPropertyChanged
 {
-    public ProviderSettingsViewModel ViewModel { get; private set; } = null!;
+    private ProviderSettingsViewModel? _viewModel;
+    
+    public ProviderSettingsViewModel? ViewModel
+    {
+        get => _viewModel;
+        private set
+        {
+            if (_viewModel != value)
+            {
+                _viewModel = value;
+                PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(ViewModel)));
+            }
+        }
+    }
+
+    public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
 
     // Sticky Headers fields
     private Border? _stickyGeneral;
@@ -25,6 +40,9 @@ public sealed partial class ProviderSettingsPage : Page
 
     public ProviderSettingsPage()
     {
+        // 初始化默认 ViewModel 以避免绑定错误
+        ViewModel = new ProviderSettingsViewModel();
+        
         this.InitializeComponent();
         this.Loaded += OnPageLoaded;
     }
@@ -40,6 +58,11 @@ public sealed partial class ProviderSettingsPage : Page
             {
                 ViewModel = new ProviderSettingsViewModel(provider, App.ProviderService);
             }
+            else
+            {
+                // Provider 不存在（可能已被删除），返回首页
+                Frame.Navigate(typeof(HomePage));
+            }
         }
     }
 
@@ -54,6 +77,8 @@ public sealed partial class ProviderSettingsPage : Page
 
     private void OnCopyKeyClicked(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
+        if (ViewModel == null) return;
+        
         if (sender is Button btn && btn.Tag is Guid keyId)
         {
             try
@@ -88,23 +113,36 @@ public sealed partial class ProviderSettingsPage : Page
         var result = await dialog.ShowAsync();
         if (result == ContentDialogResult.Primary)
         {
+            if (ViewModel == null) return;
+            
+            var providerId = ViewModel.Provider.Id;
+            
             // 先执行删除
             ViewModel.DeleteProvider();
             
-            // 使用 Dispatcher 确保在 UI 线程上执行导航，并稍微延迟以确保删除完成
-            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal, () =>
+            // 清理导航历史：移除所有指向该 Provider 的历史记录
+            CleanupNavigationHistory(providerId);
+            
+            // 直接导航（不使用 Dispatcher，因为删除是同步的）
+            if (Frame.CanGoBack)
             {
-                // Navigate back to home
-                if (Frame.CanGoBack)
-                {
-                    Frame.GoBack();
-                }
-                else
-                {
-                    Frame.Navigate(typeof(HomePage));
-                }
-            });
+                Frame.GoBack();
+            }
+            else
+            {
+                Frame.Navigate(typeof(HomePage));
+            }
         }
+    }
+
+    /// <summary>
+    /// 清理导航历史中指向已删除 Provider 的记录
+    /// </summary>
+    private void CleanupNavigationHistory(Guid deletedProviderId)
+    {
+        // WinUI 3 的 Frame 不支持直接操作导航历史
+        // 但我们可以通过不回退到已删除的页面来避免问题
+        // 这个方法为未来扩展预留
     }
 
     private void OnCopyModelIdClicked(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
@@ -143,6 +181,8 @@ public sealed partial class ProviderSettingsPage : Page
     }
     private async void OnChangeIconClicked(object sender, RoutedEventArgs e)
     {
+        if (ViewModel == null) return;
+        
         var picker = new Windows.Storage.Pickers.FileOpenPicker();
         
         // WinUI 3 Window handle workaround
@@ -165,6 +205,8 @@ public sealed partial class ProviderSettingsPage : Page
 
     private async void OnRemoveIconClicked(object sender, RoutedEventArgs e)
     {
+        if (ViewModel == null) return;
+        
         await ViewModel.UpdateIconAsync(null);
     }
 

@@ -23,7 +23,7 @@ public partial class ProviderSettingsViewModel : ObservableObject
     private string _name = string.Empty;
 
     [ObservableProperty]
-    private string _type = "OpenAI Compatible";
+    private string _type = "OpenAI API";
 
     [ObservableProperty]
     private string? _baseUrl;
@@ -36,10 +36,9 @@ public partial class ProviderSettingsViewModel : ObservableObject
 
     public ObservableCollection<string> ProviderTypes { get; } = new()
     {
-        "OpenAI Compatible",
-        "Anthropic",
-        "DeepSeek",
-        "Ollama",
+        "OpenAI API",
+        "Claude API",
+        "Google Gemini API",
         "Custom"
     };
 
@@ -56,10 +55,13 @@ public partial class ProviderSettingsViewModel : ObservableObject
         _type = provider.Type;
         _baseUrl = provider.ApiBaseUrl;
         _description = provider.Description;
-        LoadKeys();
-        LoadModels();
+        LoadKeys(_originalProvider);
+        LoadModels(_originalProvider);
         HasCustomIcon = !string.IsNullOrEmpty(provider.IconPath);
     }
+
+    // 公开 Provider 以便访问
+    public Provider Provider => _originalProvider;
 
     // Default for designer
     public ProviderSettingsViewModel() 
@@ -147,6 +149,20 @@ public partial class ProviderSettingsViewModel : ObservableObject
         var current = providers.FirstOrDefault(p => p.Id == _originalProvider.Id);
         if (current == null) return;
         _originalProvider = current;
+    }
+
+    private Provider? GetProviderFromService(Guid id)
+    {
+        return _providerService.GetAllProviders().FirstOrDefault(p => p.Id == id);
+    }
+
+    private void LoadKeys(Provider? current = null)
+    {
+        if (current == null) current = GetProviderFromService(_originalProvider.Id);
+        if (current == null) return;
+        _originalProvider = current;
+
+        ApiKeys.Clear();
 
         foreach (var k in _originalProvider.ApiKeys)
         {
@@ -226,8 +242,48 @@ public partial class ProviderSettingsViewModel : ObservableObject
     {
         if (item == null || string.IsNullOrWhiteSpace(item.NewKey)) return;
 
+        // Keep track of existing IDs to find the new one later
+        var existingIds = _originalProvider.ApiKeys.Select(k => k.Id).ToHashSet();
+        
+        // Add to service
         _providerService.AddApiKey(_originalProvider.Id, item.NewKey);
-        LoadKeys(); // Reload to get ID and correct state
+        
+        // Refresh provider from source to get the new key ID and state
+        var updatedProvider = GetProviderFromService(_originalProvider.Id);
+        if (updatedProvider == null) return;
+        
+        _originalProvider = updatedProvider;
+        
+        // Find the new key
+        var newKeyModel = updatedProvider.ApiKeys.FirstOrDefault(k => !existingIds.Contains(k.Id));
+        
+        if (newKeyModel != null)
+        {
+            // Calculate masked key locally for display
+            string maskedKey;
+            if (item.NewKey.Length >= 11)
+            {
+                int dotsCount = Math.Min(20, item.NewKey.Length - 11);
+                string dots = new string('·', dotsCount);
+                maskedKey = item.NewKey.Substring(0, 7) + dots + item.NewKey.Substring(item.NewKey.Length - 4);
+            }
+            else
+            {
+                maskedKey = item.NewKey.Substring(0, Math.Min(7, item.NewKey.Length)) + "······";
+            }
+            
+            // Update the wrapper in-place
+            item.Id = newKeyModel.Id;
+            item.MaskedKey = maskedKey;
+            item.NewKey = string.Empty; // Clear plain text
+            item.IsEditing = false;
+            // Commands are already injected
+        }
+        else
+        {
+            // Fallback: reload all if something went wrong finding the match
+            LoadKeys();
+        }
     }
 
     private void CancelAddKey(KeyWrapper? item)
@@ -260,14 +316,22 @@ public partial class ProviderSettingsViewModel : ObservableObject
         }
 
         _providerService.RemoveApiKey(_originalProvider.Id, item.Id);
-        LoadKeys();
+        ApiKeys.Remove(item);
+        
+        // Update local object
+        var key = _originalProvider.ApiKeys.FirstOrDefault(k => k.Id == item.Id);
+        if (key != null) _originalProvider.ApiKeys.Remove(key);
     }
 
     private void ToggleFavoriteKey(KeyWrapper? item)
     {
         if (_providerService == null || item == null || item.Id == Guid.Empty) return;
         _providerService.ToggleFavoriteApiKey(_originalProvider.Id, item.Id);
-        LoadKeys(); // Refresh to update icon state accurately or we can just toggle local
+        item.IsFavorite = !item.IsFavorite;
+        
+        // Update local object
+        var key = _originalProvider.ApiKeys.FirstOrDefault(k => k.Id == item.Id);
+        if (key != null) key.IsFavorite = item.IsFavorite;
     }
 
     private void CopyKey(KeyWrapper? item)
@@ -302,9 +366,12 @@ public partial class ProviderSettingsViewModel : ObservableObject
 
     // --- Models ---
     
-    private void LoadModels()
+    private void LoadModels(Provider? current = null)
     {
-        if (_providerService == null) return;
+        if (current == null) current = GetProviderFromService(_originalProvider.Id);
+        if (current == null) return;
+        _originalProvider = current;
+
         Models.Clear();
         
         foreach (var m in _originalProvider.Models)
@@ -372,7 +439,25 @@ public partial class ProviderSettingsViewModel : ObservableObject
                 InputPricePerMTokens = inputPrice,
                 OutputPricePerMTokens = outputPrice
             };
+            
             _providerService.AddModel(_originalProvider.Id, model);
+
+            // Refresh provider to get clean state but don't reload list
+            var current = GetProviderFromService(_originalProvider.Id);
+            if (current != null) _originalProvider = current;
+
+            // Update item in-place
+            item.Id = model.Id;
+            item.Name = model.DisplayName;
+            item.InputPriceValue = (double)(inputPrice ?? 0);
+            item.OutputPriceValue = (double)(outputPrice ?? 0);
+            
+            // Format strings for display if needed, but they are bound to InputPriceValue/OutputPriceValue usually via converter 
+            // Wrapper properties:
+            item.InputPrice = item.InputPriceValue.ToString();
+            item.OutputPrice = item.OutputPriceValue.ToString();
+            
+            item.IsEditing = false;
         }
         else // Editing existing model
         {
@@ -387,14 +472,19 @@ public partial class ProviderSettingsViewModel : ObservableObject
                 
                 // Save changes
                 _providerService.UpdateProvider(_originalProvider);
+                
+                // Refresh provider locally
+                var current = GetProviderFromService(_originalProvider.Id);
+                if (current != null) _originalProvider = current;
+                
+                // Update wrapper
+                item.Id = model.Id;
+                item.Name = model.DisplayName;
+                item.IsEditing = false;
             }
         }
-
-        // Refresh
-        var providers = _providerService.GetAllProviders();
-        var current = providers.FirstOrDefault(p => p.Id == _originalProvider.Id);
-        if (current != null) _originalProvider = current;
-        LoadModels();
+        
+        // No global LoadModels() call here to preserve other new cards
     }
 
     private void CancelAddModel(ModelWrapper? item)
@@ -451,11 +541,12 @@ public partial class ProviderSettingsViewModel : ObservableObject
             _providerService.UpdateProvider(_originalProvider);
         }
 
-        // Refresh
+        // Refresh local provider, but don't reload list to keep UI state
         var providers = _providerService.GetAllProviders();
         var current = providers.FirstOrDefault(p => p.Id == _originalProvider.Id);
         if (current != null) _originalProvider = current;
-        LoadModels();
+        
+        item.IsEditing = false;
     }
 
     private void CancelEditModel(ModelWrapper? item)
@@ -468,12 +559,12 @@ public partial class ProviderSettingsViewModel : ObservableObject
     {
         if (item == null) return;
         _providerService.RemoveModel(_originalProvider.Id, item.Id);
+        Models.Remove(item);
         
-        // Refresh
+        // Refresh local provider to keep in sync
         var providers = _providerService.GetAllProviders();
         var current = providers.FirstOrDefault(p => p.Id == _originalProvider.Id);
         if (current != null) _originalProvider = current;
-        LoadModels();
     }
 
     private void ToggleFavoriteModel(ModelWrapper? item)
@@ -570,6 +661,13 @@ public partial class ModelWrapper : ObservableObject
 
     [ObservableProperty]
     private double _outputPriceValue;
+
+    // Display strings
+    [ObservableProperty]
+    private string _inputPrice = "0";
+
+    [ObservableProperty]
+    private string _outputPrice = "0";
 
     public string FavoriteIcon => IsFavorite ? "\uE735" : "\uE734";
 

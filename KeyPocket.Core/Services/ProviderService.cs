@@ -28,6 +28,39 @@ public class ProviderService
         return _storage.Load().Providers;
     }
 
+    /// <summary>
+    /// 生成默认的供应商名称（例如 "New Provider 1"）
+    /// </summary>
+    private string GenerateDefaultProviderName()
+    {
+        var config = _storage.Load();
+        int counter = 1;
+        string baseName = "New Provider";
+        string name = $"{baseName} {counter}";
+        
+        // 查找未使用的名称
+        while (config.Providers.Any(p => p.Name == name))
+        {
+            counter++;
+            name = $"{baseName} {counter}";
+        }
+        
+        return name;
+    }
+
+    /// <summary>
+    /// 创建一个默认配置的供应商
+    /// </summary>
+    public Provider CreateProvider()
+    {
+        return CreateProvider(
+            GenerateDefaultProviderName(),
+            "OpenAI API",
+            null,
+            null
+        );
+    }
+
     public Provider CreateProvider(string name, string type, string? baseUrl = null, string? description = null)
     {
         var config = _storage.Load();
