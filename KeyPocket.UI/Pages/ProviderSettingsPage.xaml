@@ -19,7 +19,8 @@
         </ResourceDictionary>
     </Page.Resources>
 
-    <ScrollViewer>
+    <Grid>
+        <ScrollViewer x:Name="MainScrollViewer" ViewChanged="OnScrollViewChanged">
         <StackPanel Padding="40,32" Spacing="0">
 
             <!--  Page Header  -->
@@ -45,7 +46,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Spacing="4">
+                <StackPanel Spacing="4" x:Name="GeneralHeader">
                     <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="General" />
                     <TextBlock
                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
@@ -121,7 +122,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Spacing="4">
+                <StackPanel Spacing="4" x:Name="ApiKeysHeader">
                     <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="API Keys" />
                     <TextBlock
                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
@@ -280,7 +281,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Spacing="4">
+                <StackPanel Spacing="4" x:Name="ModelsHeader">
                     <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="Models" />
                     <TextBlock
                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
@@ -500,4 +501,10 @@
 
         </StackPanel>
     </ScrollViewer>
+
+    <!-- Sticky Headers Canvas Overlay -->
+    <Canvas x:Name="StickyHeadersCanvas" IsHitTestVisible="False" VerticalAlignment="Top">
+        <!-- Sticky headers will be added here dynamically or via templates -->
+    </Canvas>
+    </Grid>
 </Page>

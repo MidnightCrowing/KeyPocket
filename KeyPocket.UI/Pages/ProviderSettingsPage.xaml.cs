@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Navigation;
 using KeyPocket.UI.Helpers;
 using System;
 using System.Linq;
+using Microsoft.UI.Xaml.Media;
 
 namespace KeyPocket.UI.Pages;
 
@@ -13,9 +14,19 @@ public sealed partial class ProviderSettingsPage : Page
 {
     public ProviderSettingsViewModel ViewModel { get; private set; } = null!;
 
+    // Sticky Headers fields
+    private Border? _stickyGeneral;
+    private Border? _stickyApiKeys;
+    private Border? _stickyModels;
+    private double _generalTop;
+    private double _apiKeysTop;
+    private double _modelsTop;
+    private const double StickyHeaderHeight = 60;
+
     public ProviderSettingsPage()
     {
         this.InitializeComponent();
+        this.Loaded += OnPageLoaded;
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -142,7 +153,6 @@ public sealed partial class ProviderSettingsPage : Page
 
         var file = await picker.PickSingleFileAsync();
         if (file != null)
-        if (file != null)
         {
             await ViewModel.UpdateIconAsync(file);
         }
@@ -151,5 +161,138 @@ public sealed partial class ProviderSettingsPage : Page
     private async void OnRemoveIconClicked(object sender, RoutedEventArgs e)
     {
         await ViewModel.UpdateIconAsync(null);
+    }
+
+    private void OnPageLoaded(object sender, RoutedEventArgs e)
+    {
+        CreateStickyHeaders();
+        CalculateSectionPositions();
+    }
+
+    private void CreateStickyHeaders()
+    {
+        // Create sticky header for General
+        _stickyGeneral = CreateStickyHeaderBorder("General", "Basic provider information.");
+        StickyHeadersCanvas.Children.Add(_stickyGeneral);
+
+        // Create sticky header for API Keys
+        _stickyApiKeys = CreateStickyHeaderBorder("API Keys", "Manage access keys for this provider.");
+        StickyHeadersCanvas.Children.Add(_stickyApiKeys);
+
+        // Create sticky header for Models
+        _stickyModels = CreateStickyHeaderBorder("Models", "Configure available models.");
+        StickyHeadersCanvas.Children.Add(_stickyModels);
+
+        // Initially hide all sticky headers
+        _stickyGeneral.Visibility = Visibility.Collapsed;
+        _stickyApiKeys.Visibility = Visibility.Collapsed;
+        _stickyModels.Visibility = Visibility.Collapsed;
+    }
+
+    private Border CreateStickyHeaderBorder(string title, string subtitle)
+    {
+        var border = new Border
+        {
+            // Use the same background as the page for proper theme support
+            Background = this.Background,
+            BorderThickness = new Thickness(0, 0, 0, 1),
+            Padding = new Thickness(0, 12, 0, 12),
+            Width = 240, // Match the left column width
+            Height = 70 // Increased height to prevent text clipping
+        };
+
+        var stackPanel = new StackPanel { Spacing = 4 };
+        
+        var titleBlock = new TextBlock
+        {
+            Text = title,
+            Style = (Style)Application.Current.Resources["SubtitleTextBlockStyle"]
+        };
+        
+        var subtitleBlock = new TextBlock
+        {
+            Text = subtitle,
+            Style = (Style)Application.Current.Resources["CaptionTextBlockStyle"]
+        };
+
+        stackPanel.Children.Add(titleBlock);
+        stackPanel.Children.Add(subtitleBlock);
+        border.Child = stackPanel;
+
+        Canvas.SetLeft(border, 40); // Match the page padding
+        Canvas.SetTop(border, 0);
+        Canvas.SetZIndex(border, 100);
+
+        return border;
+    }
+
+    private void CalculateSectionPositions()
+    {
+        try
+        {
+            var scrollContent = MainScrollViewer.Content as FrameworkElement;
+            if (scrollContent == null) return;
+
+            // Get positions relative to scroll content
+            if (GeneralHeader != null)
+            {
+                var transform = GeneralHeader.TransformToVisual(scrollContent);
+                var point = transform.TransformPoint(new Windows.Foundation.Point(0, 0));
+                _generalTop = point.Y;
+            }
+
+            if (ApiKeysHeader != null)
+            {
+                var transform = ApiKeysHeader.TransformToVisual(scrollContent);
+                var point = transform.TransformPoint(new Windows.Foundation.Point(0, 0));
+                _apiKeysTop = point.Y;
+            }
+
+            if (ModelsHeader != null)
+            {
+                var transform = ModelsHeader.TransformToVisual(scrollContent);
+                var point = transform.TransformPoint(new Windows.Foundation.Point(0, 0));
+                _modelsTop = point.Y;
+            }
+        }
+        catch { /* Ignore errors during position calculation */ }
+    }
+
+    private void OnScrollViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
+    {
+        if (_stickyGeneral == null || _stickyApiKeys == null || _stickyModels == null)
+            return;
+
+        var scrollOffset = MainScrollViewer.VerticalOffset;
+
+        // Determine which header should be sticky
+        if (scrollOffset >= _modelsTop - StickyHeaderHeight)
+        {
+            // Models section is at top
+            _stickyGeneral.Visibility = Visibility.Collapsed;
+            _stickyApiKeys.Visibility = Visibility.Collapsed;
+            _stickyModels.Visibility = Visibility.Visible;
+        }
+        else if (scrollOffset >= _apiKeysTop - StickyHeaderHeight)
+        {
+            // API Keys section is at top
+            _stickyGeneral.Visibility = Visibility.Collapsed;
+            _stickyApiKeys.Visibility = Visibility.Visible;
+            _stickyModels.Visibility = Visibility.Collapsed;
+        }
+        else if (scrollOffset >= _generalTop - StickyHeaderHeight)
+        {
+            // General section is at top
+            _stickyGeneral.Visibility = Visibility.Visible;
+            _stickyApiKeys.Visibility = Visibility.Collapsed;
+            _stickyModels.Visibility = Visibility.Collapsed;
+        }
+        else
+        {
+            // No sticky header needed
+            _stickyGeneral.Visibility = Visibility.Collapsed;
+            _stickyApiKeys.Visibility = Visibility.Collapsed;
+            _stickyModels.Visibility = Visibility.Collapsed;
+        }
     }
 }
