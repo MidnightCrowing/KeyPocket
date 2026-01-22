@@ -12,7 +12,6 @@ public partial class ModelsViewModel : ObservableObject
     private readonly ProviderService _providerService;
     private readonly ObservableCollection<ModelItemViewModel> _allModels = new();
 
-#pragma warning disable MVVMTK0045
     [ObservableProperty]
     private ObservableCollection<ModelItemViewModel> _filteredModels = new();
 
@@ -27,7 +26,6 @@ public partial class ModelsViewModel : ObservableObject
 
     [ObservableProperty]
     private string _selectedSortOption = "Provider"; // Provider, Name, Price
-#pragma warning restore MVVMTK0045
 
     public ObservableCollection<string> Capabilities { get; } = new ObservableCollection<string>
     {

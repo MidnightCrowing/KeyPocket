@@ -1,4 +1,3 @@
-#pragma warning disable MVVMTK0045
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using KeyPocket.Core.Services;

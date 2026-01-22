@@ -9,7 +9,6 @@ using KeyPocket.Core.Services;
 using KeyPocket.UI.Helpers;
 using Microsoft.UI.Xaml;
 
-#pragma warning disable MVVMTK0045
 
 namespace KeyPocket.UI.ViewModels;
 

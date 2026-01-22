@@ -11,7 +11,6 @@ public partial class KeysViewModel : ObservableObject
     private readonly ProviderService _providerService;
     private readonly ObservableCollection<KeyItemViewModel> _allKeys = new();
 
-#pragma warning disable MVVMTK0045
     [ObservableProperty]
     private ObservableCollection<KeyItemViewModel> _filteredKeys = new();
 
@@ -23,7 +22,6 @@ public partial class KeysViewModel : ObservableObject
 
     [ObservableProperty]
     private string _selectedSortOption = "Date Created"; // Date Created, Provider, Status
-#pragma warning restore MVVMTK0045
 
     public ObservableCollection<string> SortOptions { get; } = new ObservableCollection<string>
     {

@@ -5,7 +5,6 @@ using Microsoft.UI.Xaml;
 using System;
 using Windows.System;
 
-#pragma warning disable MVVMTK0045
 
 namespace KeyPocket.UI.ViewModels;
 

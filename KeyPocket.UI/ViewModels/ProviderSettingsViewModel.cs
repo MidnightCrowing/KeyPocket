@@ -1,4 +1,3 @@
-#pragma warning disable MVVMTK0045
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;

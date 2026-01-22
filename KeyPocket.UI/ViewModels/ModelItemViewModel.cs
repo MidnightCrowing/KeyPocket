@@ -13,13 +13,11 @@ public partial class ModelItemViewModel : ObservableObject
     private readonly ProviderService _providerService;
     private readonly ModelInfo _model;
 
-#pragma warning disable MVVMTK0045
     [ObservableProperty]
     private string _providerName;
 
     [ObservableProperty]
     private string? _providerIcon;
-#pragma warning restore MVVMTK0045
 
     public ModelItemViewModel(ModelInfo model, string providerName, string? providerIcon, ProviderService providerService)
     {
