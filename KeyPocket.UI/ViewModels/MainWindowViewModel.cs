@@ -58,19 +58,23 @@ public partial class MainWindowViewModel : ObservableObject
     /// </summary>
     private void OnProviderCreated(object recipient, ProviderCreatedMessage message)
     {
-        var provider = _providerService.GetAllProviders()
-            .FirstOrDefault(p => p.Id == message.ProviderId);
-        
-        if (provider != null)
+        // 确保在 UI 线程上执行
+        App.MainWindow.DispatcherQueue.TryEnqueue(() =>
         {
-            Providers.Add(new SidebarProviderItem
+            var provider = _providerService.GetAllProviders()
+                .FirstOrDefault(p => p.Id == message.ProviderId);
+            
+            if (provider != null)
             {
-                Id = provider.Id,
-                Name = provider.Name,
-                IconPath = provider.IconPath,
-                Type = provider.Type
-            });
-        }
+                Providers.Add(new SidebarProviderItem
+                {
+                    Id = provider.Id,
+                    Name = provider.Name,
+                    IconPath = provider.IconPath,
+                    Type = provider.Type
+                });
+            }
+        });
     }
 
     /// <summary>

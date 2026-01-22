@@ -53,7 +53,6 @@ namespace KeyPocket.UI.Pages
         private void UpdateVisualState()
         {
             EmptyStatePanel.Visibility = ViewModel.IsEmpty ? Visibility.Visible : Visibility.Collapsed;
-            ContentGrid.Visibility = ViewModel.IsNotEmpty ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void OnAddProviderClicked(object sender, RoutedEventArgs e)
