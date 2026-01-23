@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KeyPocket.Core.Models;
+using KeyPocket.UI.Helpers;
 using KeyPocket.Core.Services;
 using System;
 using System.Threading.Tasks;
@@ -38,8 +39,21 @@ public partial class ModelItemViewModel : ObservableObject
     public decimal? OutputPrice => _model.OutputPricePerMTokens;
 
     // Helper for UI formatting as requested: "Null" if no price
-    public string InputPriceFormatted => InputPrice.HasValue ? $"${InputPrice.Value:F3}" : "Null";
-    public string OutputPriceFormatted => OutputPrice.HasValue ? $"${OutputPrice.Value:F3}" : "Null";
+    public string InputPriceFormatted => InputPrice.HasValue ? FormatPrice(InputPrice.Value) : "Null";
+    public string OutputPriceFormatted => OutputPrice.HasValue ? FormatPrice(OutputPrice.Value) : "Null";
+
+    private static string FormatPrice(decimal usdPrice)
+    {
+        var settings = SettingsHelper.Current;
+        if (settings.SelectedCurrency == "CNY")
+        {
+            var cny = usdPrice * settings.UsdToCnyRate;
+            return $"¥{cny:F3}";
+        }
+
+        // Default: USD
+        return $"${usdPrice:F3}";
+    }
 
 
     public bool IsFavorite
