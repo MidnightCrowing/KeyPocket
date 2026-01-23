@@ -5,6 +5,7 @@ using KeyPocket.Core.Models;
 using KeyPocket.Core.Services;
 using KeyPocket.UI.Messages;
 using KeyPocket.UI.Pages;
+using KeyPocket.UI.Helpers;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Linq;
@@ -44,6 +45,9 @@ public partial class ProviderSettingsViewModel : ObservableObject
     public ObservableCollection<KeyWrapper> ApiKeys { get; } = new();
     public ObservableCollection<ModelWrapper> Models { get; } = new();
 
+    // Track the currency currently used to display model prices in this page
+    private string _displayCurrency = SettingsHelper.Current.SelectedCurrency;
+
     public ProviderSettingsViewModel(Provider provider, ProviderService providerService)
     {
         _originalProvider = provider;
@@ -60,6 +64,66 @@ public partial class ProviderSettingsViewModel : ObservableObject
 
         ApiKeys.CollectionChanged += OnApiKeysCollectionChanged;
         Models.CollectionChanged += OnModelsCollectionChanged;
+
+        // 订阅全局设置变化以更新货币符号
+        try
+        {
+            SettingsHelper.Current.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(SettingsHelper.Current.SelectedCurrency))
+                {
+                    var newCurrency = SettingsHelper.Current.SelectedCurrency;
+                    var oldCurrency = _displayCurrency ?? "USD";
+                    // Update ViewModel-level symbol
+                    OnPropertyChanged(nameof(CurrencySymbol));
+
+                    // If currency changed, convert numeric values on wrappers
+                    if (!string.Equals(oldCurrency, newCurrency, StringComparison.OrdinalIgnoreCase))
+                    {
+                        try
+                        {
+                            // Rate: USD -> CNY
+                            double rate = (double)SettingsHelper.Current.UsdToCnyRate;
+                            // Determine conversion factor from old -> new
+                            double factor = 1.0;
+                            if (string.Equals(oldCurrency, "CNY", StringComparison.OrdinalIgnoreCase) && string.Equals(newCurrency, "USD", StringComparison.OrdinalIgnoreCase))
+                            {
+                                // CNY -> USD
+                                if (rate != 0) factor = 1.0 / rate;
+                            }
+                            else if (string.Equals(oldCurrency, "USD", StringComparison.OrdinalIgnoreCase) && string.Equals(newCurrency, "CNY", StringComparison.OrdinalIgnoreCase))
+                            {
+                                // USD -> CNY
+                                factor = rate;
+                            }
+
+                            foreach (var mw in Models)
+                            {
+                                try
+                                {
+                                    // Convert and round to reasonable precision (4 decimals)
+                                    mw.InputPriceValue = Math.Round(mw.InputPriceValue * factor, 6);
+                                    mw.OutputPriceValue = Math.Round(mw.OutputPriceValue * factor, 6);
+                                    // Update display strings if used
+                                    mw.InputPrice = mw.InputPriceValue.ToString();
+                                    mw.OutputPrice = mw.OutputPriceValue.ToString();
+                                    // Notify wrapper to refresh currency symbol
+                                    mw.RefreshCurrencySymbol();
+                                }
+                                catch { }
+                            }
+                        }
+                        catch { }
+                        finally
+                        {
+                            // Remember the current displayed currency
+                            _displayCurrency = newCurrency;
+                        }
+                    }
+                }
+            };
+        }
+        catch { }
     }
 
     // 公开 Provider 以便访问
@@ -71,6 +135,9 @@ public partial class ProviderSettingsViewModel : ObservableObject
         _providerService = null!;
         _originalProvider = new Provider();
     }
+
+    // 当前货币符号（基于 SettingsHelper.Current.SelectedCurrency）
+    public string CurrencySymbol => SettingsHelper.Current.SelectedCurrency == "CNY" ? "¥" : "$";
 
     [RelayCommand]
     public void Save()
@@ -171,42 +238,41 @@ public partial class ProviderSettingsViewModel : ObservableObject
         {
             foreach (var k in _originalProvider.ApiKeys)
             {
-                // ... (existing logic)
-            // Decrypt the key to get the original plain text for proper masking
-            string plainKey = string.Empty;
-            try
-            {
-                plainKey = _providerService.GetDecryptedApiKey(_originalProvider.Id, k.Id);
-            }
-            catch
-            {
-                plainKey = "[Error]";
-            }
+                // Decrypt the key to get the original plain text for proper masking
+                string plainKey = string.Empty;
+                try
+                {
+                    plainKey = _providerService.GetDecryptedApiKey(_originalProvider.Id, k.Id);
+                }
+                catch
+                {
+                    plainKey = "[Error]";
+                }
 
-            // Generate masked key: first 7 + dots + last 4
-            string maskedKey = string.Empty;
-            if (plainKey.Length >= 11)
-            {
-                int dotsCount = Math.Min(20, plainKey.Length - 11); // Max 20 dots
-                string dots = new string('·', dotsCount);
-                maskedKey = plainKey.Substring(0, 7) + dots + plainKey.Substring(plainKey.Length - 4);
+                // Generate masked key: first 7 + dots + last 4
+                string maskedKey = string.Empty;
+                if (plainKey.Length >= 11)
+                {
+                    int dotsCount = Math.Min(20, plainKey.Length - 11); // Max 20 dots
+                    string dots = new string('·', dotsCount);
+                    maskedKey = plainKey.Substring(0, 7) + dots + plainKey.Substring(plainKey.Length - 4);
+                }
+                else if (plainKey.Length > 0)
+                {
+                    maskedKey = plainKey.Substring(0, Math.Min(7, plainKey.Length)) + "······";
+                }
+                
+                var w = new KeyWrapper
+                {
+                    Id = k.Id,
+                    Tag = k.Tag,
+                    MaskedKey = maskedKey,
+                    IsFavorite = k.IsFavorite,
+                    IsEditing = false
+                };
+                InjectKeyCommands(w);
+                ApiKeys.Add(w);
             }
-            else if (plainKey.Length > 0)
-            {
-                maskedKey = plainKey.Substring(0, Math.Min(7, plainKey.Length)) + "······";
-            }
-            
-            var w = new KeyWrapper
-            {
-                Id = k.Id,
-                Tag = k.Tag,
-                MaskedKey = maskedKey,
-                IsFavorite = k.IsFavorite,
-                IsEditing = false
-            };
-            InjectKeyCommands(w);
-            ApiKeys.Add(w);
-        }
         }
         finally
         {
@@ -390,16 +456,46 @@ public partial class ProviderSettingsViewModel : ObservableObject
         {
             foreach (var m in _originalProvider.Models)
             {
-             var w = new ModelWrapper
-             {
-                 Id = m.Id,
-                 Name = m.DisplayName,
-                 IsFavorite = m.IsFavorite,
-                 IsEditing = false
-             };
-             InjectModelCommands(w);
-             Models.Add(w);
-        }
+                var w = new ModelWrapper
+                {
+                    Id = m.Id,
+                    Name = m.DisplayName,
+                    IsFavorite = m.IsFavorite,
+                    IsEditing = false
+                };
+
+                // Load stored prices and convert from stored currency to current display currency if needed
+                string storedCurrency = string.IsNullOrWhiteSpace(m.PriceCurrency) ? "USD" : m.PriceCurrency!;
+                string displayCurrency = _displayCurrency ?? SettingsHelper.Current.SelectedCurrency ?? "USD";
+
+                double inputVal = (double)(m.InputPricePerMTokens ?? 0);
+                double outputVal = (double)(m.OutputPricePerMTokens ?? 0);
+
+                if (!string.Equals(storedCurrency, displayCurrency, StringComparison.OrdinalIgnoreCase))
+                {
+                    try
+                    {
+                        double rate = (double)SettingsHelper.Current.UsdToCnyRate;
+                        double conv = 1.0;
+                        if (string.Equals(storedCurrency, "USD", StringComparison.OrdinalIgnoreCase) && string.Equals(displayCurrency, "CNY", StringComparison.OrdinalIgnoreCase))
+                            conv = rate; // USD -> CNY
+                        else if (string.Equals(storedCurrency, "CNY", StringComparison.OrdinalIgnoreCase) && string.Equals(displayCurrency, "USD", StringComparison.OrdinalIgnoreCase))
+                            conv = (rate != 0) ? 1.0 / rate : 1.0; // CNY -> USD
+
+                        inputVal = Math.Round(inputVal * conv, 6);
+                        outputVal = Math.Round(outputVal * conv, 6);
+                    }
+                    catch { }
+                }
+
+                w.InputPriceValue = inputVal;
+                w.OutputPriceValue = outputVal;
+                w.InputPrice = w.InputPriceValue.ToString();
+                w.OutputPrice = w.OutputPriceValue.ToString();
+
+                InjectModelCommands(w);
+                Models.Add(w);
+            }
         }
         finally
         {
@@ -456,7 +552,8 @@ public partial class ProviderSettingsViewModel : ObservableObject
                 DisplayName = string.IsNullOrWhiteSpace(item.NewName) ? item.NewId : item.NewName,
                 ProviderId = _originalProvider.Id,
                 InputPricePerMTokens = inputPrice,
-                OutputPricePerMTokens = outputPrice
+                OutputPricePerMTokens = outputPrice,
+                PriceCurrency = _displayCurrency ?? SettingsHelper.Current.SelectedCurrency ?? "USD"
             };
             
             _providerService.AddModel(_originalProvider.Id, model);
@@ -488,7 +585,8 @@ public partial class ProviderSettingsViewModel : ObservableObject
                 model.DisplayName = string.IsNullOrWhiteSpace(item.NewName) ? item.NewId : item.NewName;
                 model.InputPricePerMTokens = inputPrice;
                 model.OutputPricePerMTokens = outputPrice;
-                
+                model.PriceCurrency = _displayCurrency ?? SettingsHelper.Current.SelectedCurrency ?? "USD";
+                 
                 // Save changes
                 _providerService.UpdateProvider(_originalProvider);
                 
@@ -531,8 +629,31 @@ public partial class ProviderSettingsViewModel : ObservableObject
         var model = _originalProvider.Models.FirstOrDefault(m => m.Id == item.Id);
         if (model != null)
         {
-            item.InputPriceValue = (double)(model.InputPricePerMTokens ?? 0);
-            item.OutputPriceValue = (double)(model.OutputPricePerMTokens ?? 0);
+            // Load stored prices using model.PriceCurrency and convert to display currency if needed
+            string storedCurrency = string.IsNullOrWhiteSpace(model.PriceCurrency) ? "USD" : model.PriceCurrency!;
+            string displayCurrency = _displayCurrency ?? SettingsHelper.Current.SelectedCurrency ?? "USD";
+
+            double inp = (double)(model.InputPricePerMTokens ?? 0);
+            double outp = (double)(model.OutputPricePerMTokens ?? 0);
+            if (!string.Equals(storedCurrency, displayCurrency, StringComparison.OrdinalIgnoreCase))
+            {
+                try
+                {
+                    double rate = (double)SettingsHelper.Current.UsdToCnyRate;
+                    double conv = 1.0;
+                    if (string.Equals(storedCurrency, "USD", StringComparison.OrdinalIgnoreCase) && string.Equals(displayCurrency, "CNY", StringComparison.OrdinalIgnoreCase))
+                        conv = rate;
+                    else if (string.Equals(storedCurrency, "CNY", StringComparison.OrdinalIgnoreCase) && string.Equals(displayCurrency, "USD", StringComparison.OrdinalIgnoreCase))
+                        conv = (rate != 0) ? 1.0 / rate : 1.0;
+
+                    inp = Math.Round(inp * conv, 6);
+                    outp = Math.Round(outp * conv, 6);
+                }
+                catch { }
+            }
+
+            item.InputPriceValue = inp;
+            item.OutputPriceValue = outp;
         }
         
         item.IsEditing = true;
@@ -756,6 +877,15 @@ public partial class ModelWrapper : ObservableObject
 
     [ObservableProperty]
     private string _outputPrice = "0";
+
+    // Provide currency symbol for each wrapper (updates via RefreshCurrencySymbol)
+    public string CurrencySymbol => SettingsHelper.Current.SelectedCurrency == "CNY" ? "¥" : "$";
+    
+    // Called by parent ViewModel when global settings change
+    public void RefreshCurrencySymbol()
+    {
+        OnPropertyChanged(nameof(CurrencySymbol));
+    }
 
     public string FavoriteIcon => IsFavorite ? "\uE735" : "\uE734";
 

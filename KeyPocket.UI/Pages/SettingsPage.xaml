@@ -53,6 +53,28 @@
                     </ComboBox>
                 </toolkit:SettingsCard>
 
+                <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="Currency" />
+                <toolkit:SettingsCard Description="Select display currency and conversion rate" Header="Currency">
+                    <toolkit:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xEAF3;" />
+                    </toolkit:SettingsCard.HeaderIcon>
+                    <StackPanel Spacing="8">
+                        <ComboBox
+                            AutomationProperties.AutomationId="currencyComboBox"
+                            SelectedValue="{x:Bind ViewModel.SelectedCurrency, Mode=TwoWay}"
+                            SelectedValuePath="Tag">
+                            <ComboBoxItem Tag="USD" Content="USD (美元)" />
+                            <ComboBoxItem Tag="CNY" Content="CNY (人民币)" />
+                        </ComboBox>
+
+                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <TextBlock VerticalAlignment="Center" Text="USD → CNY rate:" />
+                            <NumberBox Value="{x:Bind ViewModel.UsdToCnyRate, Mode=TwoWay}" Minimum="0" Maximum="1000" SmallChange="0.01" Width="120" />
+                            <!-- Refresh button removed: rate is now editable directly in NumberBox -->
+                        </StackPanel>
+                    </StackPanel>
+                </toolkit:SettingsCard>
+
                 <!--  About  -->
                 <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="About" />
                 <toolkit:SettingsExpander
@@ -91,3 +113,4 @@
         </Border>
     </ScrollView>
 </Page>
+
