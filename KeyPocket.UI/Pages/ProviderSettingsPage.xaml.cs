@@ -179,6 +179,23 @@ public sealed partial class ProviderSettingsPage : Page, System.ComponentModel.I
             e.Handled = true;
         }
     }
+
+    // Round price value to 3 decimal places to avoid showing long double artifacts
+    private void OnPriceValueChanged(object sender, Microsoft.UI.Xaml.Controls.NumberBoxValueChangedEventArgs e)
+    {
+        if (sender is Microsoft.UI.Xaml.Controls.NumberBox nb)
+        {
+            try
+            {
+                var rounded = Math.Round(nb.Value, 3);
+                if (Math.Abs(nb.Value - rounded) > 0)
+                {
+                    nb.Value = rounded;
+                }
+            }
+            catch { }
+        }
+    }
     private async void OnChangeIconClicked(object sender, RoutedEventArgs e)
     {
         if (ViewModel == null) return;

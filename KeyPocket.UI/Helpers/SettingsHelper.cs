@@ -148,4 +148,18 @@ public partial class SettingsHelper : ObservableSettings
         get => GetOrCreateDefault(ElementTheme.Dark);
         set => Set(value);
     }
+
+    // 货币设置: 默认 USD，可切换为 CNY
+    public string SelectedCurrency
+    {
+        get => GetOrCreateDefault("USD");
+        set => Set(value);
+    }
+
+    // 美元到人民币的默认汇率（可调整）
+    public decimal UsdToCnyRate
+    {
+        get => GetOrCreateDefault(7.0m);
+        set => Set(value);
+    }
 }
