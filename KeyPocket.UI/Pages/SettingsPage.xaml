@@ -70,7 +70,7 @@
                         <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                             <TextBlock VerticalAlignment="Center" Text="USD → CNY rate:" />
                             <NumberBox Value="{x:Bind ViewModel.UsdToCnyRate, Mode=TwoWay}" Minimum="0" Maximum="1000" SmallChange="0.01" Width="120" />
-                            <Button x:Name="RefreshRateButton" Click="RefreshRateButton_Click" Command="{x:Bind ViewModel.RefreshExchangeRateCommand}" Content="Refresh" Style="{StaticResource DefaultButtonStyle}" />
+                            <!-- Refresh button removed: rate is now editable directly in NumberBox -->
                         </StackPanel>
                     </StackPanel>
                 </toolkit:SettingsCard>
