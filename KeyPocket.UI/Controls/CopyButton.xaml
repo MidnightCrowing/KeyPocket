@@ -8,16 +8,16 @@
 
     <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Dark">
-            <StaticResource ResourceKey="ButtonForegroundPointerOver" x:Key="CopyButtonPointerOverForegroundBrush" />
-            <StaticResource ResourceKey="ButtonForegroundPressed" x:Key="CopyButtonPressedForegroundBrush" />
+            <SolidColorBrush Color="{ThemeResource SystemBaseHighColor}" x:Key="CopyButtonPointerOverForegroundBrush" />
+            <SolidColorBrush Color="{ThemeResource SystemBaseMediumColor}" x:Key="CopyButtonPressedForegroundBrush" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Light">
-            <StaticResource ResourceKey="ButtonForegroundPointerOver" x:Key="CopyButtonPointerOverForegroundBrush" />
-            <StaticResource ResourceKey="ButtonForegroundPressed" x:Key="CopyButtonPressedForegroundBrush" />
+            <SolidColorBrush Color="{ThemeResource SystemBaseHighColor}" x:Key="CopyButtonPointerOverForegroundBrush" />
+            <SolidColorBrush Color="{ThemeResource SystemBaseMediumColor}" x:Key="CopyButtonPressedForegroundBrush" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="HighContrast">
-            <StaticResource ResourceKey="ButtonForegroundPointerOver" x:Key="CopyButtonPointerOverForegroundBrush" />
-            <StaticResource ResourceKey="ButtonForegroundPressed" x:Key="CopyButtonPressedForegroundBrush" />
+            <SolidColorBrush Color="{ThemeResource SystemBaseHighColor}" x:Key="CopyButtonPointerOverForegroundBrush" />
+            <SolidColorBrush Color="{ThemeResource SystemBaseMediumColor}" x:Key="CopyButtonPressedForegroundBrush" />
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 

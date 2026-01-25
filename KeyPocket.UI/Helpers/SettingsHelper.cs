@@ -149,17 +149,38 @@ public partial class SettingsHelper : ObservableSettings
         set => Set(value);
     }
 
-    // 货币设置: 默认 USD，可切换为 CNY
+    // 货币设置: 默认 USD，可切换为 CNY 等
     public string SelectedCurrency
     {
         get => GetOrCreateDefault("USD");
         set => Set(value);
     }
 
-    // 美元到人民币的默认汇率（可调整）
-    public decimal UsdToCnyRate
+    // 可用货币列表
+    public List<string> AvailableCurrencies
     {
-        get => GetOrCreateDefault(7.0m);
+        get => GetOrCreateDefault(new List<string> { "USD", "CNY" });
+        set => Set(value);
+    }
+
+    // 汇率字典: Key="SOURCE_TARGET" (e.g. "USD_CNY"), Value=Rate
+    public Dictionary<string, decimal> ExchangeRates
+    {
+        get => GetOrCreateDefault(new Dictionary<string, decimal> 
+        { 
+            { "USD_CNY", 7.0m } 
+        });
+        set => Set(value);
+    }
+
+    // Currency Symbols: Key="CODE" (e.g. "USD"), Value="SYMBOL" (e.g. "$")
+    public Dictionary<string, string> CurrencySymbols
+    {
+        get => GetOrCreateDefault(new Dictionary<string, string> 
+        { 
+            { "USD", "$" },
+            { "CNY", "¥" }
+        });
         set => Set(value);
     }
 }

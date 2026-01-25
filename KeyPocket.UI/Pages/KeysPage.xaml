@@ -69,157 +69,80 @@
         </Grid>
 
         <!--  Content  -->
-        <GridView
+        <ListView
             Grid.Row="1"
-            IsItemClickEnabled="False"
             ItemsSource="{x:Bind ViewModel.FilteredKeys, Mode=OneWay}"
             SelectionMode="None">
-            <GridView.ItemTemplate>
+            <ListView.ItemTemplate>
                 <DataTemplate x:DataType="vm:KeyItemViewModel">
-                    <Grid
-                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        BorderThickness="1"
-                        CornerRadius="8"
-                        Height="180"
-                        Padding="0"
-                        Width="320">
+                    <Grid Padding="0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="200" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
 
-                        <Grid Padding="16" RowSpacing="12">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-
-                            <!--  Header: Provider Info + Favorite  -->
-                            <Grid Grid.Row="0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-
-                                <TextBlock
-                                    Opacity="0.7"
-                                    Style="{ThemeResource CaptionTextBlockStyle}"
-                                    Text="{x:Bind ProviderName}"
-                                    TextTrimming="CharacterEllipsis"
-                                    VerticalAlignment="Center" />
-
-                                <!--  Favorite  -->
-                                <Grid Grid.Column="1">
-                                    <Button
-                                        Background="Transparent"
-                                        BorderThickness="0"
-                                        Command="{x:Bind ToggleFavoriteCommand}"
-                                        Padding="4"
-                                        Visibility="{x:Bind IsFavorite, Mode=OneWay, Converter={StaticResource NegBoolToVis}}">
-                                        <FontIcon FontSize="16" Glyph="&#xE734;" />
-                                    </Button>
-                                    <Button
-                                        Background="Transparent"
-                                        BorderThickness="0"
-                                        Command="{x:Bind ToggleFavoriteCommand}"
-                                        Padding="4"
-                                        Visibility="{x:Bind IsFavorite, Mode=OneWay, Converter={StaticResource BoolToVis}}">
-                                        <FontIcon
-                                            FontSize="16"
-                                            Foreground="#F2C811"
-                                            Glyph="&#xE735;" />
-                                    </Button>
-                                </Grid>
-                            </Grid>
-
-                            <!--  Key Content  -->
-                            <Grid Grid.Row="1" VerticalAlignment="Center">
-                                <TextBlock
-                                    FontFamily="Consolas"
-                                    FontSize="16"
-                                    HorizontalAlignment="Center"
-                                    Text="{x:Bind DisplayKey, Mode=OneWay}"
-                                    TextTrimming="CharacterEllipsis"
-                                    VerticalAlignment="Center" />
-                            </Grid>
-
-                            <!--  Actions & Metadata  -->
-                            <Grid ColumnSpacing="8" Grid.Row="2">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-
-                                <!--  Tag with horizontal layout  -->
-                                <StackPanel
-                                    Orientation="Horizontal"
-                                    Spacing="8"
-                                    VerticalAlignment="Center">
-                                    <TextBlock
-                                        Opacity="0.6"
-                                        Style="{ThemeResource CaptionTextBlockStyle}"
-                                        Text="Tag:"
-                                        VerticalAlignment="Center" />
-                                    <TextBox
-                                        Background="Transparent"
-                                        BorderThickness="0"
-                                        FontSize="12"
-                                        MinWidth="100"
-                                        Opacity="0.8"
-                                        PlaceholderText="Add tag..."
-                                        Text="{x:Bind Tag, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                        VerticalAlignment="Center" />
-                                </StackPanel>
-
-                                <!--  Icons  -->
-                                <StackPanel
-                                    Grid.Column="1"
-                                    Orientation="Horizontal"
-                                    Spacing="4">
-                                    <!--  Reveal  -->
-                                    <Grid>
-                                        <Button
-                                            Background="Transparent"
-                                            BorderThickness="0"
-                                            Command="{x:Bind RevealKeyCommand}"
-                                            Padding="6"
-                                            ToolTipService.ToolTip="Show Key"
-                                            Visibility="{x:Bind IsKeyRevealed, Mode=OneWay, Converter={StaticResource NegBoolToVis}}">
-                                            <FontIcon FontSize="14" Glyph="&#xE890;" />
-                                        </Button>
-                                        <Button
-                                            Background="Transparent"
-                                            BorderThickness="0"
-                                            Command="{x:Bind RevealKeyCommand}"
-                                            Padding="6"
-                                            ToolTipService.ToolTip="Hide Key"
-                                            Visibility="{x:Bind IsKeyRevealed, Mode=OneWay, Converter={StaticResource BoolToVis}}">
-                                            <FontIcon FontSize="14" Glyph="&#xE891;" />
-                                        </Button>
-                                    </Grid>
-
-                                    <!--  Copy  -->
-                                    <controls:CopyButton
-                                        Click="CopyButton_Click"
-                                        Content="&#xE8C8;"
-                                        Padding="6"
-                                        Tag="{x:Bind Id, Mode=OneWay}"
-                                        ToolTipService.ToolTip="Copy Key" />
-                                </StackPanel>
-                            </Grid>
-                        </Grid>
-
-                        <!--  Created Date Footer (Optional, maybe overlap bottom right)  -->
+                        <!-- Provider -->
                         <TextBlock
-                            FontSize="10"
-                            HorizontalAlignment="Right"
-                            IsHitTestVisible="False"
-                            Margin="0,0,8,4"
-                            Opacity="0.4"
-                            Text="{x:Bind CreatedAtFormatted}"
-                            VerticalAlignment="Bottom" />
+                            Style="{ThemeResource BodyTextBlockStyle}"
+                            Text="{x:Bind ProviderName}"
+                            VerticalAlignment="Center" />
 
+                        <!-- Key -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                             <TextBlock
+                                FontFamily="Consolas"
+                                Text="{x:Bind DisplayKey, Mode=OneWay}"
+                                VerticalAlignment="Center" />
+                             
+                             <!-- Reveal Toggle -->
+                             <Button
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Command="{x:Bind RevealKeyCommand}"
+                                Padding="4"
+                                ToolTipService.ToolTip="Toggle Visibility">
+                                <FontIcon FontSize="12" Glyph="{x:Bind IsKeyRevealed, Mode=OneWay, Converter={StaticResource BoolToGlyphConverter}, ConverterParameter='Reveal'}" /> 
+                                <!-- Note: Simply using text or standard icon logic since converter might not exist for glyph switching directly without parameter logic. using simple logic below: -->
+                             </Button>
+                        </StackPanel>
+
+                        <!-- Tag -->
+                        <TextBox
+                            Grid.Column="2"
+                            PlaceholderText="Tag"
+                            Text="{x:Bind Tag, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                            VerticalAlignment="Center" 
+                            Margin="0,0,16,0"/>
+
+                        <!-- Actions -->
+                        <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="4">
+                            <Button
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Command="{x:Bind ToggleFavoriteCommand}"
+                                Padding="4"
+                                ToolTipService.ToolTip="Favorite">
+                                <FontIcon 
+                                    FontSize="16" 
+                                    Foreground="{x:Bind IsFavorite, Mode=OneWay, Converter={StaticResource FavoriteColorConverter}}"
+                                    Glyph="{x:Bind IsFavorite, Mode=OneWay, Converter={StaticResource FavoriteIconConverter}}" /> 
+                            </Button>
+                            
+                            <controls:CopyButton
+                                Click="CopyButton_Click"
+                                Content="&#xE8C8;"
+                                Padding="6"
+                                Tag="{x:Bind Id, Mode=OneWay}"
+                                ToolTipService.ToolTip="Copy Key" />
+                            
+                            <!-- Delete Button (Simulated or add to ViewModel if missing) -->
+                            <!-- Assuming only favorite toggle and copy are current primary actions in row -->
+                        </StackPanel>
                     </Grid>
                 </DataTemplate>
-            </GridView.ItemTemplate>
-        </GridView>
+            </ListView.ItemTemplate>
+        </ListView>
     </Grid>
 </Page>

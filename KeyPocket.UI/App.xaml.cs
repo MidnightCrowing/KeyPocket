@@ -46,8 +46,7 @@ namespace KeyPocket.UI
         {
                 InitializeServices();
 
-                // 后台异步获取最新 USD->CNY 汇率（不阻塞启动）
-                _ = System.Threading.Tasks.Task.Run(async () => await ExchangeRateHelper.FetchAndUpdateAsync().ConfigureAwait(false));
+
 
             _window = new MainWindow();
             MainWindow = _window;

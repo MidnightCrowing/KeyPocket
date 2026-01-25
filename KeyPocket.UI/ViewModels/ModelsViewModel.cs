@@ -58,7 +58,7 @@ public partial class ModelsViewModel : ObservableObject
 
             foreach (var model in provider.Models)
             {
-                _allModels.Add(new ModelItemViewModel(model, provider.Name, provider.IconPath, _providerService));
+                _allModels.Add(new ModelItemViewModel(model, provider.Name, provider.IconPath, provider.Currency, _providerService));
             }
         }
 
@@ -104,7 +104,7 @@ public partial class ModelsViewModel : ObservableObject
         query = SelectedSortOption switch
         {
             "Name" => query.OrderBy(m => m.DisplayName),
-            "Price" => query.OrderBy(m => m.InputPrice ?? decimal.MaxValue), // Nulls last or treated as expensive? Usually free/unknown. Let's put nulls at end.
+            "Price" => query.OrderBy(m => m.ConvertedInputPrice.HasValue ? 0 : 1).ThenBy(m => m.ConvertedInputPrice ?? m.InputPrice ?? decimal.MaxValue),
             _ => query.OrderBy(m => m.ProviderName).ThenBy(m => m.DisplayName) // Default: Provider
         };
 

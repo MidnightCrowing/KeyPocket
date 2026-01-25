@@ -23,11 +23,7 @@ public class ModelInfo
     /// </summary>
     public decimal? OutputPricePerMTokens { get; set; }
 
-    /// <summary>
-    /// 保存时使用的货币（例如 "USD" 或 "CNY"）。新增字段，便于在不同显示货币间进行转换。
-    /// 如果为 null 或空，默认视为 "USD"。
-    /// </summary>
-    public string? PriceCurrency { get; set; }
+
 
     /// <summary>
     /// 模型是否已弃用。

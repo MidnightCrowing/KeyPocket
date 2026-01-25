@@ -18,13 +18,16 @@ public partial class ModelItemViewModel : ObservableObject
     private string _providerName;
 
     [ObservableProperty]
-    private string? _providerIcon;
+    private string? _providerIcon; // Keep observable if needed, though mostly static for item
 
-    public ModelItemViewModel(ModelInfo model, string providerName, string? providerIcon, ProviderService providerService)
+    private readonly string _providerCurrency;
+
+    public ModelItemViewModel(ModelInfo model, string providerName, string? providerIcon, string providerCurrency, ProviderService providerService)
     {
         _model = model;
         _providerName = providerName;
         _providerIcon = providerIcon;
+        _providerCurrency = providerCurrency ?? "USD";
         _providerService = providerService;
     }
 
@@ -38,21 +41,61 @@ public partial class ModelItemViewModel : ObservableObject
     public decimal? InputPrice => _model.InputPricePerMTokens;
     public decimal? OutputPrice => _model.OutputPricePerMTokens;
 
-    // Helper for UI formatting as requested: "Null" if no price
-    public string InputPriceFormatted => InputPrice.HasValue ? FormatPrice(InputPrice.Value) : "Null";
-    public string OutputPriceFormatted => OutputPrice.HasValue ? FormatPrice(OutputPrice.Value) : "Null";
-
-    private static string FormatPrice(decimal usdPrice)
+    // For sorting: returns converted price if available, else null
+    public decimal? ConvertedInputPrice 
     {
-        var settings = SettingsHelper.Current;
-        if (settings.SelectedCurrency == "CNY")
+        get 
         {
-            var cny = usdPrice * settings.UsdToCnyRate;
-            return $"¥{cny:F3}";
+            if (!InputPrice.HasValue) return null;
+            return ExchangeRateHelper.Convert(InputPrice.Value, _providerCurrency, SettingsHelper.Current.SelectedCurrency);
+        }
+    }
+
+    // Helper for UI formatting as requested: "Null" if no price
+    public string InputPriceFormatted => GetMainPrice(InputPrice);
+    public string InputPriceOriginal => GetSecondaryPrice(InputPrice);
+    
+    public string OutputPriceFormatted => GetMainPrice(OutputPrice);
+    public string OutputPriceOriginal => GetSecondaryPrice(OutputPrice);
+
+    private string GetMainPrice(decimal? price)
+    {
+        if (!price.HasValue) return "Null";
+        
+        var settings = SettingsHelper.Current;
+        var targetCurrency = settings.SelectedCurrency;
+        string sourceCurrency = _providerCurrency;
+        
+        var converted = ExchangeRateHelper.Convert(price.Value, sourceCurrency, targetCurrency);
+        
+        // If conversion fails (no rate), return original (with source symbol)
+        if (converted == null)
+        {
+            return $"{ExchangeRateHelper.GetCurrencySymbol(sourceCurrency)}{price.Value:F3}"; // e.g. $0.002
+        }
+        
+        // If conversion succeeds, return converted (with target symbol)
+        return $"{ExchangeRateHelper.GetCurrencySymbol(targetCurrency)}{converted:F3}";
+    }
+
+    private string GetSecondaryPrice(decimal? price)
+    {
+        if (!price.HasValue) return string.Empty;
+
+        var settings = SettingsHelper.Current;
+        var targetCurrency = settings.SelectedCurrency;
+        string sourceCurrency = _providerCurrency; 
+
+        var converted = ExchangeRateHelper.Convert(price.Value, sourceCurrency, targetCurrency);
+        
+        // If conversion failed or target is same as source, don't show secondary
+        if (converted == null || targetCurrency == sourceCurrency)
+        {
+            return string.Empty;
         }
 
-        // Default: USD
-        return $"${usdPrice:F3}";
+        // Show original in parens
+        return $"({ExchangeRateHelper.GetCurrencySymbol(sourceCurrency)}{price.Value:F3})";
     }
 
 

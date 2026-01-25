@@ -20,6 +20,11 @@ public class Provider
     public string Type { get; set; } = "OpenAI API";
 
     /// <summary>
+    /// 此服务商定价使用的货币 (e.g. "USD", "CNY")。默认为 "USD"。
+    /// </summary>
+    public string Currency { get; set; } = "USD";
+
+    /// <summary>
     /// API 基础地址。
     /// </summary>
     public string? ApiBaseUrl { get; set; }

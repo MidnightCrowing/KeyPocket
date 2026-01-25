@@ -94,6 +94,18 @@
                     </StackPanel>
 
                     <StackPanel Spacing="8">
+                        <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Provider Currency" />
+                        <ComboBox
+                            HorizontalAlignment="Stretch"
+                            ItemsSource="{x:Bind ViewModel.AvailableCurrencies}"
+                            SelectedItem="{x:Bind ViewModel.ProviderCurrency, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="The currency used by this provider for billing." />
+                    </StackPanel>
+
+                    <StackPanel Spacing="8">
                         <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Description" />
                         <TextBox
                             AcceptsReturn="True"
@@ -436,12 +448,14 @@
 
                                             <StackPanel>
                                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                                                    <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="Input Price (" />
-                                                    <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="{x:Bind CurrencySymbol, Mode=OneWay}" Margin="6,0,6,0" />
-                                                    <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="per M tokens)" />
+                                                    <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="Input Price (per M tokens)" />
                                                 </StackPanel>
                                                 <StackPanel Orientation="Horizontal" Spacing="8">
-                                                    <TextBlock VerticalAlignment="Center" Text="{x:Bind CurrencySymbol, Mode=OneWay}" />
+                                                    <TextBlock 
+                                                        Text="{x:Bind ProviderSymbol, Mode=OneWay}" 
+                                                        VerticalAlignment="Center" 
+                                                        FontWeight="SemiBold"
+                                                        FontSize="16"/>
                                                     <NumberBox
                                                         LargeChange="0.1"
                                                         PlaceholderText="e.g. 0.03"
@@ -454,12 +468,14 @@
 
                                             <StackPanel Grid.Column="2">
                                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                                                    <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="Output Price (" />
-                                                    <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="{x:Bind CurrencySymbol, Mode=OneWay}" Margin="6,0,6,0" />
-                                                    <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="per M tokens)" />
+                                                    <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="Output Price (per M tokens)" />
                                                 </StackPanel>
                                                 <StackPanel Orientation="Horizontal" Spacing="8">
-                                                    <TextBlock VerticalAlignment="Center" Text="{x:Bind CurrencySymbol, Mode=OneWay}" />
+                                                    <TextBlock 
+                                                        Text="{x:Bind ProviderSymbol, Mode=OneWay}" 
+                                                        VerticalAlignment="Center" 
+                                                        FontWeight="SemiBold"
+                                                        FontSize="16"/>
                                                     <NumberBox
                                                         LargeChange="0.1"
                                                         PlaceholderText="e.g. 0.06"

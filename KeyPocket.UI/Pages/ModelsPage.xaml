@@ -189,13 +189,24 @@
                                         Opacity="0.6"
                                         Style="{ThemeResource CaptionTextBlockStyle}"
                                         Text="In:" />
-                                    <TextBlock Style="{ThemeResource CaptionTextBlockStyle}" Text="{x:Bind InputPriceFormatted}" />
+                                    <TextBlock Style="{ThemeResource CaptionTextBlockStyle}" 
+                                               Text="{x:Bind InputPriceFormatted}" 
+                                               Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" FontWeight="SemiBold" />
+                                    <TextBlock Style="{ThemeResource CaptionTextBlockStyle}" 
+                                               Text="{x:Bind InputPriceOriginal}" 
+                                               Opacity="0.5" />
+                                    
                                     <TextBlock
                                         Margin="8,0,0,0"
                                         Opacity="0.6"
                                         Style="{ThemeResource CaptionTextBlockStyle}"
                                         Text="Out:" />
-                                    <TextBlock Style="{ThemeResource CaptionTextBlockStyle}" Text="{x:Bind OutputPriceFormatted}" />
+                                    <TextBlock Style="{ThemeResource CaptionTextBlockStyle}" 
+                                               Text="{x:Bind OutputPriceFormatted}" 
+                                               Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" FontWeight="SemiBold" />
+                                    <TextBlock Style="{ThemeResource CaptionTextBlockStyle}" 
+                                               Text="{x:Bind OutputPriceOriginal}" 
+                                               Opacity="0.5" />
                                 </StackPanel>
                             </StackPanel>
 

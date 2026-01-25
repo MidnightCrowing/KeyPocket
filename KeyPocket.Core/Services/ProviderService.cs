@@ -128,6 +128,7 @@ public class ProviderService
             provider.Type = updatedProvider.Type;
             provider.ApiBaseUrl = updatedProvider.ApiBaseUrl;
             provider.Description = updatedProvider.Description;
+            provider.Currency = updatedProvider.Currency;
             
             // Update Models and ApiKeys lists
             provider.Models = updatedProvider.Models;
