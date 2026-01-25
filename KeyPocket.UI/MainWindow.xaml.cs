@@ -8,6 +8,8 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using KeyPocket.UI.Helpers;
 using KeyPocket.UI.ViewModels;
+using System.Linq;
+
 
 namespace KeyPocket.UI;
 
@@ -38,28 +40,65 @@ public sealed partial class MainWindow
 
         contentFrame.Navigated += OnContentFrameNavigated;
         
-        // 初始化侧边栏服务商列表
+        // Initialize Sidebar Providers
         LoadProvidersToSidebar();
         
-        // 监听 ViewModel 的 Providers 集合变化
+        // Listen to Providers collection changes
         ViewModel.Providers.CollectionChanged += Providers_CollectionChanged;
         
-        // 订阅服务商创建消息以处理导航
+        // Subscribe to Provider creation
         WeakReferenceMessenger.Default.Register<ProviderCreatedMessage>(this, (r, m) =>
         {
-            // 使用 Dispatcher 确保 Provider 已完全保存后再导航
             DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal, () =>
             {
-                // 导航到新创建的服务商配置页
                 contentFrame.Navigate(typeof(ProviderSettingsPage), m.ProviderId.ToString());
                 SelectProviderInSidebar(m.ProviderId);
             });
         });
+
+        // Listen for Theme changes to update icons
+        if (Content is FrameworkElement root)
+        {
+            root.ActualThemeChanged += (s, e) => UpdateAllSidebarIcons();
+        }
+    }
+
+    private void UpdateAllSidebarIcons()
+    {
+        // 1. Update Sidebar items
+        // Recursively or iterate menu items
+        foreach (var item in navView.MenuItems)
+        {
+             if (item is NavigationViewItem navItem && navItem.Tag is string tag && tag.StartsWith("Provider_"))
+             {
+                 try 
+                 {
+                     var providerIdStr = tag.Substring("Provider_".Length);
+                     if (Guid.TryParse(providerIdStr, out var pid))
+                     {
+                         var provider = ViewModel.Providers.FirstOrDefault(p => p.Id == pid);
+                         if (provider != null)
+                         {
+                             navItem.Icon = ResolveIconElement(provider.IconPath, provider.DefaultIconGlyph);
+                         }
+                     }
+                 }
+                 catch {}
+             }
+        }
+
+        // 2. Notify other components (like HomeViewModel)
+        bool isDark = true;
+        if (Content is FrameworkElement root)
+        {
+            isDark = root.ActualTheme == Microsoft.UI.Xaml.ElementTheme.Dark;
+        }
+        WeakReferenceMessenger.Default.Send(new ThemeChangedMessage(isDark));
     }
 
     private void Providers_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
-        // 当 ViewModel 的 Providers 集合变化时，更新侧边栏
+        // Update sidebar on collection change
         if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add && e.NewItems != null)
         {
             foreach (SidebarProviderItem item in e.NewItems)
@@ -82,10 +121,7 @@ public sealed partial class MainWindow
 
     private void LoadProvidersToSidebar()
     {
-        // 清除现有的动态服务商项
         ClearDynamicProviders();
-        
-        // 添加所有服务商
         foreach (var provider in ViewModel.Providers)
         {
             AddProviderToSidebar(provider);
@@ -106,22 +142,12 @@ public sealed partial class MainWindow
 
     private void AddProviderToSidebar(SidebarProviderItem provider)
     {
-        // 找到 "Providers" 标题的位置
         int insertIndex = FindProvidersHeaderIndex();
         if (insertIndex == -1) return;
 
-        // 创建图标
-        IconElement icon;
-        if (!string.IsNullOrEmpty(provider.IconPath))
-        {
-            icon = new ImageIcon { Source = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri($"ms-appdata:///local/{provider.IconPath}")) };
-        }
-        else
-        {
-            icon = new FontIcon { Glyph = provider.DefaultIconGlyph };
-        }
+        // Create Icon using helper
+        IconElement icon = ResolveIconElement(provider.IconPath, provider.DefaultIconGlyph);
 
-        // 创建导航项
         var navItem = new NavigationViewItem
         {
             Content = provider.Name,
@@ -129,7 +155,7 @@ public sealed partial class MainWindow
             Icon = icon
         };
 
-        // 监听 provider 属性变化以更新 UI
+        // Listen for changes
         provider.PropertyChanged += (s, e) =>
         {
             if (s is SidebarProviderItem p && navItem.Tag is string itemTag && itemTag == $"Provider_{p.Id}")
@@ -140,20 +166,68 @@ public sealed partial class MainWindow
                 }
                 else if (e.PropertyName == nameof(SidebarProviderItem.IconPath) || e.PropertyName == nameof(SidebarProviderItem.Type))
                 {
-                    // 更新图标
-                    if (!string.IsNullOrEmpty(p.IconPath))
-                    {
-                        navItem.Icon = new ImageIcon { Source = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri($"ms-appdata:///local/{p.IconPath}")) };
-                    }
-                    else
-                    {
-                        navItem.Icon = new FontIcon { Glyph = p.DefaultIconGlyph };
-                    }
+                    navItem.Icon = ResolveIconElement(p.IconPath, p.DefaultIconGlyph);
                 }
             }
         };
 
         navView.MenuItems.Insert(insertIndex, navItem);
+    }
+
+    private IconElement ResolveIconElement(string? iconPath, string defaultGlyph)
+    {
+         if (string.IsNullOrEmpty(iconPath))
+         {
+             return new FontIcon { Glyph = defaultGlyph };
+         }
+
+         // If path contains specific characters, treat as file path
+         if (iconPath.Contains('/') || iconPath.Contains('\\') || iconPath.Contains('.'))
+         {
+             // Custom file matching absolute path
+             try 
+             {
+                 return new ImageIcon { Source = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(iconPath)) };
+             }
+             catch
+             {
+                 return new FontIcon { Glyph = defaultGlyph };
+             }
+         }
+         else
+         {
+             // Preset Name (e.g. "Openai")
+             // Determine theme
+             var isDark = true; 
+             if (Content is FrameworkElement root)
+             {
+                 isDark = root.ActualTheme == ElementTheme.Dark;
+             }
+             
+             // Normalize name to lowercase for filename base
+             var baseName = iconPath.ToLower();
+             
+             // Construct path based on availability
+             // Try to find {baseName}-{theme}.png, otherwise {baseName}.png
+             
+             string appInstalledPath = Windows.ApplicationModel.Package.Current.InstalledLocation.Path;
+             string assetsPath = System.IO.Path.Combine(appInstalledPath, "Assets", "ProviderIcons");
+             string suffix = isDark ? "-dark" : "-light";
+             string themeSpecificPath = System.IO.Path.Combine(assetsPath, $"{baseName}{suffix}.png");
+             
+             string uriToUse;
+             if (System.IO.File.Exists(themeSpecificPath))
+             {
+                  uriToUse = $"ms-appx:///Assets/ProviderIcons/{baseName}{suffix}.png";
+             }
+             else
+             {
+                  // Fallback to base
+                  uriToUse = $"ms-appx:///Assets/ProviderIcons/{baseName}.png";
+             }
+             
+             return new ImageIcon { Source = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(uriToUse)) };
+         }
     }
 
     private void RemoveProviderFromSidebar(Guid providerId)

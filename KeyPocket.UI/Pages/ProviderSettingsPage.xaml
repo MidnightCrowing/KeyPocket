@@ -67,7 +67,42 @@
                     <StackPanel Spacing="8">
                         <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Icon" />
                         <StackPanel Orientation="Horizontal" Spacing="8">
-                            <Button Click="OnChangeIconClicked" Content="Change Icon" />
+                            <Button Content="Presets">
+                                <Button.Flyout>
+                                    <Flyout Placement="Bottom">
+                                        <GridView 
+                                            ItemsSource="{x:Bind ViewModel.DefaultIcons}" 
+                                            SelectionMode="None"
+                                            IsItemClickEnabled="True"
+                                            ItemClick="OnDefaultIconItemClick"
+                                            HorizontalAlignment="Center"
+                                            MaxWidth="300">
+                                            <GridView.ItemContainerStyle>
+                                                <Style TargetType="GridViewItem">
+                                                    <Setter Property="Margin" Value="0,6" />
+                                                    <Setter Property="Padding" Value="4" />
+                                                </Style>
+                                            </GridView.ItemContainerStyle>
+                                            <GridView.ItemTemplate>
+                                                <DataTemplate x:DataType="viewModels:DefaultIconItem">
+                                                    <StackPanel Spacing="4" Width="50" ToolTipService.ToolTip="{x:Bind Name}">
+                                                        <Image Source="{x:Bind Path}" Width="24" Height="24" HorizontalAlignment="Center" />
+                                                        <TextBlock 
+                                                            Text="{x:Bind Name}" 
+                                                            HorizontalAlignment="Center" 
+                                                            TextTrimming="CharacterEllipsis" 
+                                                            FontSize="10"
+                                                            MaxLines="1"/>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </GridView.ItemTemplate>
+                                        </GridView>
+                                    </Flyout>
+                                </Button.Flyout>
+                            </Button>
+                            
+                            <Button Click="OnChangeIconClicked" Content="Browse..." />
+                            
                             <Button
                                 Click="OnRemoveIconClicked"
                                 Content="Remove Icon"

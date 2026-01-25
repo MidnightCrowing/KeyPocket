@@ -14,6 +14,14 @@ using System.Windows.Input;
 
 namespace KeyPocket.UI.ViewModels;
 
+public class DefaultIconItem
+{
+    public string Name { get; set; } = string.Empty;
+    public string Path { get; set; } = string.Empty;
+    public string FileName { get; set; } = string.Empty;
+}
+
+
 public partial class ProviderSettingsViewModel : ObservableObject
 {
     private readonly ProviderService _providerService;
@@ -62,6 +70,7 @@ public partial class ProviderSettingsViewModel : ObservableObject
 
     public ObservableCollection<KeyWrapper> ApiKeys { get; } = new();
     public ObservableCollection<ModelWrapper> Models { get; } = new();
+    public ObservableCollection<DefaultIconItem> DefaultIcons { get; } = new();
 
     // Track the currency currently used to display model prices in this page
     private string _displayCurrency = SettingsHelper.Current.SelectedCurrency;
@@ -80,6 +89,8 @@ public partial class ProviderSettingsViewModel : ObservableObject
         LoadKeys(_originalProvider);
         LoadModels(_originalProvider);
         HasCustomIcon = !string.IsNullOrEmpty(provider.IconPath);
+        
+        LoadDefaultIcons();
 
         ApiKeys.CollectionChanged += OnApiKeysCollectionChanged;
         Models.CollectionChanged += OnModelsCollectionChanged;
@@ -137,16 +148,11 @@ public partial class ProviderSettingsViewModel : ObservableObject
             }
             else
             {
-                var iconsFolder = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFolderAsync("Icons", Windows.Storage.CreationCollisionOption.OpenIfExists);
-                // Use Provider ID as filename to keep it simpler and unique per provider
-                string ext = file.FileType;
-                string fileName = $"{_originalProvider.Id}{ext}";
+                // Direct access - no copying
+                string originalPath = file.Path;
                 
-                var targetFile = await file.CopyAsync(iconsFolder, fileName, Windows.Storage.NameCollisionOption.ReplaceExisting);
-                string relativePath = System.IO.Path.Combine("Icons", fileName);
-                
-                _originalProvider.IconPath = relativePath;
-                _providerService.UpdateProviderIcon(_originalProvider.Id, relativePath);
+                _originalProvider.IconPath = originalPath;
+                _providerService.UpdateProviderIcon(_originalProvider.Id, originalPath);
             }
             
             // Update property
@@ -725,6 +731,138 @@ public partial class ProviderSettingsViewModel : ObservableObject
         finally
         {
             _isSyncingOrder = false;
+        }
+    }
+
+    private async void LoadDefaultIcons()
+    {
+        try
+        {
+            DefaultIcons.Clear();
+            var installLocation = Windows.ApplicationModel.Package.Current.InstalledLocation;
+            
+            var assetsFolder = await installLocation.GetFolderAsync("Assets");
+            var providerIconsFolder = await assetsFolder.GetFolderAsync("ProviderIcons");
+            var files = await providerIconsFolder.GetFilesAsync();
+
+            // Determine current effective theme
+            // Handled simply by checking application requested theme or settings
+            // For now, checking the actual UI theme is complex in VM without UI thread access usually.
+            // We'll rely on a heuristic: 
+            // If we are in "Dark" mode (SettingsHelper), prefer -dark.
+            // If "Light", prefer -light.
+            // If "System", well, let's just default to one or try to guess.
+            // Actually, let's just load ALL of them but simplify the display?
+            // User requirement: "Icons ... are used in Dark theme". 
+            // Logic: Group by "Base Name". Pick the best match.
+            
+            bool isDark = true; // Default assumption or check settings
+            var currentTheme = SettingsHelper.Current.SelectedAppTheme;
+            
+            if (currentTheme == Microsoft.UI.Xaml.ElementTheme.Light) isDark = false;
+            else if (currentTheme == Microsoft.UI.Xaml.ElementTheme.Dark) isDark = true;
+            else 
+            {
+                // System - could check Application.Current.RequestedTheme if on UI thread
+                // For safety in VM, let's check the global state if possible or default to Dark (popular)
+                // Accessing Window.Current might throw if on background thread, but LoadDefaultIcons is called from ctor (UI thread usually) or command.
+                // However, Application.Current.RequestedTheme is safer.
+                try 
+                {
+                    if (Microsoft.UI.Xaml.Application.Current.RequestedTheme == Microsoft.UI.Xaml.ApplicationTheme.Light)
+                        isDark = false;
+                    else
+                        isDark = true;
+                }
+                catch
+                {
+                    // Fallback
+                    isDark = true;
+                }
+            }
+
+            var iconGroups = files
+                .Where(f => f.FileType.ToLower() == ".png" || f.FileType.ToLower() == ".svg")
+                .GroupBy(f => 
+                {
+                    var name = f.DisplayName.ToLower();
+                    if (name.EndsWith("-dark")) return name.Substring(0, name.Length - 5);
+                    if (name.EndsWith("-light")) return name.Substring(0, name.Length - 6);
+                    return name;
+                });
+
+            foreach (var group in iconGroups)
+            {
+                Windows.Storage.StorageFile? bestMatch = null;
+                
+                if (isDark)
+                {
+                    // Try -dark, then base, then -light
+                    bestMatch = group.FirstOrDefault(f => f.DisplayName.ToLower().EndsWith("-dark"));
+                    if (bestMatch == null) bestMatch = group.FirstOrDefault(f => !f.DisplayName.ToLower().Contains("-"));
+                    if (bestMatch == null) bestMatch = group.FirstOrDefault(f => f.DisplayName.ToLower().EndsWith("-light"));
+                }
+                else
+                {
+                     // Try -light, then base, then -dark
+                    bestMatch = group.FirstOrDefault(f => f.DisplayName.ToLower().EndsWith("-light"));
+                    if (bestMatch == null) bestMatch = group.FirstOrDefault(f => !f.DisplayName.ToLower().Contains("-"));
+                    if (bestMatch == null) bestMatch = group.FirstOrDefault(f => f.DisplayName.ToLower().EndsWith("-dark"));
+                }
+
+                if (bestMatch != null)
+                {
+                    string name = group.Key;
+                    if (name.Length > 0) name = char.ToUpper(name[0]) + name.Substring(1);
+                    
+                    // Use ms-appx URI for reliable display in WinUI
+                    // bestMatch.Name is safe
+                    string relativePath = $"ms-appx:///Assets/ProviderIcons/{bestMatch.Name}";
+
+                    DefaultIcons.Add(new DefaultIconItem 
+                    { 
+                        Name = name, 
+                        Path = relativePath, // Bindable URI
+                        FileName = bestMatch.Name
+                    });
+                }
+            }
+        }
+        catch (Exception)
+        {
+            // Ignore
+        }
+    }
+
+    [RelayCommand]
+    public async System.Threading.Tasks.Task SelectDefaultIcon(DefaultIconItem? item)
+    {
+        if (item == null || _providerService == null) return;
+        
+        try
+        {
+             // When selecting a preset, we just save the name!
+             // The main window will resolve it to Assets/ProviderIcons/{Name}-{Theme}.png
+             
+             // When selecting a preset, we just save the name!
+             // The main window will resolve it to Assets/ProviderIcons/{Name}-{Theme}.png
+             
+             // Set new path as the Name (e.g. "Openai")
+             // We use the normalized Name from the item
+             string newPath = item.Name;
+             
+             _originalProvider.IconPath = newPath;
+             _providerService.UpdateProviderIcon(_originalProvider.Id, newPath);
+             
+             // Update property
+             HasCustomIcon = !string.IsNullOrEmpty(_originalProvider.IconPath);
+             
+             // Notify sidebar
+             WeakReferenceMessenger.Default.Send(new ProviderUpdatedMessage(_originalProvider.Id)); 
+        }
+        catch(Exception)
+        {
+            // Logging?
         }
     }
 }

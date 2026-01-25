@@ -113,28 +113,69 @@ public partial class ProviderViewModel : ObservableObject
 
     public void UpdateIcon(string type, string? iconPath = null)
     {
-        // 1. Try Custom Icon
+        // 1. Try resolving Icon
         if (!string.IsNullOrEmpty(iconPath))
         {
-            try
+            // Case A: Custom File (contains path separators or dot, though presets don't have dot)
+            // But wait, presets were stored as "Openai". No dot.
+            // Custom files: "GUID_123.png". Has dot.
+            
+            if (iconPath.Contains('/') || iconPath.Contains('\\') || iconPath.Contains('.'))
             {
-                var localFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
-                var fullPath = System.IO.Path.Combine(localFolder.Path, iconPath);
-                
-                if (System.IO.File.Exists(fullPath))
+                try
                 {
-                    CustomIconSource = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(fullPath));
+                    // Direct absolute path check
+                    if (System.IO.File.Exists(iconPath))
+                    {
+                        CustomIconSource = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(iconPath));
+                        IsCustomIcon = true;
+                        return;
+                    }
+                }
+                catch { /* Ignore load errors, fallback to glyph */ }
+            }
+            else
+            {
+                // Case B: Preset Name (e.g. "Openai")
+                try
+                {
+                    var baseName = iconPath.ToLower();
+                    var isDark = ThemeHelper.IsDarkTheme();
+                    
+                    string appInstalledPath = Windows.ApplicationModel.Package.Current.InstalledLocation.Path;
+                    string assetsPath = System.IO.Path.Combine(appInstalledPath, "Assets", "ProviderIcons");
+                    string suffix = isDark ? "-dark" : "-light";
+                    string themeSpecificPath = System.IO.Path.Combine(assetsPath, $"{baseName}{suffix}.png");
+                    
+                    string uriToUse;
+                    if (System.IO.File.Exists(themeSpecificPath))
+                    {
+                        uriToUse = $"ms-appx:///Assets/ProviderIcons/{baseName}{suffix}.png";
+                    }
+                    else
+                    {
+                        // Fallback to base
+                        uriToUse = $"ms-appx:///Assets/ProviderIcons/{baseName}.png";
+                    }
+
+                    CustomIconSource = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(uriToUse));
                     IsCustomIcon = true;
                     return;
                 }
+                catch { /* Ignore */ }
             }
-            catch { /* Ignore load errors, fallback to glyph */ }
         }
 
         // 2. Fallback to Glyph
         IsCustomIcon = false;
         CustomIconSource = null;
         Icon = "\uE99A"; // Default icon for all types
+    }
+
+    public void RefreshIcon()
+    {
+        // Re-run logic with current theme
+        UpdateIcon(Type, CoreModel?.IconPath);
     }
 }
 
