@@ -40,25 +40,41 @@ public class JsonFileStorageProvider : IStorageProvider
     public void Save(KeyPocketConfig config)
     {
         var directory = Path.GetDirectoryName(_filePath);
-        if (!string.IsNullOrEmpty(directory))
-            if (!Directory.Exists(directory))
-                Directory.CreateDirectory(directory);
+        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+            Directory.CreateDirectory(directory);
 
         var tempPath = _filePath + ".tmp";
+        var backupPath = _filePath + ".bak";
+
         try
         {
-            // 原子写入的第一步：先写到临时文件
+            // 1. 先写临时文件
             var json = JsonSerializer.Serialize(config, JsonOptions);
             File.WriteAllText(tempPath, json);
 
-            // 原子写入的第二步：将临时文件重命名（覆盖）原文件
+            // 2. 如果目标存在，先移到备份
             if (File.Exists(_filePath))
-                File.Replace(tempPath, _filePath, null);
-            else
-                File.Move(tempPath, _filePath);
+            {
+                File.Move(_filePath, backupPath, true);
+            }
+
+            // 3. 将临时文件移正
+            File.Move(tempPath, _filePath);
+
+            // 4. 成功后删除备份
+            if (File.Exists(backupPath))
+            {
+                File.Delete(backupPath);
+            }
         }
         catch (Exception)
         {
+            // 如果出错了（比如第3步失败），尝试用备份恢复
+            if (!File.Exists(_filePath) && File.Exists(backupPath))
+            {
+                try { File.Move(backupPath, _filePath); } catch { }
+            }
+
             if (File.Exists(tempPath)) File.Delete(tempPath);
             throw;
         }
