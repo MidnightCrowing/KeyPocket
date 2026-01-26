@@ -94,20 +94,18 @@
         </StackPanel>
 
         <!--  Content Grid  -->
-        <ScrollViewer 
-            Padding="0,0,12,0"
+        <ScrollViewer
             IsHitTestVisible="{x:Bind ViewModel.IsNotEmpty, Mode=OneWay}"
+            Padding="0,0,12,0"
             Visibility="{x:Bind ViewModel.IsNotEmpty, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}">
-            <ItemsControl
-                ItemsSource="{x:Bind ViewModel.Providers}"
-                x:Name="ContentGrid">
+            <ItemsControl ItemsSource="{x:Bind ViewModel.Providers}" x:Name="ContentGrid">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <controls:StaggeredPanel
-                            DesiredColumnWidth="300"
                             ColumnSpacing="12"
-                            RowSpacing="12"
-                            HorizontalAlignment="Stretch" />
+                            DesiredColumnWidth="300"
+                            HorizontalAlignment="Stretch"
+                            RowSpacing="12" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
@@ -116,11 +114,11 @@
                             Background="{ThemeResource LayerOnMicaBaseAltFillColorDefaultBrush}"
                             BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
                             BorderThickness="1"
+                            CanDrag="False"
                             CornerRadius="8"
                             Padding="16"
                             Shadow="{StaticResource SharedShadow}"
                             Tapped="OnProviderTapped"
-                            CanDrag="False"
                             Translation="0,0,8">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
@@ -217,8 +215,8 @@
                             <!--  Models (Pinned)  -->
                             <ItemsControl
                                 Grid.Row="3"
-                                ItemsSource="{x:Bind Models}"
                                 IsHitTestVisible="True"
+                                ItemsSource="{x:Bind Models}"
                                 Margin="0,16,0,0">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -241,8 +239,8 @@
                             <!--  Keys  -->
                             <ItemsControl
                                 Grid.Row="4"
-                                ItemsSource="{x:Bind Keys}"
                                 IsHitTestVisible="True"
+                                ItemsSource="{x:Bind Keys}"
                                 Margin="0,12,0,0">
                                 <ItemsControl.ItemTemplate>
 
@@ -270,8 +268,8 @@
 
                                                 <!--  Tag (if exists)  -->
                                                 <Border
-                                                    Grid.Column="0"
                                                     CornerRadius="3"
+                                                    Grid.Column="0"
                                                     HorizontalAlignment="Left"
                                                     Margin="0,0,8,0"
                                                     Padding="4,2"

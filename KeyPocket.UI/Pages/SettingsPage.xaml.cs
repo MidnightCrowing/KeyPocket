@@ -1,15 +1,13 @@
-﻿using Microsoft.UI.Xaml.Controls;
-using KeyPocket.UI.ViewModels;
-using Windows.Globalization.NumberFormatting;
+﻿using Windows.Globalization.NumberFormatting;
 using CommunityToolkit.WinUI.Controls;
+using KeyPocket.UI.ViewModels;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 
 namespace KeyPocket.UI.Pages;
 
 public sealed partial class SettingsPage : Page
 {
-    public SettingsViewModel ViewModel { get; }
-
     public SettingsPage()
     {
         ViewModel = new SettingsViewModel();
@@ -21,13 +19,15 @@ public sealed partial class SettingsPage : Page
         ViewModel.Rates.CollectionChanged += (s, e) => RenderRates();
     }
 
+    public SettingsViewModel ViewModel { get; }
+
     private void RenderRates()
     {
         // SettingsExpander crashes when using ItemsSource with certain templates or wrappers.
         // We manually populate the Items collection with strictly Typed SettingsCards.
-        
+
         if (RatesExpander == null) return;
-        
+
         RatesExpander.Items.Clear();
 
         var rateTemplate = Resources["RateTemplate"] as DataTemplate;
@@ -44,8 +44,8 @@ public sealed partial class SettingsPage : Page
                 var element = template.LoadContent() as FrameworkElement;
                 if (element is SettingsCard card)
                 {
-                   card.DataContext = item;
-                   RatesExpander.Items.Add(card);
+                    card.DataContext = item;
+                    RatesExpander.Items.Add(card);
                 }
             }
         }

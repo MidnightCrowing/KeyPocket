@@ -1,28 +1,26 @@
+using System;
+using Windows.ApplicationModel.DataTransfer;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KeyPocket.Core.Models;
-using KeyPocket.UI.Helpers;
 using KeyPocket.Core.Services;
-using System;
-using System.Threading.Tasks;
-using Windows.ApplicationModel.DataTransfer;
+using KeyPocket.UI.Helpers;
 
 namespace KeyPocket.UI.ViewModels;
 
 public partial class ModelItemViewModel : ObservableObject
 {
-    private readonly ProviderService _providerService;
     private readonly ModelInfo _model;
 
-    [ObservableProperty]
-    private string _providerName;
-
-    [ObservableProperty]
-    private string? _providerIcon; // Keep observable if needed, though mostly static for item
-
     private readonly string _providerCurrency;
+    private readonly ProviderService _providerService;
 
-    public ModelItemViewModel(ModelInfo model, string providerName, string? providerIcon, string providerCurrency, ProviderService providerService)
+    [ObservableProperty] private string? _providerIcon; // Keep observable if needed, though mostly static for item
+
+    [ObservableProperty] private string _providerName;
+
+    public ModelItemViewModel(ModelInfo model, string providerName, string? providerIcon, string providerCurrency,
+        ProviderService providerService)
     {
         _model = model;
         _providerName = providerName;
@@ -34,7 +32,7 @@ public partial class ModelItemViewModel : ObservableObject
     public string Id => _model.Id;
     public string DisplayName => _model.DisplayName;
     public Guid ProviderId => _model.ProviderId;
-    
+
     public bool IsChatModel => _model.IsChatModel;
     public bool IsEmbeddingModel => _model.IsEmbeddingModel;
 
@@ -42,62 +40,22 @@ public partial class ModelItemViewModel : ObservableObject
     public decimal? OutputPrice => _model.OutputPricePerMTokens;
 
     // For sorting: returns converted price if available, else null
-    public decimal? ConvertedInputPrice 
+    public decimal? ConvertedInputPrice
     {
-        get 
+        get
         {
             if (!InputPrice.HasValue) return null;
-            return ExchangeRateHelper.Convert(InputPrice.Value, _providerCurrency, SettingsHelper.Current.SelectedCurrency);
+            return ExchangeRateHelper.Convert(InputPrice.Value, _providerCurrency,
+                SettingsHelper.Current.SelectedCurrency);
         }
     }
 
     // Helper for UI formatting as requested: "Null" if no price
     public string InputPriceFormatted => GetMainPrice(InputPrice);
     public string InputPriceOriginal => GetSecondaryPrice(InputPrice);
-    
+
     public string OutputPriceFormatted => GetMainPrice(OutputPrice);
     public string OutputPriceOriginal => GetSecondaryPrice(OutputPrice);
-
-    private string GetMainPrice(decimal? price)
-    {
-        if (!price.HasValue) return "Null";
-        
-        var settings = SettingsHelper.Current;
-        var targetCurrency = settings.SelectedCurrency;
-        string sourceCurrency = _providerCurrency;
-        
-        var converted = ExchangeRateHelper.Convert(price.Value, sourceCurrency, targetCurrency);
-        
-        // If conversion fails (no rate), return original (with source symbol)
-        if (converted == null)
-        {
-            return $"{ExchangeRateHelper.GetCurrencySymbol(sourceCurrency)}{price.Value:F3}"; // e.g. $0.002
-        }
-        
-        // If conversion succeeds, return converted (with target symbol)
-        return $"{ExchangeRateHelper.GetCurrencySymbol(targetCurrency)}{converted:F3}";
-    }
-
-    private string GetSecondaryPrice(decimal? price)
-    {
-        if (!price.HasValue) return string.Empty;
-
-        var settings = SettingsHelper.Current;
-        var targetCurrency = settings.SelectedCurrency;
-        string sourceCurrency = _providerCurrency; 
-
-        var converted = ExchangeRateHelper.Convert(price.Value, sourceCurrency, targetCurrency);
-        
-        // If conversion failed or target is same as source, don't show secondary
-        if (converted == null || targetCurrency == sourceCurrency)
-        {
-            return string.Empty;
-        }
-
-        // Show original in parens
-        return $"({ExchangeRateHelper.GetCurrencySymbol(sourceCurrency)}{price.Value:F3})";
-    }
-
 
     public bool IsFavorite
     {
@@ -114,6 +72,41 @@ public partial class ModelItemViewModel : ObservableObject
         }
     }
 
+    private string GetMainPrice(decimal? price)
+    {
+        if (!price.HasValue) return "Null";
+
+        var settings = SettingsHelper.Current;
+        var targetCurrency = settings.SelectedCurrency;
+        var sourceCurrency = _providerCurrency;
+
+        var converted = ExchangeRateHelper.Convert(price.Value, sourceCurrency, targetCurrency);
+
+        // If conversion fails (no rate), return original (with source symbol)
+        if (converted == null)
+            return $"{ExchangeRateHelper.GetCurrencySymbol(sourceCurrency)}{price.Value:F3}"; // e.g. $0.002
+
+        // If conversion succeeds, return converted (with target symbol)
+        return $"{ExchangeRateHelper.GetCurrencySymbol(targetCurrency)}{converted:F3}";
+    }
+
+    private string GetSecondaryPrice(decimal? price)
+    {
+        if (!price.HasValue) return string.Empty;
+
+        var settings = SettingsHelper.Current;
+        var targetCurrency = settings.SelectedCurrency;
+        var sourceCurrency = _providerCurrency;
+
+        var converted = ExchangeRateHelper.Convert(price.Value, sourceCurrency, targetCurrency);
+
+        // If conversion failed or target is same as source, don't show secondary
+        if (converted == null || targetCurrency == sourceCurrency) return string.Empty;
+
+        // Show original in parens
+        return $"({ExchangeRateHelper.GetCurrencySymbol(sourceCurrency)}{price.Value:F3})";
+    }
+
     [RelayCommand]
     private void CopyId()
     {
@@ -121,7 +114,7 @@ public partial class ModelItemViewModel : ObservableObject
         package.SetText(Id);
         Clipboard.SetContent(package);
     }
-    
+
     [RelayCommand]
     private void ToggleFavorite()
     {

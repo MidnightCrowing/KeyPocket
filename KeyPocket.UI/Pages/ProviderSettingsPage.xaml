@@ -1,12 +1,12 @@
-<Page x:Name="Root"
+<Page
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     mc:Ignorable="d"
     x:Class="KeyPocket.UI.Pages.ProviderSettingsPage"
+    x:Name="Root"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:controls="using:KeyPocket.UI.Controls"
     xmlns:converters="using:KeyPocket.UI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="using:KeyPocket.UI.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModels="using:KeyPocket.UI.ViewModels"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
@@ -20,649 +20,663 @@
     </Page.Resources>
 
     <Grid>
-        <ScrollViewer x:Name="MainScrollViewer" ViewChanged="OnScrollViewChanged">
-        <StackPanel Padding="40,32" Spacing="0">
+        <ScrollViewer ViewChanged="OnScrollViewChanged" x:Name="MainScrollViewer">
+            <StackPanel Padding="40,32" Spacing="0">
 
-            <!--  Page Header  -->
-            <TextBlock
-                Margin="0,0,0,8"
-                Style="{StaticResource TitleTextBlockStyle}"
-                Text="Provider Settings" />
-            <TextBlock
-                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                Margin="0,0,0,24"
-                Style="{StaticResource BodyTextBlockStyle}"
-                Text="Manage your provider details, API keys, and model configurations." />
-
-            <Border
-                Background="{ThemeResource SurfaceStrokeColorDefaultBrush}"
-                Height="1"
-                Margin="0,0,0,32" />
-
-            <!--  General Settings Section  -->
-            <Grid ColumnSpacing="40">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="240" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-
-                <StackPanel Spacing="4" x:Name="GeneralHeader">
-                    <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="General" />
-                    <TextBlock
-                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                        Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="Basic provider information." />
-                </StackPanel>
-
-                <StackPanel
-                    Grid.Column="1"
-                    HorizontalAlignment="Stretch"
-                    MaxWidth="800"
-                    Spacing="24">
-                    <StackPanel Spacing="8">
-                        <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Name" />
-                        <TextBox Text="{x:Bind ViewModel.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    </StackPanel>
-
-                    <StackPanel Spacing="8">
-                        <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Icon" />
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <Button Content="Presets">
-                                <Button.Flyout>
-                                    <Flyout Placement="Bottom">
-                                        <GridView 
-                                            ItemsSource="{x:Bind ViewModel.DefaultIcons, Mode=OneWay}" 
-                                            SelectionMode="None"
-                                            IsItemClickEnabled="True"
-                                            ItemClick="OnDefaultIconItemClick"
-                                            HorizontalAlignment="Center"
-                                            MaxWidth="300">
-                                            <GridView.ItemContainerStyle>
-                                                <Style TargetType="GridViewItem">
-                                                    <Setter Property="Margin" Value="0,6" />
-                                                    <Setter Property="Padding" Value="4" />
-                                                </Style>
-                                            </GridView.ItemContainerStyle>
-                                            <GridView.ItemTemplate>
-                                                <DataTemplate x:DataType="viewModels:DefaultIconItem">
-                                                    <StackPanel Spacing="4" Width="50" ToolTipService.ToolTip="{x:Bind Name}">
-                                                        <Image Source="{x:Bind Path}" Width="24" Height="24" HorizontalAlignment="Center" />
-                                                        <TextBlock 
-                                                            Text="{x:Bind Name}" 
-                                                            HorizontalAlignment="Center" 
-                                                            TextTrimming="CharacterEllipsis" 
-                                                            FontSize="10"
-                                                            MaxLines="1"/>
-                                                    </StackPanel>
-                                                </DataTemplate>
-                                            </GridView.ItemTemplate>
-                                        </GridView>
-                                    </Flyout>
-                                </Button.Flyout>
-                            </Button>
-                            
-                            <Button Click="OnChangeIconClicked" Content="Browse..." />
-                            
-                            <Button
-                                Click="OnRemoveIconClicked"
-                                Content="Remove Icon"
-                                Style="{StaticResource DefaultButtonStyle}"
-                                Visibility="{x:Bind ViewModel.HasCustomIcon, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}" />
-                        </StackPanel>
-                    </StackPanel>
-
-                    <StackPanel Spacing="8">
-                        <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Base URL" />
-                        <TextBox PlaceholderText="https://api.openai.com/v1" Text="{x:Bind ViewModel.BaseUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <TextBlock
-                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                            Style="{StaticResource CaptionTextBlockStyle}"
-                            Text="The base URL of the API provider." />
-                    </StackPanel>
-
-                    <StackPanel Spacing="8">
-                        <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="API Mode" />
-                        <ComboBox
-                            HorizontalAlignment="Stretch"
-                            ItemsSource="{x:Bind ViewModel.ProviderTypes, Mode=OneWay}"
-                            SelectedIndex="{x:Bind ViewModel.TypeIndex, Mode=TwoWay}" />
-                    </StackPanel>
-
-                    <StackPanel Spacing="8">
-                        <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Provider Currency" />
-                        <ComboBox
-                            HorizontalAlignment="Stretch"
-                            ItemsSource="{x:Bind ViewModel.AvailableCurrencies, Mode=OneWay}"
-                            SelectedItem="{x:Bind ViewModel.ProviderCurrency, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <TextBlock
-                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                            Style="{StaticResource CaptionTextBlockStyle}"
-                            Text="The currency used by this provider for billing." />
-                    </StackPanel>
-
-                    <StackPanel Spacing="8">
-                        <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Description" />
-                        <TextBox
-                            AcceptsReturn="True"
-                            Height="80"
-                            Text="{x:Bind ViewModel.Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                            TextWrapping="Wrap" />
-                    </StackPanel>
-
-                    <Button
-                        Command="{x:Bind ViewModel.SaveCommand, Mode=OneWay}"
-                        Content="Save Changes"
-                        HorizontalAlignment="Right"
-                        Style="{StaticResource AccentButtonStyle}" />
-                </StackPanel>
-            </Grid>
-
-            <Border
-                Background="{ThemeResource SurfaceStrokeColorDefaultBrush}"
-                Height="1"
-                Margin="0,40,0,40" />
-
-            <!--  API Keys Section  -->
-            <Grid ColumnSpacing="40">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="240" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-
-                <StackPanel Spacing="4" x:Name="ApiKeysHeader">
-                    <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="API Keys" />
-                    <TextBlock
-                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                        Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="Manage access keys for this provider." />
-                </StackPanel>
-
-                <StackPanel
-                    Grid.Column="1"
-                    HorizontalAlignment="Stretch"
-                    MaxWidth="800"
-                    Spacing="16">
-                    <ListView 
-                        ItemsSource="{x:Bind ViewModel.ApiKeys, Mode=OneWay}"
-                        CanReorderItems="True"
-                        AllowDrop="True"
-                        CanDragItems="True"
-                        SelectionMode="None"
-                        ScrollViewer.VerticalScrollMode="Disabled">
-                        <ListView.ItemContainerStyle>
-                            <Style TargetType="ListViewItem">
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                                <Setter Property="Padding" Value="0" />
-                                <Setter Property="Margin" Value="0,0,0,8" />
-                                <Setter Property="MinHeight" Value="0" />
-                                <Setter Property="Background" Value="Transparent" />
-                            </Style>
-                        </ListView.ItemContainerStyle>
-                        <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="viewModels:KeyWrapper">
-                                <Grid
-                                    Background="{ThemeResource LayerFillColorDefaultBrush}"
-                                    BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
-                                    BorderThickness="1"
-                                    CornerRadius="4"
-                                    Padding="12">
-
-                                    <!--  Read Only View  -->
-                                    <Grid Visibility="{x:Bind IsReadOnly, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-
-                                        <!--  Left Side: Masked Key  -->
-                                        <TextBlock
-                                            FontFamily="Consolas"
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                            Style="{StaticResource BodyTextBlockStyle}"
-                                            Text="{x:Bind MaskedKey, Mode=OneWay}"
-                                            VerticalAlignment="Center" />
-
-                                        <!--  Right Side: Buttons  -->
-                                        <StackPanel
-                                            Grid.Column="1"
-                                            Orientation="Horizontal"
-                                            Spacing="8">
-
-                                            <!--  Tag Button / Input Area  -->
-                                            <Grid>
-                                                <!--  Add Tag Icon Button (shown when no tag)  -->
-                                                <Button
-                                                    Background="Transparent"
-                                                    BorderThickness="0"
-                                                    Command="{x:Bind StartEditTagCommand}"
-                                                    Padding="8"
-                                                    ToolTipService.ToolTip="Add Tag"
-                                                    VerticalAlignment="Center"
-                                                    Visibility="{x:Bind IsTagDisplayVisible, Converter={StaticResource BoolToVisConverter}, Mode=OneWay}">
-                                                    <FontIcon
-                                                        FontFamily="{StaticResource SymbolThemeFontFamily}"
-                                                        FontSize="16"
-                                                        Glyph="&#xE8EC;" />
-                                                </Button>
-
-                                                <!--  Tag Text Button (shown when tag exists and not editing)  -->
-                                                <Button
-                                                    Command="{x:Bind StartEditTagCommand}"
-                                                    Content="{x:Bind Tag, Mode=OneWay}"
-                                                    Padding="8,4"
-                                                    Style="{StaticResource SubtleButtonStyle}"
-                                                    ToolTipService.ToolTip="Click to edit tag"
-                                                    VerticalAlignment="Center"
-                                                    Visibility="{x:Bind IsTagTextVisible, Converter={StaticResource BoolToVisConverter}, Mode=OneWay}" />
-
-                                                <!--  Tag Input (shown when editing)  -->
-                                                <TextBox
-                                                    KeyDown="OnKeyTagKeyDown"
-                                                    PlaceholderText="Tag"
-                                                    Text="{x:Bind Tag, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                    VerticalAlignment="Center"
-                                                    Visibility="{x:Bind IsTagEditing, Converter={StaticResource BoolToVisConverter}, Mode=OneWay}"
-                                                    Width="80" />
-                                            </Grid>
-
-                                            <controls:CopyButton
-                                                Click="OnCopyKeyClicked"
-                                                Content="&#xE8C8;"
-                                                Padding="8"
-                                                Tag="{x:Bind Id, Mode=OneWay}"
-                                                ToolTipService.ToolTip="Copy Key" />
-                                            <Button
-                                                Background="Transparent"
-                                                BorderThickness="0"
-                                                Command="{x:Bind ToggleFavoriteCommand}"
-                                                Padding="8"
-                                                ToolTipService.ToolTip="Favorite">
-                                                <FontIcon
-                                                    FontFamily="{StaticResource SymbolThemeFontFamily}"
-                                                    FontSize="16"
-                                                    Glyph="{x:Bind FavoriteIcon, Mode=OneWay}" />
-                                            </Button>
-                                            <Button
-                                                Background="Transparent"
-                                                BorderThickness="0"
-                                                Command="{x:Bind DeleteCommand}"
-                                                Padding="8"
-                                                ToolTipService.ToolTip="Delete">
-                                                <FontIcon
-                                                    FontFamily="{StaticResource SymbolThemeFontFamily}"
-                                                    FontSize="16"
-                                                    Foreground="{ThemeResource SystemFillColorCriticalBrush}"
-                                                    Glyph="&#xE74D;" />
-                                            </Button>
-                                        </StackPanel>
-                                    </Grid>
-
-                                    <!--  Edit View  -->
-                                    <Grid KeyDown="OnApiKeyEditKeyDown" Visibility="{x:Bind IsEditing, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-
-                                        <PasswordBox Password="{x:Bind NewKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Enter API Key (sk-...)" />
-
-                                        <StackPanel
-                                            Grid.Column="1"
-                                            Margin="12,0,0,0"
-                                            Orientation="Horizontal"
-                                            Spacing="8">
-                                            <Button
-                                                Command="{x:Bind ConfirmAddCommand}"
-                                                CommandParameter="{x:Bind}"
-                                                Content="Confirm"
-                                                Style="{StaticResource AccentButtonStyle}" />
-                                            <Button
-                                                Command="{x:Bind CancelAddCommand}"
-                                                CommandParameter="{x:Bind}"
-                                                Content="Cancel" />
-                                        </StackPanel>
-                                    </Grid>
-                                </Grid>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                    <Button Command="{x:Bind ViewModel.AddKeyCommand, Mode=OneWay}" Content="Add API Key" />
-                </StackPanel>
-            </Grid>
-
-            <Border
-                Background="{ThemeResource SurfaceStrokeColorDefaultBrush}"
-                Height="1"
-                Margin="0,40,0,40" />
-
-            <!--  Models Section  -->
-            <Grid ColumnSpacing="40">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="240" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-
-                <StackPanel Spacing="4" x:Name="ModelsHeader">
-                    <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="Models" />
-                    <TextBlock
-                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                        Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="Configure available models." />
-                </StackPanel>
-
-                <StackPanel
-                    Grid.Column="1"
-                    HorizontalAlignment="Stretch"
-                    MaxWidth="800"
-                    Spacing="16">
-
-                    <ListView 
-                        ItemsSource="{x:Bind ViewModel.Models, Mode=OneWay}"
-                        CanReorderItems="True"
-                        AllowDrop="True"
-                        CanDragItems="True"
-                        SelectionMode="None"
-                        ScrollViewer.VerticalScrollMode="Disabled">
-                        <ListView.ItemContainerStyle>
-                            <Style TargetType="ListViewItem">
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                                <Setter Property="Padding" Value="0" />
-                                <Setter Property="Margin" Value="0,0,0,8" />
-                                <Setter Property="MinHeight" Value="0" />
-                                <Setter Property="Background" Value="Transparent" />
-                            </Style>
-                        </ListView.ItemContainerStyle>
-                        <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="viewModels:ModelWrapper">
-                                <Grid
-                                    Background="{ThemeResource LayerFillColorDefaultBrush}"
-                                    BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
-                                    BorderThickness="1"
-                                    CornerRadius="4"
-                                    Padding="12">
-
-                                    <!--  Read Only View  -->
-                                    <Grid Visibility="{x:Bind IsReadOnly, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-
-                                        <TextBlock
-                                            Grid.Column="0"
-                                            Style="{StaticResource BodyStrongTextBlockStyle}"
-                                            Text="{x:Bind Name, Mode=OneWay}"
-                                            VerticalAlignment="Center" />
-
-                                        <!-- Price Info -->
-                                        <Grid 
-                                            Grid.Column="1" 
-                                            VerticalAlignment="Center" 
-                                            Margin="0,0,24,0"
-                                            RowSpacing="2"
-                                            ColumnSpacing="4">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="Auto"/>
-                                            </Grid.RowDefinitions>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-
-                                            <!-- Input Price -->
-                                            <TextBlock 
-                                                Grid.Row="0" Grid.Column="0"
-                                                Text="In:" 
-                                                Visibility="{x:Bind HasInputPrice, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}"
-                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" 
-                                                FontSize="12"
-                                                FontFamily="Consolas"
-                                                HorizontalAlignment="Left"/>
-                                            <TextBlock 
-                                                Grid.Row="0" Grid.Column="1"
-                                                Text="{x:Bind InputPriceDisplay, Mode=OneWay}" 
-                                                Visibility="{x:Bind HasInputPrice, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}"
-                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" 
-                                                FontSize="12"
-                                                FontFamily="Consolas"
-                                                HorizontalAlignment="Right"/>
-
-                                            <!-- Output Price -->
-                                            <TextBlock 
-                                                Grid.Row="1" Grid.Column="0"
-                                                Text="Out:" 
-                                                Visibility="{x:Bind HasOutputPrice, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}"
-                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" 
-                                                FontSize="12"
-                                                FontFamily="Consolas"
-                                                HorizontalAlignment="Left"/>
-                                            <TextBlock 
-                                                Grid.Row="1" Grid.Column="1"
-                                                Text="{x:Bind OutputPriceDisplay, Mode=OneWay}" 
-                                                Visibility="{x:Bind HasOutputPrice, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}"
-                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" 
-                                                FontSize="12"
-                                                FontFamily="Consolas"
-                                                HorizontalAlignment="Right"/>
-                                        </Grid>
-
-                                        <StackPanel
-                                            Grid.Column="2"
-                                            Orientation="Horizontal"
-                                            Spacing="4">
-                                            <controls:CopyButton
-                                                Click="OnCopyModelIdClicked"
-                                                Content="&#xE8C8;"
-                                                Padding="8"
-                                                Tag="{x:Bind Id, Mode=OneWay}"
-                                                ToolTipService.ToolTip="Copy Model ID" />
-                                            <Button
-                                                Background="Transparent"
-                                                BorderThickness="0"
-                                                Command="{x:Bind StartEditCommand}"
-                                                Padding="8"
-                                                ToolTipService.ToolTip="Edit">
-                                                <FontIcon
-                                                    FontFamily="{StaticResource SymbolThemeFontFamily}"
-                                                    FontSize="16"
-                                                    Glyph="&#xE70F;" />
-                                            </Button>
-                                            <Button
-                                                Background="Transparent"
-                                                BorderThickness="0"
-                                                Command="{x:Bind ToggleFavoriteCommand}"
-                                                Padding="8"
-                                                ToolTipService.ToolTip="Favorite">
-                                                <FontIcon
-                                                    FontFamily="{StaticResource SymbolThemeFontFamily}"
-                                                    FontSize="16"
-                                                    Glyph="{x:Bind FavoriteIcon, Mode=OneWay}" />
-                                            </Button>
-                                            <Button
-                                                Background="Transparent"
-                                                BorderThickness="0"
-                                                Command="{x:Bind DeleteCommand}"
-                                                Padding="8"
-                                                ToolTipService.ToolTip="Delete">
-                                                <FontIcon
-                                                    FontFamily="{StaticResource SymbolThemeFontFamily}"
-                                                    FontSize="16"
-                                                    Foreground="{ThemeResource SystemFillColorCriticalBrush}"
-                                                    Glyph="&#xE74D;" />
-                                            </Button>
-                                        </StackPanel>
-                                    </Grid>
-
-                                    <!--  Edit View  -->
-                                    <Grid KeyDown="OnModelEditKeyDown" Visibility="{x:Bind IsEditing, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                        </Grid.RowDefinitions>
-
-                                        <!--  Row 1: ID and Name  -->
-                                        <Grid Grid.Row="0" Margin="0,0,0,12">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="12" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
-
-                                            <StackPanel>
-                                                <TextBlock
-                                                    Margin="0,0,0,4"
-                                                    Style="{StaticResource CaptionTextBlockStyle}"
-                                                    Text="Model ID" />
-                                                <TextBox PlaceholderText="e.g. gpt-4" Text="{x:Bind NewId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                            </StackPanel>
-
-                                            <StackPanel Grid.Column="2">
-                                                <TextBlock
-                                                    Margin="0,0,0,4"
-                                                    Style="{StaticResource CaptionTextBlockStyle}"
-                                                    Text="Display Name (Optional)" />
-                                                <TextBox PlaceholderText="e.g. GPT-4" Text="{x:Bind NewName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                            </StackPanel>
-                                        </Grid>
-
-                                        <!--  Row 2: Pricing  -->
-                                        <Grid Grid.Row="1" Margin="0,0,0,12">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="12" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
-
-                                            <StackPanel>
-                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                                                    <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="Input Price (per M tokens)" />
-                                                </StackPanel>
-                                                <Grid ColumnSpacing="8">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                        <ColumnDefinition Width="*"/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <TextBlock 
-                                                        Grid.Column="0"
-                                                        Text="{x:Bind ProviderSymbol, Mode=OneWay}" 
-                                                        VerticalAlignment="Center" 
-                                                        FontWeight="SemiBold"
-                                                        FontSize="16"/>
-                                                    <NumberBox
-                                                        Grid.Column="1"
-                                                        HorizontalAlignment="Stretch"
-                                                        LargeChange="0.1"
-                                                        PlaceholderText="e.g. 0.03"
-                                                        SmallChange="0.01"
-                                                        SpinButtonPlacementMode="Inline"
-                                                        Value="{x:Bind InputPriceValue, Mode=TwoWay}"
-                                                        ValueChanged="OnPriceValueChanged" />
-                                                </Grid>
-                                            </StackPanel>
-
-                                            <StackPanel Grid.Column="2">
-                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                                                    <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="Output Price (per M tokens)" />
-                                                </StackPanel>
-                                                <Grid ColumnSpacing="8">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                        <ColumnDefinition Width="*"/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <TextBlock 
-                                                        Grid.Column="0"
-                                                        Text="{x:Bind ProviderSymbol, Mode=OneWay}" 
-                                                        VerticalAlignment="Center" 
-                                                        FontWeight="SemiBold"
-                                                        FontSize="16"/>
-                                                    <NumberBox
-                                                        Grid.Column="1"
-                                                        HorizontalAlignment="Stretch"
-                                                        LargeChange="0.1"
-                                                        PlaceholderText="e.g. 0.06"
-                                                        SmallChange="0.01"
-                                                        SpinButtonPlacementMode="Inline"
-                                                        Value="{x:Bind OutputPriceValue, Mode=TwoWay}"
-                                                        ValueChanged="OnPriceValueChanged" />
-                                                </Grid>
-                                            </StackPanel>
-                                         </Grid>
-
-                                        <!--  Row 3: Buttons  -->
-                                        <StackPanel
-                                            Grid.Row="2"
-                                            HorizontalAlignment="Right"
-                                            Orientation="Horizontal"
-                                            Spacing="8">
-                                            <Button
-                                                Command="{x:Bind ConfirmAddCommand}"
-                                                Content="Confirm"
-                                                Style="{StaticResource AccentButtonStyle}" />
-                                            <Button Command="{x:Bind CancelAddCommand}" Content="Cancel" />
-                                        </StackPanel>
-                                    </Grid>
-                                </Grid>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Button Command="{x:Bind ViewModel.AddModelCommand, Mode=OneWay}" Content="Add Model" />
-                        <Button Content="Fetch Models" ToolTipService.ToolTip="Fetch available models from provider" />
-                    </StackPanel>
-                </StackPanel>
-            </Grid>
-
-            <Border
-                Background="{ThemeResource SurfaceStrokeColorDefaultBrush}"
-                Height="1"
-                Margin="0,40,0,40" />
-
-
-            <StackPanel Margin="0,0,0,40" Spacing="16">
+                <!--  Page Header  -->
                 <TextBlock
-                    Foreground="{ThemeResource SystemFillColorCriticalBrush}"
-                    Style="{StaticResource SubtitleTextBlockStyle}"
-                    Text="Danger Zone" />
+                    Margin="0,0,0,8"
+                    Style="{StaticResource TitleTextBlockStyle}"
+                    Text="Provider Settings" />
+                <TextBlock
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Margin="0,0,0,24"
+                    Style="{StaticResource BodyTextBlockStyle}"
+                    Text="Manage your provider details, API keys, and model configurations." />
 
                 <Border
-                    BorderBrush="{ThemeResource SystemFillColorCriticalBrush}"
-                    BorderThickness="1"
-                    CornerRadius="6"
-                    Padding="16">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Spacing="4">
-                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Delete this provider" />
+                    Background="{ThemeResource SurfaceStrokeColorDefaultBrush}"
+                    Height="1"
+                    Margin="0,0,0,32" />
+
+                <!--  General Settings Section  -->
+                <Grid ColumnSpacing="40">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="240" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Spacing="4" x:Name="GeneralHeader">
+                        <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="General" />
+                        <TextBlock
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="Basic provider information." />
+                    </StackPanel>
+
+                    <StackPanel
+                        Grid.Column="1"
+                        HorizontalAlignment="Stretch"
+                        MaxWidth="800"
+                        Spacing="24">
+                        <StackPanel Spacing="8">
+                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Name" />
+                            <TextBox Text="{x:Bind ViewModel.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="8">
+                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Icon" />
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button Content="Presets">
+                                    <Button.Flyout>
+                                        <Flyout Placement="Bottom">
+                                            <GridView
+                                                HorizontalAlignment="Center"
+                                                IsItemClickEnabled="True"
+                                                ItemClick="OnDefaultIconItemClick"
+                                                ItemsSource="{x:Bind ViewModel.DefaultIcons, Mode=OneWay}"
+                                                MaxWidth="300"
+                                                SelectionMode="None">
+                                                <GridView.ItemContainerStyle>
+                                                    <Style TargetType="GridViewItem">
+                                                        <Setter Property="Margin" Value="0,6" />
+                                                        <Setter Property="Padding" Value="4" />
+                                                    </Style>
+                                                </GridView.ItemContainerStyle>
+                                                <GridView.ItemTemplate>
+                                                    <DataTemplate x:DataType="viewModels:DefaultIconItem">
+                                                        <StackPanel
+                                                            Spacing="4"
+                                                            ToolTipService.ToolTip="{x:Bind Name}"
+                                                            Width="50">
+                                                            <Image
+                                                                Height="24"
+                                                                HorizontalAlignment="Center"
+                                                                Source="{x:Bind Path}"
+                                                                Width="24" />
+                                                            <TextBlock
+                                                                FontSize="10"
+                                                                HorizontalAlignment="Center"
+                                                                MaxLines="1"
+                                                                Text="{x:Bind Name}"
+                                                                TextTrimming="CharacterEllipsis" />
+                                                        </StackPanel>
+                                                    </DataTemplate>
+                                                </GridView.ItemTemplate>
+                                            </GridView>
+                                        </Flyout>
+                                    </Button.Flyout>
+                                </Button>
+
+                                <Button Click="OnChangeIconClicked" Content="Browse..." />
+
+                                <Button
+                                    Click="OnRemoveIconClicked"
+                                    Content="Remove Icon"
+                                    Style="{StaticResource DefaultButtonStyle}"
+                                    Visibility="{x:Bind ViewModel.HasCustomIcon, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Spacing="8">
+                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Base URL" />
+                            <TextBox PlaceholderText="https://api.openai.com/v1" Text="{x:Bind ViewModel.BaseUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBlock
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                 Style="{StaticResource CaptionTextBlockStyle}"
-                                Text="Once you delete a provider, there is no going back. Please be certain." />
+                                Text="The base URL of the API provider." />
+                        </StackPanel>
+
+                        <StackPanel Spacing="8">
+                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="API Mode" />
+                            <ComboBox
+                                HorizontalAlignment="Stretch"
+                                ItemsSource="{x:Bind ViewModel.ProviderTypes, Mode=OneWay}"
+                                SelectedIndex="{x:Bind ViewModel.TypeIndex, Mode=TwoWay}" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="8">
+                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Provider Currency" />
+                            <ComboBox
+                                HorizontalAlignment="Stretch"
+                                ItemsSource="{x:Bind ViewModel.AvailableCurrencies, Mode=OneWay}"
+                                SelectedItem="{x:Bind ViewModel.ProviderCurrency, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="The currency used by this provider for billing." />
+                        </StackPanel>
+
+                        <StackPanel Spacing="8">
+                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Description" />
+                            <TextBox
+                                AcceptsReturn="True"
+                                Height="80"
+                                Text="{x:Bind ViewModel.Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                TextWrapping="Wrap" />
                         </StackPanel>
 
                         <Button
-                            Background="{ThemeResource SystemFillColorCriticalBrush}"
-                            BorderThickness="0"
-                            Click="OnDeleteProviderClicked"
-                            Content="Delete this provider"
-                            Foreground="White"
-                            Grid.Column="1" />
-                    </Grid>
-                </Border>
+                            Command="{x:Bind ViewModel.SaveCommand, Mode=OneWay}"
+                            Content="Save Changes"
+                            HorizontalAlignment="Right"
+                            Style="{StaticResource AccentButtonStyle}" />
+                    </StackPanel>
+                </Grid>
+
+                <Border
+                    Background="{ThemeResource SurfaceStrokeColorDefaultBrush}"
+                    Height="1"
+                    Margin="0,40,0,40" />
+
+                <!--  API Keys Section  -->
+                <Grid ColumnSpacing="40">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="240" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Spacing="4" x:Name="ApiKeysHeader">
+                        <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="API Keys" />
+                        <TextBlock
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="Manage access keys for this provider." />
+                    </StackPanel>
+
+                    <StackPanel
+                        Grid.Column="1"
+                        HorizontalAlignment="Stretch"
+                        MaxWidth="800"
+                        Spacing="16">
+                        <ListView
+                            AllowDrop="True"
+                            CanDragItems="True"
+                            CanReorderItems="True"
+                            ItemsSource="{x:Bind ViewModel.ApiKeys, Mode=OneWay}"
+                            ScrollViewer.VerticalScrollMode="Disabled"
+                            SelectionMode="None">
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    <Setter Property="Padding" Value="0" />
+                                    <Setter Property="Margin" Value="0,0,0,8" />
+                                    <Setter Property="MinHeight" Value="0" />
+                                    <Setter Property="Background" Value="Transparent" />
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="viewModels:KeyWrapper">
+                                    <Grid
+                                        Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                        BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        Padding="12">
+
+                                        <!--  Read Only View  -->
+                                        <Grid Visibility="{x:Bind IsReadOnly, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <!--  Left Side: Masked Key  -->
+                                            <TextBlock
+                                                FontFamily="Consolas"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Style="{StaticResource BodyTextBlockStyle}"
+                                                Text="{x:Bind MaskedKey, Mode=OneWay}"
+                                                VerticalAlignment="Center" />
+
+                                            <!--  Right Side: Buttons  -->
+                                            <StackPanel
+                                                Grid.Column="1"
+                                                Orientation="Horizontal"
+                                                Spacing="8">
+
+                                                <!--  Tag Button / Input Area  -->
+                                                <Grid>
+                                                    <!--  Add Tag Icon Button (shown when no tag)  -->
+                                                    <Button
+                                                        Background="Transparent"
+                                                        BorderThickness="0"
+                                                        Command="{x:Bind StartEditTagCommand}"
+                                                        Padding="8"
+                                                        ToolTipService.ToolTip="Add Tag"
+                                                        VerticalAlignment="Center"
+                                                        Visibility="{x:Bind IsTagDisplayVisible, Converter={StaticResource BoolToVisConverter}, Mode=OneWay}">
+                                                        <FontIcon
+                                                            FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                                            FontSize="16"
+                                                            Glyph="&#xE8EC;" />
+                                                    </Button>
+
+                                                    <!--  Tag Text Button (shown when tag exists and not editing)  -->
+                                                    <Button
+                                                        Command="{x:Bind StartEditTagCommand}"
+                                                        Content="{x:Bind Tag, Mode=OneWay}"
+                                                        Padding="8,4"
+                                                        Style="{StaticResource SubtleButtonStyle}"
+                                                        ToolTipService.ToolTip="Click to edit tag"
+                                                        VerticalAlignment="Center"
+                                                        Visibility="{x:Bind IsTagTextVisible, Converter={StaticResource BoolToVisConverter}, Mode=OneWay}" />
+
+                                                    <!--  Tag Input (shown when editing)  -->
+                                                    <TextBox
+                                                        KeyDown="OnKeyTagKeyDown"
+                                                        PlaceholderText="Tag"
+                                                        Text="{x:Bind Tag, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                        VerticalAlignment="Center"
+                                                        Visibility="{x:Bind IsTagEditing, Converter={StaticResource BoolToVisConverter}, Mode=OneWay}"
+                                                        Width="80" />
+                                                </Grid>
+
+                                                <controls:CopyButton
+                                                    Click="OnCopyKeyClicked"
+                                                    Content="&#xE8C8;"
+                                                    Padding="8"
+                                                    Tag="{x:Bind Id, Mode=OneWay}"
+                                                    ToolTipService.ToolTip="Copy Key" />
+                                                <Button
+                                                    Background="Transparent"
+                                                    BorderThickness="0"
+                                                    Command="{x:Bind ToggleFavoriteCommand}"
+                                                    Padding="8"
+                                                    ToolTipService.ToolTip="Favorite">
+                                                    <FontIcon
+                                                        FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                                        FontSize="16"
+                                                        Glyph="{x:Bind FavoriteIcon, Mode=OneWay}" />
+                                                </Button>
+                                                <Button
+                                                    Background="Transparent"
+                                                    BorderThickness="0"
+                                                    Command="{x:Bind DeleteCommand}"
+                                                    Padding="8"
+                                                    ToolTipService.ToolTip="Delete">
+                                                    <FontIcon
+                                                        FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                                        FontSize="16"
+                                                        Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                                                        Glyph="&#xE74D;" />
+                                                </Button>
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <!--  Edit View  -->
+                                        <Grid KeyDown="OnApiKeyEditKeyDown" Visibility="{x:Bind IsEditing, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <PasswordBox Password="{x:Bind NewKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Enter API Key (sk-...)" />
+
+                                            <StackPanel
+                                                Grid.Column="1"
+                                                Margin="12,0,0,0"
+                                                Orientation="Horizontal"
+                                                Spacing="8">
+                                                <Button
+                                                    Command="{x:Bind ConfirmAddCommand}"
+                                                    CommandParameter="{x:Bind}"
+                                                    Content="Confirm"
+                                                    Style="{StaticResource AccentButtonStyle}" />
+                                                <Button
+                                                    Command="{x:Bind CancelAddCommand}"
+                                                    CommandParameter="{x:Bind}"
+                                                    Content="Cancel" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                        <Button Command="{x:Bind ViewModel.AddKeyCommand, Mode=OneWay}" Content="Add API Key" />
+                    </StackPanel>
+                </Grid>
+
+                <Border
+                    Background="{ThemeResource SurfaceStrokeColorDefaultBrush}"
+                    Height="1"
+                    Margin="0,40,0,40" />
+
+                <!--  Models Section  -->
+                <Grid ColumnSpacing="40">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="240" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Spacing="4" x:Name="ModelsHeader">
+                        <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="Models" />
+                        <TextBlock
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="Configure available models." />
+                    </StackPanel>
+
+                    <StackPanel
+                        Grid.Column="1"
+                        HorizontalAlignment="Stretch"
+                        MaxWidth="800"
+                        Spacing="16">
+
+                        <ListView
+                            AllowDrop="True"
+                            CanDragItems="True"
+                            CanReorderItems="True"
+                            ItemsSource="{x:Bind ViewModel.Models, Mode=OneWay}"
+                            ScrollViewer.VerticalScrollMode="Disabled"
+                            SelectionMode="None">
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    <Setter Property="Padding" Value="0" />
+                                    <Setter Property="Margin" Value="0,0,0,8" />
+                                    <Setter Property="MinHeight" Value="0" />
+                                    <Setter Property="Background" Value="Transparent" />
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="viewModels:ModelWrapper">
+                                    <Grid
+                                        Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                        BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        Padding="12">
+
+                                        <!--  Read Only View  -->
+                                        <Grid Visibility="{x:Bind IsReadOnly, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock
+                                                Grid.Column="0"
+                                                Style="{StaticResource BodyStrongTextBlockStyle}"
+                                                Text="{x:Bind Name, Mode=OneWay}"
+                                                VerticalAlignment="Center" />
+
+                                            <!--  Price Info  -->
+                                            <Grid
+                                                ColumnSpacing="4"
+                                                Grid.Column="1"
+                                                Margin="0,0,24,0"
+                                                RowSpacing="2"
+                                                VerticalAlignment="Center">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <!--  Input Price  -->
+                                                <TextBlock
+                                                    FontFamily="Consolas"
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Grid.Column="0"
+                                                    Grid.Row="0"
+                                                    HorizontalAlignment="Left"
+                                                    Text="In:"
+                                                    Visibility="{x:Bind HasInputPrice, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}" />
+                                                <TextBlock
+                                                    FontFamily="Consolas"
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Grid.Column="1"
+                                                    Grid.Row="0"
+                                                    HorizontalAlignment="Right"
+                                                    Text="{x:Bind InputPriceDisplay, Mode=OneWay}"
+                                                    Visibility="{x:Bind HasInputPrice, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}" />
+
+                                                <!--  Output Price  -->
+                                                <TextBlock
+                                                    FontFamily="Consolas"
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Grid.Column="0"
+                                                    Grid.Row="1"
+                                                    HorizontalAlignment="Left"
+                                                    Text="Out:"
+                                                    Visibility="{x:Bind HasOutputPrice, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}" />
+                                                <TextBlock
+                                                    FontFamily="Consolas"
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Grid.Column="1"
+                                                    Grid.Row="1"
+                                                    HorizontalAlignment="Right"
+                                                    Text="{x:Bind OutputPriceDisplay, Mode=OneWay}"
+                                                    Visibility="{x:Bind HasOutputPrice, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}" />
+                                            </Grid>
+
+                                            <StackPanel
+                                                Grid.Column="2"
+                                                Orientation="Horizontal"
+                                                Spacing="4">
+                                                <controls:CopyButton
+                                                    Click="OnCopyModelIdClicked"
+                                                    Content="&#xE8C8;"
+                                                    Padding="8"
+                                                    Tag="{x:Bind Id, Mode=OneWay}"
+                                                    ToolTipService.ToolTip="Copy Model ID" />
+                                                <Button
+                                                    Background="Transparent"
+                                                    BorderThickness="0"
+                                                    Command="{x:Bind StartEditCommand}"
+                                                    Padding="8"
+                                                    ToolTipService.ToolTip="Edit">
+                                                    <FontIcon
+                                                        FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                                        FontSize="16"
+                                                        Glyph="&#xE70F;" />
+                                                </Button>
+                                                <Button
+                                                    Background="Transparent"
+                                                    BorderThickness="0"
+                                                    Command="{x:Bind ToggleFavoriteCommand}"
+                                                    Padding="8"
+                                                    ToolTipService.ToolTip="Favorite">
+                                                    <FontIcon
+                                                        FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                                        FontSize="16"
+                                                        Glyph="{x:Bind FavoriteIcon, Mode=OneWay}" />
+                                                </Button>
+                                                <Button
+                                                    Background="Transparent"
+                                                    BorderThickness="0"
+                                                    Command="{x:Bind DeleteCommand}"
+                                                    Padding="8"
+                                                    ToolTipService.ToolTip="Delete">
+                                                    <FontIcon
+                                                        FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                                        FontSize="16"
+                                                        Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                                                        Glyph="&#xE74D;" />
+                                                </Button>
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <!--  Edit View  -->
+                                        <Grid KeyDown="OnModelEditKeyDown" Visibility="{x:Bind IsEditing, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
+                                            <!--  Row 1: ID and Name  -->
+                                            <Grid Grid.Row="0" Margin="0,0,0,12">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="12" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <StackPanel>
+                                                    <TextBlock
+                                                        Margin="0,0,0,4"
+                                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                                        Text="Model ID" />
+                                                    <TextBox PlaceholderText="e.g. gpt-4" Text="{x:Bind NewId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                </StackPanel>
+
+                                                <StackPanel Grid.Column="2">
+                                                    <TextBlock
+                                                        Margin="0,0,0,4"
+                                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                                        Text="Display Name (Optional)" />
+                                                    <TextBox PlaceholderText="e.g. GPT-4" Text="{x:Bind NewName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                </StackPanel>
+                                            </Grid>
+
+                                            <!--  Row 2: Pricing  -->
+                                            <Grid Grid.Row="1" Margin="0,0,0,12">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="12" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <StackPanel>
+                                                    <StackPanel Margin="0,0,0,4" Orientation="Horizontal">
+                                                        <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="Input Price (per M tokens)" />
+                                                    </StackPanel>
+                                                    <Grid ColumnSpacing="8">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock
+                                                            FontSize="16"
+                                                            FontWeight="SemiBold"
+                                                            Grid.Column="0"
+                                                            Text="{x:Bind ProviderSymbol, Mode=OneWay}"
+                                                            VerticalAlignment="Center" />
+                                                        <NumberBox
+                                                            Grid.Column="1"
+                                                            HorizontalAlignment="Stretch"
+                                                            LargeChange="0.1"
+                                                            PlaceholderText="e.g. 0.03"
+                                                            SmallChange="0.01"
+                                                            SpinButtonPlacementMode="Inline"
+                                                            Value="{x:Bind InputPriceValue, Mode=TwoWay}"
+                                                            ValueChanged="OnPriceValueChanged" />
+                                                    </Grid>
+                                                </StackPanel>
+
+                                                <StackPanel Grid.Column="2">
+                                                    <StackPanel Margin="0,0,0,4" Orientation="Horizontal">
+                                                        <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="Output Price (per M tokens)" />
+                                                    </StackPanel>
+                                                    <Grid ColumnSpacing="8">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock
+                                                            FontSize="16"
+                                                            FontWeight="SemiBold"
+                                                            Grid.Column="0"
+                                                            Text="{x:Bind ProviderSymbol, Mode=OneWay}"
+                                                            VerticalAlignment="Center" />
+                                                        <NumberBox
+                                                            Grid.Column="1"
+                                                            HorizontalAlignment="Stretch"
+                                                            LargeChange="0.1"
+                                                            PlaceholderText="e.g. 0.06"
+                                                            SmallChange="0.01"
+                                                            SpinButtonPlacementMode="Inline"
+                                                            Value="{x:Bind OutputPriceValue, Mode=TwoWay}"
+                                                            ValueChanged="OnPriceValueChanged" />
+                                                    </Grid>
+                                                </StackPanel>
+                                            </Grid>
+
+                                            <!--  Row 3: Buttons  -->
+                                            <StackPanel
+                                                Grid.Row="2"
+                                                HorizontalAlignment="Right"
+                                                Orientation="Horizontal"
+                                                Spacing="8">
+                                                <Button
+                                                    Command="{x:Bind ConfirmAddCommand}"
+                                                    Content="Confirm"
+                                                    Style="{StaticResource AccentButtonStyle}" />
+                                                <Button Command="{x:Bind CancelAddCommand}" Content="Cancel" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Button Command="{x:Bind ViewModel.AddModelCommand, Mode=OneWay}" Content="Add Model" />
+                            <Button Content="Fetch Models" ToolTipService.ToolTip="Fetch available models from provider" />
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+
+                <Border
+                    Background="{ThemeResource SurfaceStrokeColorDefaultBrush}"
+                    Height="1"
+                    Margin="0,40,0,40" />
+
+
+                <StackPanel Margin="0,0,0,40" Spacing="16">
+                    <TextBlock
+                        Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                        Style="{StaticResource SubtitleTextBlockStyle}"
+                        Text="Danger Zone" />
+
+                    <Border
+                        BorderBrush="{ThemeResource SystemFillColorCriticalBrush}"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        Padding="16">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Spacing="4">
+                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Delete this provider" />
+                                <TextBlock
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Style="{StaticResource CaptionTextBlockStyle}"
+                                    Text="Once you delete a provider, there is no going back. Please be certain." />
+                            </StackPanel>
+
+                            <Button
+                                Background="{ThemeResource SystemFillColorCriticalBrush}"
+                                BorderThickness="0"
+                                Click="OnDeleteProviderClicked"
+                                Content="Delete this provider"
+                                Foreground="White"
+                                Grid.Column="1" />
+                        </Grid>
+                    </Border>
+                </StackPanel>
+
             </StackPanel>
+        </ScrollViewer>
 
-        </StackPanel>
-    </ScrollViewer>
-
-    <!-- Sticky Headers Canvas Overlay -->
-    <Canvas x:Name="StickyHeadersCanvas" IsHitTestVisible="False" VerticalAlignment="Top">
-        <!-- Sticky headers will be added here dynamically or via templates -->
-    </Canvas>
+        <!--  Sticky Headers Canvas Overlay  -->
+        <Canvas
+            IsHitTestVisible="False"
+            VerticalAlignment="Top"
+            x:Name="StickyHeadersCanvas">
+            <!--  Sticky headers will be added here dynamically or via templates  -->
+        </Canvas>
     </Grid>
 </Page>

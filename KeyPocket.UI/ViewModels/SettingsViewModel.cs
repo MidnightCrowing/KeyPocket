@@ -1,22 +1,20 @@
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using KeyPocket.UI.Helpers;
-using Microsoft.UI.Xaml;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.System;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using KeyPocket.UI.Helpers;
+using Microsoft.UI.Xaml;
 
 namespace KeyPocket.UI.ViewModels;
 
 public partial class ExchangeRateItem : ObservableObject
 {
-    public string Source { get; }
-    public string Target { get; }
+    private readonly Action<string, decimal> _onRateChanged;
 
-    [ObservableProperty]
-    private decimal _rate;
+    [ObservableProperty] private decimal _rate;
 
     public ExchangeRateItem(string source, string target, decimal rate, Action<string, decimal> onRateChanged)
     {
@@ -26,7 +24,14 @@ public partial class ExchangeRateItem : ObservableObject
         _onRateChanged = onRateChanged;
     }
 
-    private readonly Action<string, decimal> _onRateChanged;
+    public string Source { get; }
+    public string Target { get; }
+
+    public double RateValue
+    {
+        get => (double)Rate;
+        set => Rate = (decimal)value;
+    }
 
     partial void OnRateChanged(decimal value)
     {
@@ -34,42 +39,72 @@ public partial class ExchangeRateItem : ObservableObject
         _onRateChanged?.Invoke(key, value);
         OnPropertyChanged(nameof(RateValue));
     }
-    
-    public double RateValue
-    {
-        get => (double)Rate;
-        set => Rate = (decimal)value;
-    }
 }
 
-public class AddRatePlaceholder 
-{ 
+public class AddRatePlaceholder
+{
     // Just a placeholder type
 }
 
 public partial class SettingsViewModel : ObservableObject
 {
-    [ObservableProperty]
-    private int _themeIndex;
+    [ObservableProperty] private bool _isAddingCurrency;
+
+    // New Custom Rate Input
+    [ObservableProperty] private bool _isAddingRate;
+
+    [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(ConfirmAddCurrencyCommand))]
+    private string _newCurrencyCode = string.Empty;
+
+    [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(ConfirmAddCurrencyCommand))]
+    private string _newCurrencySymbol = string.Empty;
+
+    [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(AddCustomRateCommand))]
+    private string _newRateSource = string.Empty;
+
+    [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(AddCustomRateCommand))]
+    private string _newRateTarget = string.Empty;
+
+    // Use double.NaN to represent empty/unset for NumberBox
+    [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(AddCustomRateCommand))]
+    private double _newRateValue = double.NaN;
+
+    [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(DeleteSelectedCurrencyCommand))]
+    private string _selectedCurrency;
+
+    [ObservableProperty] private int _themeIndex;
+
+    public SettingsViewModel()
+    {
+        // 1. Theme
+        _themeIndex = ThemeHelper.Theme switch
+        {
+            ElementTheme.Light => 0,
+            ElementTheme.Dark => 1,
+            _ => 2
+        };
+
+        // 2. Currencies
+        LoadCurrencies();
+        _selectedCurrency = SettingsHelper.Current.SelectedCurrency;
+
+        // 3. Rates
+        LoadRates();
+    }
 
     // --- Currency Selection ---
 
-    public ObservableCollection<string> AvailableCurrencies { get; private set; } = new();
+    public ObservableCollection<string> AvailableCurrencies { get; } = new();
 
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(DeleteSelectedCurrencyCommand))]
-    private string _selectedCurrency;
+    // --- Exchange Rates ---
 
-    [ObservableProperty]
-    private bool _isAddingCurrency;
+    // 使用 object 以容纳 ExchangeRateItem 和 AddRatePlaceholder
+    public ObservableCollection<object> Rates { get; } = new();
 
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(ConfirmAddCurrencyCommand))]
-    private string _newCurrencyCode = string.Empty;
-
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(ConfirmAddCurrencyCommand))]
-    private string _newCurrencySymbol = string.Empty;
+    public string Version =>
+        ProcessInfoHelper.GetVersion() is Version version
+            ? string.Format("{0}.{1}.{2}.{3}", version.Major, version.Minor, version.Build, version.Revision)
+            : string.Empty;
 
     // ...
 
@@ -95,10 +130,10 @@ public partial class SettingsViewModel : ObservableObject
         // Must have code and symbol
         if (string.IsNullOrWhiteSpace(NewCurrencyCode) || string.IsNullOrWhiteSpace(NewCurrencySymbol))
             return false;
-        
+
         // Code usually 3 letters, but user said 'specifications'
         // Let's enforce non-empty and maybe no digits for code, max len is controlled by UI
-        string code = NewCurrencyCode.Trim();
+        var code = NewCurrencyCode.Trim();
         if (code.Any(char.IsDigit) || code.Length < 2) return false;
 
         return true;
@@ -108,23 +143,23 @@ public partial class SettingsViewModel : ObservableObject
     private void ConfirmAddCurrency()
     {
         // Logic remains similar but simplified since checks are done
-        string code = NewCurrencyCode.Trim().ToUpper();
-        string symbol = NewCurrencySymbol.Trim();
-        
+        var code = NewCurrencyCode.Trim().ToUpper();
+        var symbol = NewCurrencySymbol.Trim();
+
         if (!AvailableCurrencies.Contains(code))
         {
             AvailableCurrencies.Add(code);
             var list = SettingsHelper.Current.AvailableCurrencies;
             list.Add(code);
             SettingsHelper.Current.AvailableCurrencies = list;
-            
+
             var symbols = SettingsHelper.Current.CurrencySymbols;
             symbols[code] = symbol;
             SettingsHelper.Current.CurrencySymbols = symbols;
 
             SelectedCurrency = code;
         }
-        else 
+        else
         {
             var symbols = SettingsHelper.Current.CurrencySymbols;
             if (!symbols.ContainsKey(code) || symbols[code] != symbol)
@@ -149,7 +184,7 @@ public partial class SettingsViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanDeleteSelectedCurrency))]
     private void DeleteSelectedCurrency()
     {
-        string current = SelectedCurrency;
+        var current = SelectedCurrency;
         // Prevent deleting defaults or if empty
         if (string.IsNullOrEmpty(current) || current == "USD" || current == "CNY") return;
 
@@ -174,78 +209,20 @@ public partial class SettingsViewModel : ObservableObject
         }
     }
 
-    // --- Exchange Rates ---
-
-    // --- Exchange Rates ---
-
-    // 使用 object 以容纳 ExchangeRateItem 和 AddRatePlaceholder
-    public ObservableCollection<object> Rates { get; private set; } = new();
-
-    // New Custom Rate Input
-    [ObservableProperty]
-    private bool _isAddingRate;
-
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(AddCustomRateCommand))]
-    private string _newRateSource = string.Empty;
-
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(AddCustomRateCommand))]
-    private string _newRateTarget = string.Empty;
-
-    // Use double.NaN to represent empty/unset for NumberBox
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(AddCustomRateCommand))]
-    private double _newRateValue = double.NaN;
-
     partial void OnNewRateValueChanged(double value)
     {
         if (!double.IsNaN(value))
         {
             // Enforce 2 decimal places to match UI and prevent float drift
-            double rounded = Math.Round(value, 2, MidpointRounding.AwayFromZero);
-            if (Math.Abs(value - rounded) > double.Epsilon)
-            {
-                NewRateValue = rounded;
-            }
+            var rounded = Math.Round(value, 2, MidpointRounding.AwayFromZero);
+            if (Math.Abs(value - rounded) > double.Epsilon) NewRateValue = rounded;
         }
-    }
-
-    public string Version
-    {
-        get
-        {
-            return ProcessInfoHelper.GetVersion() is Version version
-                ? string.Format("{0}.{1}.{2}.{3}", version.Major, version.Minor, version.Build, version.Revision)
-                : string.Empty;
-        }
-    }
-
-    public SettingsViewModel()
-    {
-        // 1. Theme
-        _themeIndex = ThemeHelper.Theme switch
-        {
-            ElementTheme.Light => 0,
-            ElementTheme.Dark => 1,
-            _ => 2
-        };
-
-        // 2. Currencies
-        LoadCurrencies();
-        _selectedCurrency = SettingsHelper.Current.SelectedCurrency;
-
-        // 3. Rates
-        LoadRates();
     }
 
     private void LoadCurrencies()
     {
         AvailableCurrencies.Clear();
-        foreach (var c in SettingsHelper.Current.AvailableCurrencies)
-        {
-            AvailableCurrencies.Add(c);
-        }
+        foreach (var c in SettingsHelper.Current.AvailableCurrencies) AvailableCurrencies.Add(c);
     }
 
     private void LoadRates()
@@ -256,12 +233,9 @@ public partial class SettingsViewModel : ObservableObject
         {
             // Key format: SOURCE_TARGET
             var parts = kvp.Key.Split('_');
-            if (parts.Length == 2)
-            {
-                Rates.Add(new ExchangeRateItem(parts[0], parts[1], kvp.Value, OnRateItemChanged));
-            }
+            if (parts.Length == 2) Rates.Add(new ExchangeRateItem(parts[0], parts[1], kvp.Value, OnRateItemChanged));
         }
-        
+
         // 始终在最后添加 Placeholder
         Rates.Add(new AddRatePlaceholder());
     }
@@ -274,7 +248,6 @@ public partial class SettingsViewModel : ObservableObject
     }
 
 
-
     [RelayCommand]
     private void DeleteRate(ExchangeRateItem item)
     {
@@ -282,18 +255,15 @@ public partial class SettingsViewModel : ObservableObject
         Rates.Remove(item);
 
         var rates = SettingsHelper.Current.ExchangeRates;
-        string key = $"{item.Source}_{item.Target}";
+        var key = $"{item.Source}_{item.Target}";
         if (rates.ContainsKey(key))
         {
             rates.Remove(key);
             SettingsHelper.Current.ExchangeRates = rates; // Save
         }
-        
+
         // 确保 Placeholder 还在
-        if (!Rates.Any(x => x is AddRatePlaceholder))
-        {
-             Rates.Add(new AddRatePlaceholder());
-        }
+        if (!Rates.Any(x => x is AddRatePlaceholder)) Rates.Add(new AddRatePlaceholder());
     }
 
     [RelayCommand]
@@ -328,19 +298,20 @@ public partial class SettingsViewModel : ObservableObject
         {
             if (string.IsNullOrWhiteSpace(NewRateSource) || string.IsNullOrWhiteSpace(NewRateTarget)) return;
 
-            string key = $"{NewRateSource.Trim().ToUpper()}_{NewRateTarget.Trim().ToUpper()}";
+            var key = $"{NewRateSource.Trim().ToUpper()}_{NewRateTarget.Trim().ToUpper()}";
             var rates = SettingsHelper.Current.ExchangeRates;
             rates[key] = (decimal)NewRateValue;
             SettingsHelper.Current.ExchangeRates = rates; // Trigger save
 
             // Visual update - insert BEFORE the placeholder
-            var newItem = new ExchangeRateItem(NewRateSource.Trim().ToUpper(), NewRateTarget.Trim().ToUpper(), (decimal)NewRateValue, OnRateItemChanged);
-            
+            var newItem = new ExchangeRateItem(NewRateSource.Trim().ToUpper(), NewRateTarget.Trim().ToUpper(),
+                (decimal)NewRateValue, OnRateItemChanged);
+
             // 找到 Placeholder 的位置
             var placeholder = Rates.FirstOrDefault(x => x is AddRatePlaceholder);
             if (placeholder != null)
             {
-                int index = Rates.IndexOf(placeholder);
+                var index = Rates.IndexOf(placeholder);
                 Rates.Insert(index, newItem);
             }
             else

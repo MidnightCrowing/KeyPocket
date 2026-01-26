@@ -12,10 +12,7 @@ public static class ThemeHelper
         get
         {
             var window = WindowHelper.GetMainWindow();
-            if (window?.Content is FrameworkElement rootElement)
-            {
-                return rootElement.RequestedTheme;
-            }
+            if (window?.Content is FrameworkElement rootElement) return rootElement.RequestedTheme;
 
             return ElementTheme.Default;
         }
@@ -27,7 +24,7 @@ public static class ThemeHelper
                 rootElement.RequestedTheme = value;
                 TitleBarHelper.ApplySystemThemeToCaptionButtons(window, value);
             }
-        
+
             SettingsHelper.Current.SelectedAppTheme = value;
         }
     }
@@ -39,10 +36,7 @@ public static class ThemeHelper
 
     public static bool IsDarkTheme()
     {
-        if (Theme == ElementTheme.Default)
-        {
-            return Application.Current.RequestedTheme == ApplicationTheme.Dark;
-        }
+        if (Theme == ElementTheme.Default) return Application.Current.RequestedTheme == ApplicationTheme.Dark;
         return Theme == ElementTheme.Dark;
     }
 }

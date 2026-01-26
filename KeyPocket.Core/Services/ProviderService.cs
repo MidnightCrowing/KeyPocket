@@ -1,21 +1,18 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Windows.Storage;
+using KeyPocket.Core.Crypto;
 using KeyPocket.Core.Models;
 using KeyPocket.Core.Storage;
-using KeyPocket.Core.Crypto;
 
 namespace KeyPocket.Core.Services;
 
 /// <summary>
-/// Manages Provider business logic.
+///     Manages Provider business logic.
 /// </summary>
 public class ProviderService
 {
-
+    private readonly ISecretProtector _secretProtector;
 
     private readonly IStorageProvider _storage;
-    private readonly ISecretProtector _secretProtector;
 
     public ProviderService(IStorageProvider storage, ISecretProtector secretProtector)
     {
@@ -29,35 +26,33 @@ public class ProviderService
     }
 
     /// <summary>
-    /// Generate a default provider name (e.g. "New Provider 1")
+    ///     Generate a default provider name (e.g. "New Provider 1")
     /// </summary>
     private string GenerateDefaultProviderName()
     {
         var config = _storage.Load();
-        int counter = 1;
-        string baseName = "New Provider";
-        string name = $"{baseName} {counter}";
-        
+        var counter = 1;
+        var baseName = "New Provider";
+        var name = $"{baseName} {counter}";
+
         // Find unused name
         while (config.Providers.Any(p => p.Name == name))
         {
             counter++;
             name = $"{baseName} {counter}";
         }
-        
+
         return name;
     }
 
     /// <summary>
-    /// Create a provider with default configuration
+    ///     Create a provider with default configuration
     /// </summary>
     public Provider CreateProvider()
     {
         return CreateProvider(
             GenerateDefaultProviderName(),
-            "OpenAI API",
-            null,
-            null
+            "OpenAI API"
         );
     }
 
@@ -84,24 +79,19 @@ public class ProviderService
         {
             // Delete icon file if exists
             if (!string.IsNullOrEmpty(provider.IconPath))
-            {
                 try
                 {
-                    var iconFile = System.IO.Path.Combine(
-                        Windows.Storage.ApplicationData.Current.LocalFolder.Path,
+                    var iconFile = Path.Combine(
+                        ApplicationData.Current.LocalFolder.Path,
                         provider.IconPath
                     );
-                    if (System.IO.File.Exists(iconFile))
-                    {
-                        System.IO.File.Delete(iconFile);
-                    }
+                    if (File.Exists(iconFile)) File.Delete(iconFile);
                 }
                 catch
                 {
                     // Ignore errors during icon deletion
                 }
-            }
-            
+
             config.Providers.Remove(provider);
             _storage.Save(config);
         }
@@ -129,12 +119,12 @@ public class ProviderService
             provider.ApiBaseUrl = updatedProvider.ApiBaseUrl;
             provider.Description = updatedProvider.Description;
             provider.Currency = updatedProvider.Currency;
-            
+
             // Update Models and ApiKeys lists
             provider.Models = updatedProvider.Models;
             provider.ApiKeys = updatedProvider.ApiKeys;
             provider.IconPath = updatedProvider.IconPath;
-            
+
             _storage.Save(config);
         }
     }
@@ -149,6 +139,7 @@ public class ProviderService
             _storage.Save(config);
         }
     }
+
     public void AddApiKey(Guid providerId, string key)
     {
         var config = _storage.Load();
@@ -156,8 +147,8 @@ public class ProviderService
         if (provider != null)
         {
             var encrypted = _secretProtector.Protect(key);
-            provider.ApiKeys.Add(new ApiKey 
-            { 
+            provider.ApiKeys.Add(new ApiKey
+            {
                 ProviderId = providerId,
                 EncryptedKey = encrypted,
                 CreatedAt = DateTime.Now
@@ -171,7 +162,7 @@ public class ProviderService
         var config = _storage.Load();
         var provider = config.Providers.FirstOrDefault(p => p.Id == providerId);
         var key = provider?.ApiKeys.FirstOrDefault(k => k.Id == keyId);
-        
+
         if (key != null)
         {
             key.Tag = tag;
@@ -205,13 +196,13 @@ public class ProviderService
             if (key != null)
             {
                 key.IsFavorite = !key.IsFavorite;
-                
+
                 // Sync with ID list for backward compatibility if needed, or just rely on property
                 if (key.IsFavorite && !provider.FavoriteApiKeyIds.Contains(keyId))
                     provider.FavoriteApiKeyIds.Add(keyId);
                 else if (!key.IsFavorite && provider.FavoriteApiKeyIds.Contains(keyId))
                     provider.FavoriteApiKeyIds.Remove(keyId);
-                    
+
                 _storage.Save(config);
             }
         }
@@ -276,13 +267,13 @@ public class ProviderService
             if (model != null)
             {
                 model.IsFavorite = !model.IsFavorite;
-                
+
                 // Sync list
                 if (model.IsFavorite && !provider.FavoriteModelIds.Contains(modelId))
                     provider.FavoriteModelIds.Add(modelId);
                 else if (!model.IsFavorite && provider.FavoriteModelIds.Contains(modelId))
                     provider.FavoriteModelIds.Remove(modelId);
-                    
+
                 _storage.Save(config);
             }
         }
@@ -293,10 +284,10 @@ public class ProviderService
         var config = _storage.Load();
         var provider = config.Providers.FirstOrDefault(p => p.Id == providerId);
         var key = provider?.ApiKeys.FirstOrDefault(k => k.Id == keyId);
-        
+
         if (key == null || string.IsNullOrEmpty(key.EncryptedKey))
             return string.Empty;
-            
+
         return _secretProtector.Unprotect(key.EncryptedKey);
     }
 }

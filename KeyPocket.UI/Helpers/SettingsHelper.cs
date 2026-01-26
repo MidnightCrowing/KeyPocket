@@ -1,19 +1,27 @@
-﻿using Microsoft.UI.Xaml;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using Windows.Storage;
+using Microsoft.UI.Xaml;
 
 namespace KeyPocket.UI.Helpers;
 
 public abstract class ObservableSettings : INotifyPropertyChanged
 {
     private static readonly string ConfigFilePath = GetConfigPath();
-    private readonly ConcurrentDictionary<string, object?> _settings = new();
     private readonly object _fileLock = new();
+    private readonly ConcurrentDictionary<string, object?> _settings = new();
+
+    protected ObservableSettings()
+    {
+        Load();
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     private static string GetConfigPath()
     {
@@ -21,30 +29,22 @@ public abstract class ObservableSettings : INotifyPropertyChanged
         try
         {
             // 对于 WinUI 3 打包应用，使用 LocalFolder (LocalState 目录)
-            path = Windows.Storage.ApplicationData.Current.LocalFolder.Path;
+            path = ApplicationData.Current.LocalFolder.Path;
         }
         catch (Exception ex)
         {
             // 记录路径获取失败的原因
-            var fallbackBase = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "KeyPocket");
+            var fallbackBase = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "KeyPocket");
             if (!Directory.Exists(fallbackBase)) Directory.CreateDirectory(fallbackBase);
-            File.AppendAllText(Path.Combine(fallbackBase, "PathError.txt"), $"[{DateTime.Now}] GetConfigPath failed: {ex.Message}\n{ex.StackTrace}\n");
+            File.AppendAllText(Path.Combine(fallbackBase, "PathError.txt"),
+                $"[{DateTime.Now}] GetConfigPath failed: {ex.Message}\n{ex.StackTrace}\n");
             path = fallbackBase;
         }
-        
-        if (!Directory.Exists(path))
-        {
-            Directory.CreateDirectory(path);
-        }
-        
+
+        if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+
         return Path.Combine(path, "AppConfig.json");
-    }
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    protected ObservableSettings()
-    {
-        Load();
     }
 
     protected T GetOrCreateDefault<T>(T defaultValue, [CallerMemberName] string? propertyName = null)
@@ -59,6 +59,7 @@ public abstract class ObservableSettings : INotifyPropertyChanged
                 _settings[propertyName] = deserialized;
                 return deserialized ?? defaultValue;
             }
+
             return (T)value!;
         }
 
@@ -85,20 +86,14 @@ public abstract class ObservableSettings : INotifyPropertyChanged
         try
         {
             if (File.Exists(ConfigFilePath))
-            {
                 lock (_fileLock)
                 {
                     var json = File.ReadAllText(ConfigFilePath);
                     var data = JsonSerializer.Deserialize<Dictionary<string, object?>>(json);
                     if (data != null)
-                    {
                         foreach (var kv in data)
-                        {
                             _settings[kv.Key] = kv.Value;
-                        }
-                    }
                 }
-            }
         }
         catch (Exception ex)
         {
@@ -127,21 +122,26 @@ public abstract class ObservableSettings : INotifyPropertyChanged
         try
         {
             var logPath = Path.Combine(Path.GetDirectoryName(ConfigFilePath) ?? "", "ErrorLog.txt");
-            var message = $"[{DateTime.Now}] Operation: {operation}\nException: {ex.Message}\nStackTrace: {ex.StackTrace}\n\n";
+            var message =
+                $"[{DateTime.Now}] Operation: {operation}\nException: {ex.Message}\nStackTrace: {ex.StackTrace}\n\n";
             File.AppendAllText(logPath, message);
         }
-        catch { /* 最后的防线 */ }
+        catch
+        {
+            /* 最后的防线 */
+        }
     }
 }
 
 public partial class SettingsHelper : ObservableSettings
 {
     private static readonly Lazy<SettingsHelper> Instance = new(() => new SettingsHelper());
-    public static SettingsHelper Current => Instance.Value;
 
     private SettingsHelper()
     {
     }
+
+    public static SettingsHelper Current => Instance.Value;
 
     public ElementTheme SelectedAppTheme
     {
@@ -166,9 +166,9 @@ public partial class SettingsHelper : ObservableSettings
     // 汇率字典: Key="SOURCE_TARGET" (e.g. "USD_CNY"), Value=Rate
     public Dictionary<string, decimal> ExchangeRates
     {
-        get => GetOrCreateDefault(new Dictionary<string, decimal> 
-        { 
-            { "USD_CNY", 7.0m } 
+        get => GetOrCreateDefault(new Dictionary<string, decimal>
+        {
+            { "USD_CNY", 7.0m }
         });
         set => Set(value);
     }
@@ -176,8 +176,8 @@ public partial class SettingsHelper : ObservableSettings
     // Currency Symbols: Key="CODE" (e.g. "USD"), Value="SYMBOL" (e.g. "$")
     public Dictionary<string, string> CurrencySymbols
     {
-        get => GetOrCreateDefault(new Dictionary<string, string> 
-        { 
+        get => GetOrCreateDefault(new Dictionary<string, string>
+        {
             { "USD", "$" },
             { "CNY", "¥" }
         });

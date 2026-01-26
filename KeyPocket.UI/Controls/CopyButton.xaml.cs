@@ -11,17 +11,18 @@ namespace KeyPocket.UI.Controls;
 public sealed partial class CopyButton : Button
 {
     public static readonly DependencyProperty CopiedMessageProperty =
-        DependencyProperty.Register("CopiedMessage", typeof(string), typeof(CopyButton), new PropertyMetadata("Copied to clipboard"));
-
-    public string CopiedMessage
-    {
-        get { return (string)GetValue(CopiedMessageProperty); }
-        set { SetValue(CopiedMessageProperty, value); }
-    }
+        DependencyProperty.Register("CopiedMessage", typeof(string), typeof(CopyButton),
+            new PropertyMetadata("Copied to clipboard"));
 
     public CopyButton()
     {
-        this.DefaultStyleKey = typeof(CopyButton);
+        DefaultStyleKey = typeof(CopyButton);
+    }
+
+    public string CopiedMessage
+    {
+        get => (string)GetValue(CopiedMessageProperty);
+        set => SetValue(CopiedMessageProperty, value);
     }
 
     private void CopyButton_Click(object sender, RoutedEventArgs e)
@@ -32,15 +33,13 @@ public sealed partial class CopyButton : Button
             AnnounceActionForAccessibility(this, CopiedMessage, "CopiedToClipboardActivityId");
         }
     }
-    
+
     // Confirmation of Action
-    static public void AnnounceActionForAccessibility(UIElement ue, string announcement, string activityID)
+    public static void AnnounceActionForAccessibility(UIElement ue, string announcement, string activityID)
     {
         if (FrameworkElementAutomationPeer.FromElement(ue) is AutomationPeer peer)
-        {
             peer.RaiseNotificationEvent(AutomationNotificationKind.ActionCompleted,
                 AutomationNotificationProcessing.ImportantMostRecent, announcement, activityID);
-        }
     }
 
     protected override void OnApplyTemplate()

@@ -1,32 +1,26 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using System.Linq;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using KeyPocket.Core.Services;
 using KeyPocket.UI.Messages;
-using System;
-using System.Collections.ObjectModel;
-using System.Linq;
 
 namespace KeyPocket.UI.ViewModels;
 
 /// <summary>
-/// 主窗口的 ViewModel，管理侧边栏服务商列表
+///     主窗口的 ViewModel，管理侧边栏服务商列表
 /// </summary>
 public partial class MainWindowViewModel : ObservableObject
 {
     private readonly ProviderService _providerService;
 
-    /// <summary>
-    /// 侧边栏服务商列表
-    /// </summary>
-    public ObservableCollection<SidebarProviderItem> Providers { get; } = new();
-
     public MainWindowViewModel(ProviderService providerService)
     {
         _providerService = providerService;
-        
+
         // 加载服务商列表
         LoadProviders();
-        
+
         // 订阅消息
         WeakReferenceMessenger.Default.Register<ProviderCreatedMessage>(this, OnProviderCreated);
         WeakReferenceMessenger.Default.Register<ProviderUpdatedMessage>(this, OnProviderUpdated);
@@ -34,15 +28,19 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     /// <summary>
-    /// 从服务加载服务商列表
+    ///     侧边栏服务商列表
+    /// </summary>
+    public ObservableCollection<SidebarProviderItem> Providers { get; } = new();
+
+    /// <summary>
+    ///     从服务加载服务商列表
     /// </summary>
     public void LoadProviders()
     {
         Providers.Clear();
         var providers = _providerService.GetAllProviders();
-        
+
         foreach (var provider in providers)
-        {
             Providers.Add(new SidebarProviderItem
             {
                 Id = provider.Id,
@@ -50,11 +48,10 @@ public partial class MainWindowViewModel : ObservableObject
                 IconPath = provider.IconPath,
                 Type = provider.Type
             });
-        }
     }
 
     /// <summary>
-    /// 处理服务商创建消息
+    ///     处理服务商创建消息
     /// </summary>
     private void OnProviderCreated(object recipient, ProviderCreatedMessage message)
     {
@@ -63,9 +60,8 @@ public partial class MainWindowViewModel : ObservableObject
         {
             var provider = _providerService.GetAllProviders()
                 .FirstOrDefault(p => p.Id == message.ProviderId);
-            
+
             if (provider != null)
-            {
                 Providers.Add(new SidebarProviderItem
                 {
                     Id = provider.Id,
@@ -73,12 +69,11 @@ public partial class MainWindowViewModel : ObservableObject
                     IconPath = provider.IconPath,
                     Type = provider.Type
                 });
-            }
         });
     }
 
     /// <summary>
-    /// 处理服务商更新消息
+    ///     处理服务商更新消息
     /// </summary>
     private void OnProviderUpdated(object recipient, ProviderUpdatedMessage message)
     {
@@ -88,7 +83,7 @@ public partial class MainWindowViewModel : ObservableObject
             // 从服务获取最新数据
             var provider = _providerService.GetAllProviders()
                 .FirstOrDefault(p => p.Id == message.ProviderId);
-            
+
             if (provider != null)
             {
                 // 更新属性（触发 UI 更新）
@@ -100,14 +95,11 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     /// <summary>
-    /// 处理服务商删除消息
+    ///     处理服务商删除消息
     /// </summary>
     private void OnProviderDeleted(object recipient, ProviderDeletedMessage message)
     {
         var item = Providers.FirstOrDefault(p => p.Id == message.ProviderId);
-        if (item != null)
-        {
-            Providers.Remove(item);
-        }
+        if (item != null) Providers.Remove(item);
     }
 }

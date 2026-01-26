@@ -7,8 +7,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:global="using:Windows.Globalization.NumberFormatting"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
     xmlns:selectors="using:KeyPocket.UI.Selectors"
+    xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
     xmlns:vm="using:KeyPocket.UI.ViewModels"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
@@ -20,7 +20,6 @@
             FractionDigits="2"
             IntegerDigits="1"
             x:Key="RateFormatter" />
-        <converters:DecimalToDoubleConverter x:Key="DecimalToDouble" />
 
         <!--  Spacing between cards  -->
         <x:Double x:Key="SettingsCardSpacing">4</x:Double>
@@ -30,17 +29,15 @@
             BasedOn="{StaticResource BodyStrongTextBlockStyle}"
             TargetType="TextBlock"
             x:Key="SettingsSectionHeaderTextBlockStyle">
-                <Style.Setters>
+            <Style.Setters>
                 <Setter Property="Margin" Value="1,30,0,6" />
             </Style.Setters>
         </Style>
 
-        <DataTemplate x:Key="RateTemplate" x:DataType="vm:ExchangeRateItem">
+        <DataTemplate x:DataType="vm:ExchangeRateItem" x:Key="RateTemplate">
             <toolkit:SettingsCard IsClickEnabled="False">
                 <toolkit:SettingsCard.Header>
-                    <StackPanel
-                        Orientation="Horizontal"
-                        Spacing="8">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
                         <TextBlock FontWeight="SemiBold" Text="{x:Bind Source}" />
                         <FontIcon
                             FontSize="12"
@@ -77,7 +74,7 @@
         </DataTemplate>
 
         <DataTemplate x:Key="AddFooterTemplate">
-            <!-- DataContext is AddRatePlaceholder, so we must bind to ElementName=RootPage ViewModel -->
+            <!--  DataContext is AddRatePlaceholder, so we must bind to ElementName=RootPage ViewModel  -->
             <toolkit:SettingsCard
                 Command="{Binding ElementName=RootPage, Path=ViewModel.StartAddRateCommand}"
                 HorizontalContentAlignment="Left"
@@ -146,11 +143,6 @@
                 </Grid>
             </toolkit:SettingsCard>
         </DataTemplate>
-
-        <selectors:SettingsItemTemplateSelector
-            x:Key="SettingsRateSelector"
-            AddFooterTemplate="{StaticResource AddFooterTemplate}"
-            RateTemplate="{StaticResource RateTemplate}" />
 
     </Page.Resources>
 
@@ -246,10 +238,10 @@
 
                 <!--  2. Exchange Rates Expander  -->
                 <toolkit:SettingsExpander
-                    x:Name="RatesExpander"
                     Description="Configure exchange rates between currencies"
                     Header="Exchange Rate Details"
-                    IsExpanded="False">
+                    IsExpanded="False"
+                    x:Name="RatesExpander">
                     <toolkit:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE825;" />
                     </toolkit:SettingsExpander.HeaderIcon>

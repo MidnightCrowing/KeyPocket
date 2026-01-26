@@ -1,19 +1,45 @@
-using KeyPocket.Core.Models;
+using System;
+using System.ComponentModel;
+using System.Linq;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Foundation;
+using Windows.Storage.Pickers;
+using Windows.System;
+using Windows.UI;
+using KeyPocket.UI.Helpers;
 using KeyPocket.UI.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Navigation;
-using KeyPocket.UI.Helpers;
-using System;
-using System.Linq;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Navigation;
+using WinRT.Interop;
 
 namespace KeyPocket.UI.Pages;
 
-public sealed partial class ProviderSettingsPage : Page, System.ComponentModel.INotifyPropertyChanged
+public sealed partial class ProviderSettingsPage : Page, INotifyPropertyChanged
 {
+    private const double StickyHeaderHeight = 60;
+    private double _apiKeysTop;
+    private double _generalTop;
+    private double _modelsTop;
+    private Border? _stickyApiKeys;
+
+    // Sticky Headers fields
+    private Border? _stickyGeneral;
+    private Border? _stickyModels;
     private ProviderSettingsViewModel? _viewModel;
-    
+
+    public ProviderSettingsPage()
+    {
+        // Initialize default ViewModel to avoid binding errors
+        ViewModel = new ProviderSettingsViewModel();
+
+        InitializeComponent();
+        Loaded += OnPageLoaded;
+    }
+
     public ProviderSettingsViewModel? ViewModel
     {
         get => _viewModel;
@@ -22,81 +48,56 @@ public sealed partial class ProviderSettingsPage : Page, System.ComponentModel.I
             if (_viewModel != value)
             {
                 _viewModel = value;
-                PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(ViewModel)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ViewModel)));
             }
         }
     }
 
-    public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
-
-    // Sticky Headers fields
-    private Border? _stickyGeneral;
-    private Border? _stickyApiKeys;
-    private Border? _stickyModels;
-    private double _generalTop;
-    private double _apiKeysTop;
-    private double _modelsTop;
-    private const double StickyHeaderHeight = 60;
-
-    public ProviderSettingsPage()
-    {
-        // Initialize default ViewModel to avoid binding errors
-        ViewModel = new ProviderSettingsViewModel();
-        
-        this.InitializeComponent();
-        this.Loaded += OnPageLoaded;
-    }
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
 
-        if (e.Parameter is string providerIdStr && System.Guid.TryParse(providerIdStr, out var providerId))
+        if (e.Parameter is string providerIdStr && Guid.TryParse(providerIdStr, out var providerId))
         {
             var provider = App.ProviderService.GetAllProviders().FirstOrDefault(p => p.Id == providerId);
             if (provider != null)
-            {
                 ViewModel = new ProviderSettingsViewModel(provider, App.ProviderService);
-
-            }
             else
-            {
                 // Provider does not exist (may have been deleted), return to home
                 Frame.Navigate(typeof(HomePage));
-            }
         }
     }
 
-    private void OnKeyTagKeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+    private void OnKeyTagKeyDown(object sender, KeyRoutedEventArgs e)
     {
-        if (e.Key == Windows.System.VirtualKey.Enter && sender is TextBox tb && tb.DataContext is KeyWrapper wrapper)
+        if (e.Key == VirtualKey.Enter && sender is TextBox tb && tb.DataContext is KeyWrapper wrapper)
         {
             wrapper.CommitTagEditCommand?.Execute(null);
             e.Handled = true;
         }
     }
 
-    private void OnCopyKeyClicked(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    private void OnCopyKeyClicked(object sender, RoutedEventArgs e)
     {
         if (ViewModel == null) return;
-        
+
         if (sender is Button btn && btn.Tag is Guid keyId)
-        {
             try
             {
                 var plainKey = ViewModel.GetDecryptedKey(keyId);
-                var dataPackage = new Windows.ApplicationModel.DataTransfer.DataPackage();
+                var dataPackage = new DataPackage();
                 dataPackage.SetText(plainKey);
-                Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(dataPackage);
+                Clipboard.SetContent(dataPackage);
             }
             catch
             {
                 // Silently fail
             }
-        }
     }
 
-    private async void OnDeleteProviderClicked(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    private async void OnDeleteProviderClicked(object sender, RoutedEventArgs e)
     {
         var dialog = new ContentDialog
         {
@@ -105,9 +106,9 @@ public sealed partial class ProviderSettingsPage : Page, System.ComponentModel.I
             PrimaryButtonText = "Delete",
             CloseButtonText = "Cancel",
             DefaultButton = ContentDialogButton.Close,
-            XamlRoot = this.XamlRoot
+            XamlRoot = XamlRoot
         };
-        
+
         dialog.RequestedTheme = ThemeHelper.IsDarkTheme() ? ElementTheme.Dark : ElementTheme.Light;
         dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
 
@@ -115,29 +116,25 @@ public sealed partial class ProviderSettingsPage : Page, System.ComponentModel.I
         if (result == ContentDialogResult.Primary)
         {
             if (ViewModel == null) return;
-            
+
             var providerId = ViewModel.Provider.Id;
-            
+
             // 先执行删除
             ViewModel.DeleteProvider();
-            
+
             // 清理导航历史：移除所有指向该 Provider 的历史记录
             CleanupNavigationHistory(providerId);
-            
+
             // 直接导航（不使用 Dispatcher，因为删除是同步的）
             if (Frame.CanGoBack)
-            {
                 Frame.GoBack();
-            }
             else
-            {
                 Frame.Navigate(typeof(HomePage));
-            }
         }
     }
 
     /// <summary>
-    /// Cleanup navigation history for deleted provider
+    ///     Cleanup navigation history for deleted provider
     /// </summary>
     private void CleanupNavigationHistory(Guid deletedProviderId)
     {
@@ -146,35 +143,35 @@ public sealed partial class ProviderSettingsPage : Page, System.ComponentModel.I
         // This method is reserved for future extensions
     }
 
-    private void OnCopyModelIdClicked(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    private void OnCopyModelIdClicked(object sender, RoutedEventArgs e)
     {
         if (sender is Button btn && btn.Tag is string modelId)
-        {
             try
             {
-                var dataPackage = new Windows.ApplicationModel.DataTransfer.DataPackage();
+                var dataPackage = new DataPackage();
                 dataPackage.SetText(modelId);
-                Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(dataPackage);
+                Clipboard.SetContent(dataPackage);
             }
             catch
             {
                 // Silently fail
             }
-        }
     }
 
-    private void OnModelEditKeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+    private void OnModelEditKeyDown(object sender, KeyRoutedEventArgs e)
     {
-        if (e.Key == Windows.System.VirtualKey.Escape && sender is FrameworkElement element && element.DataContext is ModelWrapper wrapper)
+        if (e.Key == VirtualKey.Escape && sender is FrameworkElement element &&
+            element.DataContext is ModelWrapper wrapper)
         {
             wrapper.CancelAddCommand?.Execute(null);
             e.Handled = true;
         }
     }
 
-    private void OnApiKeyEditKeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+    private void OnApiKeyEditKeyDown(object sender, KeyRoutedEventArgs e)
     {
-        if (e.Key == Windows.System.VirtualKey.Escape && sender is FrameworkElement element && element.DataContext is KeyWrapper wrapper)
+        if (e.Key == VirtualKey.Escape && sender is FrameworkElement element &&
+            element.DataContext is KeyWrapper wrapper)
         {
             wrapper.CancelAddCommand?.Execute(null);
             e.Handled = true;
@@ -182,35 +179,28 @@ public sealed partial class ProviderSettingsPage : Page, System.ComponentModel.I
     }
 
     // Round price value to 3 decimal places to avoid showing long double artifacts
-    private void OnPriceValueChanged(object sender, Microsoft.UI.Xaml.Controls.NumberBoxValueChangedEventArgs e)
+    private void OnPriceValueChanged(object sender, NumberBoxValueChangedEventArgs e)
     {
-        if (sender is Microsoft.UI.Xaml.Controls.NumberBox nb)
-        {
+        if (sender is NumberBox nb)
             try
             {
                 var rounded = Math.Round(nb.Value, 3);
-                if (Math.Abs(nb.Value - rounded) > 0)
-                {
-                    nb.Value = rounded;
-                }
+                if (Math.Abs(nb.Value - rounded) > 0) nb.Value = rounded;
             }
-            catch { }
-        }
+            catch
+            {
+            }
     }
+
     private void OnDefaultIconItemClick(object sender, ItemClickEventArgs e)
     {
-        if (e.ClickedItem is KeyPocket.UI.ViewModels.DefaultIconItem item)
+        if (e.ClickedItem is DefaultIconItem item)
         {
-            if (ViewModel != null)
-            {
-               ViewModel.SelectDefaultIconCommand.Execute(item);
-            }
-            
+            if (ViewModel != null) ViewModel.SelectDefaultIconCommand.Execute(item);
+
             // Try to find the flyout to close it
-            if (sender is GridView gridView && gridView.Parent is FlyoutPresenter presenter && presenter.Parent is Microsoft.UI.Xaml.Controls.Primitives.Popup popup)
-            {
-                 popup.IsOpen = false;
-            }
+            if (sender is GridView gridView && gridView.Parent is FlyoutPresenter presenter &&
+                presenter.Parent is Popup popup) popup.IsOpen = false;
             // Try to close flight if possible, or rely on native behavior
             // Current code executes the command directly.
         }
@@ -219,31 +209,28 @@ public sealed partial class ProviderSettingsPage : Page, System.ComponentModel.I
     private async void OnChangeIconClicked(object sender, RoutedEventArgs e)
     {
         if (ViewModel == null) return;
-        
-        var picker = new Windows.Storage.Pickers.FileOpenPicker();
-        
-        // WinUI 3 Window handle workaround
-        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
 
-        picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
-        picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.PicturesLibrary;
+        var picker = new FileOpenPicker();
+
+        // WinUI 3 Window handle workaround
+        var hwnd = WindowNative.GetWindowHandle(App.MainWindow);
+        InitializeWithWindow.Initialize(picker, hwnd);
+
+        picker.ViewMode = PickerViewMode.Thumbnail;
+        picker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
         picker.FileTypeFilter.Add(".jpg");
         picker.FileTypeFilter.Add(".jpeg");
         picker.FileTypeFilter.Add(".png");
         picker.FileTypeFilter.Add(".ico");
 
         var file = await picker.PickSingleFileAsync();
-        if (file != null)
-        {
-            await ViewModel.UpdateIconAsync(file);
-        }
+        if (file != null) await ViewModel.UpdateIconAsync(file);
     }
 
     private async void OnRemoveIconClicked(object sender, RoutedEventArgs e)
     {
         if (ViewModel == null) return;
-        
+
         await ViewModel.UpdateIconAsync(null);
     }
 
@@ -276,10 +263,10 @@ public sealed partial class ProviderSettingsPage : Page, System.ComponentModel.I
     private Border CreateStickyHeaderBorder(string title, string subtitle)
     {
         // Determine the current theme
-        var currentTheme = ThemeHelper.Theme == ElementTheme.Default 
-            ? (Application.Current.RequestedTheme == ApplicationTheme.Dark ? ElementTheme.Dark : ElementTheme.Light)
+        var currentTheme = ThemeHelper.Theme == ElementTheme.Default
+            ? Application.Current.RequestedTheme == ApplicationTheme.Dark ? ElementTheme.Dark : ElementTheme.Light
             : ThemeHelper.Theme;
-        
+
         var border = new Border
         {
             BorderThickness = new Thickness(0, 0, 0, 1),
@@ -288,46 +275,44 @@ public sealed partial class ProviderSettingsPage : Page, System.ComponentModel.I
             Height = 70, // Increased height to prevent text clipping
             RequestedTheme = currentTheme
         };
-        
+
         // Manually set colors based on theme
         // These colors match WinUI 3's default theme colors
         if (currentTheme == ElementTheme.Dark)
-        {
             // Dark theme colors
-            border.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 32, 32, 32)); // #202020
-        }
+            border.Background = new SolidColorBrush(Color.FromArgb(255, 32, 32, 32)); // #202020
         else
-        {
             // Light theme colors
-            border.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 243, 243, 243)); // #F3F3F3
-        }
+            border.Background = new SolidColorBrush(Color.FromArgb(255, 243, 243, 243)); // #F3F3F3
 
         var stackPanel = new StackPanel { Spacing = 4 };
-        
+
         var titleBlock = new TextBlock
         {
             Text = title,
             Style = (Style)Application.Current.Resources["SubtitleTextBlockStyle"]
         };
-        
+
         var subtitleBlock = new TextBlock
         {
             Text = subtitle,
             Style = (Style)Application.Current.Resources["CaptionTextBlockStyle"]
         };
-        
+
         // Manually set text colors based on theme
         if (currentTheme == ElementTheme.Dark)
         {
             // Dark theme text colors
-            titleBlock.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 255, 255, 255)); // White for primary text
-            subtitleBlock.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 161, 161, 161)); // #A1A1A1 for secondary text
+            titleBlock.Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)); // White for primary text
+            subtitleBlock.Foreground =
+                new SolidColorBrush(Color.FromArgb(255, 161, 161, 161)); // #A1A1A1 for secondary text
         }
         else
         {
             // Light theme text colors
-            titleBlock.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 0, 0, 0)); // Black for primary text
-            subtitleBlock.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 96, 96, 96)); // #606060 for secondary text
+            titleBlock.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0)); // Black for primary text
+            subtitleBlock.Foreground =
+                new SolidColorBrush(Color.FromArgb(255, 96, 96, 96)); // #606060 for secondary text
         }
 
         stackPanel.Children.Add(titleBlock);
@@ -352,25 +337,28 @@ public sealed partial class ProviderSettingsPage : Page, System.ComponentModel.I
             if (GeneralHeader != null)
             {
                 var transform = GeneralHeader.TransformToVisual(scrollContent);
-                var point = transform.TransformPoint(new Windows.Foundation.Point(0, 0));
+                var point = transform.TransformPoint(new Point(0, 0));
                 _generalTop = point.Y;
             }
 
             if (ApiKeysHeader != null)
             {
                 var transform = ApiKeysHeader.TransformToVisual(scrollContent);
-                var point = transform.TransformPoint(new Windows.Foundation.Point(0, 0));
+                var point = transform.TransformPoint(new Point(0, 0));
                 _apiKeysTop = point.Y;
             }
 
             if (ModelsHeader != null)
             {
                 var transform = ModelsHeader.TransformToVisual(scrollContent);
-                var point = transform.TransformPoint(new Windows.Foundation.Point(0, 0));
+                var point = transform.TransformPoint(new Point(0, 0));
                 _modelsTop = point.Y;
             }
         }
-        catch { /* Ignore errors during position calculation */ }
+        catch
+        {
+            /* Ignore errors during position calculation */
+        }
     }
 
     private void OnScrollViewChanged(object sender, ScrollViewerViewChangedEventArgs e)

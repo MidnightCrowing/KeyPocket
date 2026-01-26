@@ -1,13 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using Windows.UI;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
-using Windows.UI;
 
 namespace KeyPocket.UI.Helpers;
 
-internal partial class TitleBarHelper
+internal class TitleBarHelper
 {
     // workaround as AppWindow TitleBar doesn't update caption button colors correctly when changed while app is running
     // https://task.ms/44172495
@@ -19,7 +19,9 @@ internal partial class TitleBarHelper
             window.AppWindow.TitleBar.ButtonForegroundColor = foregroundColor;
             window.AppWindow.TitleBar.ButtonHoverForegroundColor = foregroundColor;
 
-            var backgroundHoverColor = currentTheme == ElementTheme.Dark ? Color.FromArgb(24, 255, 255, 255) : Color.FromArgb(24, 0, 0, 0);
+            var backgroundHoverColor = currentTheme == ElementTheme.Dark
+                ? Color.FromArgb(24, 255, 255, 255)
+                : Color.FromArgb(24, 0, 0, 0);
             window.AppWindow.TitleBar.ButtonHoverBackgroundColor = backgroundHoverColor;
         }
     }

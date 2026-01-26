@@ -1,9 +1,7 @@
-using System;
-
 namespace KeyPocket.Core.Models;
 
 /// <summary>
-/// AI 模型信息。
+///     AI 模型信息。
 /// </summary>
 public class ModelInfo
 {
@@ -14,34 +12,33 @@ public class ModelInfo
     public string DisplayName { get; set; } = string.Empty;
 
     /// <summary>
-    /// 每百万输入 Token 的价格。
+    ///     每百万输入 Token 的价格。
     /// </summary>
     public decimal? InputPricePerMTokens { get; set; }
 
     /// <summary>
-    /// 每百万输出 Token 的价格。
+    ///     每百万输出 Token 的价格。
     /// </summary>
     public decimal? OutputPricePerMTokens { get; set; }
 
 
-
     /// <summary>
-    /// 模型是否已弃用。
+    ///     模型是否已弃用。
     /// </summary>
     public bool IsDeprecated { get; set; }
 
     /// <summary>
-    /// 模型是否为聊天模型。
+    ///     模型是否为聊天模型。
     /// </summary>
     public bool IsChatModel { get; set; }
 
     /// <summary>
-    /// 模型是否为嵌入模型。
+    ///     模型是否为嵌入模型。
     /// </summary>
     public bool IsEmbeddingModel { get; set; }
 
     /// <summary>
-    /// 模型是否被收藏。
+    ///     模型是否被收藏。
     /// </summary>
     public bool IsFavorite { get; set; }
 }

@@ -14,8 +14,6 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Controls/CopyButton.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <converters:BoolToVisibilityConverter x:Key="BoolToVis" />
-            <converters:NegatedBoolToVisibilityConverter x:Key="NegBoolToVis" />
         </ResourceDictionary>
     </Page.Resources>
 
@@ -83,62 +81,69 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <!-- Provider -->
+                        <!--  Provider  -->
                         <TextBlock
                             Style="{ThemeResource BodyTextBlockStyle}"
                             Text="{x:Bind ProviderName}"
                             VerticalAlignment="Center" />
 
-                        <!-- Key -->
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                             <TextBlock
+                        <!--  Key  -->
+                        <StackPanel
+                            Grid.Column="1"
+                            Orientation="Horizontal"
+                            Spacing="8"
+                            VerticalAlignment="Center">
+                            <TextBlock
                                 FontFamily="Consolas"
                                 Text="{x:Bind DisplayKey, Mode=OneWay}"
                                 VerticalAlignment="Center" />
-                             
-                             <!-- Reveal Toggle -->
-                             <Button
+
+                            <!--  Reveal Toggle  -->
+                            <Button
                                 Background="Transparent"
                                 BorderThickness="0"
                                 Command="{x:Bind RevealKeyCommand}"
                                 Padding="4"
                                 ToolTipService.ToolTip="Toggle Visibility">
-                                <FontIcon FontSize="12" Glyph="{x:Bind IsKeyRevealed, Mode=OneWay, Converter={StaticResource BoolToGlyphConverter}, ConverterParameter='Reveal'}" /> 
-                                <!-- Note: Simply using text or standard icon logic since converter might not exist for glyph switching directly without parameter logic. using simple logic below: -->
-                             </Button>
+                                <FontIcon FontSize="12" Glyph="{x:Bind IsKeyRevealed, Mode=OneWay, Converter={StaticResource BoolToGlyphConverter}, ConverterParameter='Reveal'}" />
+                                <!--  Note: Simply using text or standard icon logic since converter might not exist for glyph switching directly without parameter logic. using simple logic below:  -->
+                            </Button>
                         </StackPanel>
 
-                        <!-- Tag -->
+                        <!--  Tag  -->
                         <TextBox
                             Grid.Column="2"
+                            Margin="0,0,16,0"
                             PlaceholderText="Tag"
                             Text="{x:Bind Tag, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                            VerticalAlignment="Center" 
-                            Margin="0,0,16,0"/>
+                            VerticalAlignment="Center" />
 
-                        <!-- Actions -->
-                        <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="4">
+                        <!--  Actions  -->
+                        <StackPanel
+                            Grid.Column="3"
+                            Orientation="Horizontal"
+                            Spacing="4">
                             <Button
                                 Background="Transparent"
                                 BorderThickness="0"
                                 Command="{x:Bind ToggleFavoriteCommand}"
                                 Padding="4"
                                 ToolTipService.ToolTip="Favorite">
-                                <FontIcon 
-                                    FontSize="16" 
+                                <FontIcon
+                                    FontSize="16"
                                     Foreground="{x:Bind IsFavorite, Mode=OneWay, Converter={StaticResource FavoriteColorConverter}}"
-                                    Glyph="{x:Bind IsFavorite, Mode=OneWay, Converter={StaticResource FavoriteIconConverter}}" /> 
+                                    Glyph="{x:Bind IsFavorite, Mode=OneWay, Converter={StaticResource FavoriteIconConverter}}" />
                             </Button>
-                            
+
                             <controls:CopyButton
                                 Click="CopyButton_Click"
                                 Content="&#xE8C8;"
                                 Padding="6"
                                 Tag="{x:Bind Id, Mode=OneWay}"
                                 ToolTipService.ToolTip="Copy Key" />
-                            
-                            <!-- Delete Button (Simulated or add to ViewModel if missing) -->
-                            <!-- Assuming only favorite toggle and copy are current primary actions in row -->
+
+                            <!--  Delete Button (Simulated or add to ViewModel if missing)  -->
+                            <!--  Assuming only favorite toggle and copy are current primary actions in row  -->
                         </StackPanel>
                     </Grid>
                 </DataTemplate>

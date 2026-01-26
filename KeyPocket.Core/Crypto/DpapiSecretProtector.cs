@@ -4,7 +4,7 @@ using System.Text;
 namespace KeyPocket.Core.Crypto;
 
 /// <summary>
-/// 基于 Windows DPAPI 的加密实现。
+///     基于 Windows DPAPI 的加密实现。
 /// </summary>
 public class DpapiSecretProtector : ISecretProtector
 {
@@ -15,10 +15,10 @@ public class DpapiSecretProtector : ISecretProtector
     {
         if (string.IsNullOrEmpty(plainText)) return string.Empty;
 
-        byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
-        byte[] cipherBytes = ProtectedData.Protect(
-            plainBytes, 
-            OptionalEntropy, 
+        var plainBytes = Encoding.UTF8.GetBytes(plainText);
+        var cipherBytes = ProtectedData.Protect(
+            plainBytes,
+            OptionalEntropy,
             DataProtectionScope.CurrentUser);
 
         return Convert.ToBase64String(cipherBytes);
@@ -30,10 +30,10 @@ public class DpapiSecretProtector : ISecretProtector
 
         try
         {
-            byte[] cipherBytes = Convert.FromBase64String(cipherText);
-            byte[] plainBytes = ProtectedData.Unprotect(
-                cipherBytes, 
-                OptionalEntropy, 
+            var cipherBytes = Convert.FromBase64String(cipherText);
+            var plainBytes = ProtectedData.Unprotect(
+                cipherBytes,
+                OptionalEntropy,
                 DataProtectionScope.CurrentUser);
 
             return Encoding.UTF8.GetString(plainBytes);
