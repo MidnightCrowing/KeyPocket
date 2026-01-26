@@ -16,6 +16,7 @@ using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using KeyPocket.UI.Helpers;
+using System.Threading.Tasks;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -36,6 +37,48 @@ namespace KeyPocket.UI
         public App()
         {
             InitializeComponent();
+            
+            this.UnhandledException += App_UnhandledException;
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
+        }
+
+        private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+        {
+            LogException("App_UnhandledException", e.Exception);
+            // Optional: e.Handled = true; if we want to try to suppress crash, 
+            // but for global catastrophic errors, usually better to let it fail or restart.
+        }
+
+        private void CurrentDomain_UnhandledException(object sender, System.UnhandledExceptionEventArgs e)
+        {
+            LogException("CurrentDomain_UnhandledException", e.ExceptionObject as Exception);
+        }
+
+        private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        {
+            LogException("TaskScheduler_UnobservedTaskException", e.Exception);
+            e.SetObserved(); 
+        }
+
+        private void LogException(string source, Exception? ex)
+        {
+            if (ex == null) return;
+
+            try
+            {
+                var folder = Windows.Storage.ApplicationData.Current.LocalFolder;
+                var filePath = System.IO.Path.Combine(folder.Path, "crash.log");
+                
+                string logContent = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] [{source}]\nData: {ex.Data}\nMessage: {ex.Message}\nStack: {ex.StackTrace}\n\n";
+
+                // Use simple File.AppendAllText as it is synchronous and we might be crashing
+                File.AppendAllText(filePath, logContent);
+            }
+            catch (Exception)
+            {
+                // Last ditch effort: suppress so we don't throw inside an exception handler
+            }
         }
 
         /// <summary>
