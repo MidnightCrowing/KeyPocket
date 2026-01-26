@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.ApplicationModel.Resources;
 using Windows.Foundation;
 using Windows.Storage.Pickers;
 using Windows.System;
@@ -99,12 +100,13 @@ public sealed partial class ProviderSettingsPage : Page, INotifyPropertyChanged
 
     private async void OnDeleteProviderClicked(object sender, RoutedEventArgs e)
     {
+        var resourceLoader = ResourceLoader.GetForViewIndependentUse();
         var dialog = new ContentDialog
         {
-            Title = "Delete Provider",
-            Content = "Are you sure you want to delete this provider? This action cannot be undone.",
-            PrimaryButtonText = "Delete",
-            CloseButtonText = "Cancel",
+            Title = resourceLoader.GetString("ProviderSettings_DeleteDialog_Title"),
+            Content = resourceLoader.GetString("ProviderSettings_DeleteDialog_Content"),
+            PrimaryButtonText = resourceLoader.GetString("ProviderSettings_DeleteDialog_PrimaryButton"),
+            CloseButtonText = resourceLoader.GetString("ProviderSettings_DeleteDialog_CloseButton"),
             DefaultButton = ContentDialogButton.Close,
             XamlRoot = XamlRoot
         };
@@ -242,16 +244,24 @@ public sealed partial class ProviderSettingsPage : Page, INotifyPropertyChanged
 
     private void CreateStickyHeaders()
     {
+        var resourceLoader = ResourceLoader.GetForViewIndependentUse();
+
         // Create sticky header for General
-        _stickyGeneral = CreateStickyHeaderBorder("General", "Basic provider information.");
+        _stickyGeneral = CreateStickyHeaderBorder(
+            resourceLoader.GetString("ProviderSettings_General/Text"),
+            resourceLoader.GetString("ProviderSettings_GeneralDesc/Text"));
         StickyHeadersCanvas.Children.Add(_stickyGeneral);
 
         // Create sticky header for API Keys
-        _stickyApiKeys = CreateStickyHeaderBorder("API Keys", "Manage access keys for this provider.");
+        _stickyApiKeys = CreateStickyHeaderBorder(
+            resourceLoader.GetString("ProviderSettings_ApiKeys/Text"),
+            resourceLoader.GetString("ProviderSettings_ApiKeysDesc/Text"));
         StickyHeadersCanvas.Children.Add(_stickyApiKeys);
 
         // Create sticky header for Models
-        _stickyModels = CreateStickyHeaderBorder("Models", "Configure available models.");
+        _stickyModels = CreateStickyHeaderBorder(
+            resourceLoader.GetString("ProviderSettings_Models/Text"),
+            resourceLoader.GetString("ProviderSettings_ModelsDesc/Text"));
         StickyHeadersCanvas.Children.Add(_stickyModels);
 
         // Initially hide all sticky headers

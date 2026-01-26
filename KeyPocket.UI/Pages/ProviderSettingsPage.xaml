@@ -27,12 +27,14 @@
                 <TextBlock
                     Margin="0,0,0,8"
                     Style="{StaticResource TitleTextBlockStyle}"
-                    Text="Provider Settings" />
+                    Text="Provider Settings"
+                    x:Uid="ProviderSettings_Title" />
                 <TextBlock
                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                     Margin="0,0,0,24"
                     Style="{StaticResource BodyTextBlockStyle}"
-                    Text="Manage your provider details, API keys, and model configurations." />
+                    Text="Manage your provider details, API keys, and model configurations."
+                    x:Uid="ProviderSettings_Subtitle" />
 
                 <Border
                     Background="{ThemeResource SurfaceStrokeColorDefaultBrush}"
@@ -47,11 +49,15 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel Spacing="4" x:Name="GeneralHeader">
-                        <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="General" />
+                        <TextBlock
+                            Style="{StaticResource SubtitleTextBlockStyle}"
+                            Text="General"
+                            x:Uid="ProviderSettings_General" />
                         <TextBlock
                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                             Style="{StaticResource CaptionTextBlockStyle}"
-                            Text="Basic provider information." />
+                            Text="Basic provider information."
+                            x:Uid="ProviderSettings_GeneralDesc" />
                     </StackPanel>
 
                     <StackPanel
@@ -60,14 +66,20 @@
                         MaxWidth="800"
                         Spacing="24">
                         <StackPanel Spacing="8">
-                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Name" />
+                            <TextBlock
+                                Style="{StaticResource BodyStrongTextBlockStyle}"
+                                Text="Name"
+                                x:Uid="ProviderSettings_Name" />
                             <TextBox Text="{x:Bind ViewModel.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         </StackPanel>
 
                         <StackPanel Spacing="8">
-                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Icon" />
+                            <TextBlock
+                                Style="{StaticResource BodyStrongTextBlockStyle}"
+                                Text="Icon"
+                                x:Uid="ProviderSettings_Icon" />
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <Button Content="Presets">
+                                <Button Content="Presets" x:Uid="ProviderSettings_Presets">
                                     <Button.Flyout>
                                         <Flyout Placement="Bottom">
                                             <GridView
@@ -108,27 +120,41 @@
                                     </Button.Flyout>
                                 </Button>
 
-                                <Button Click="OnChangeIconClicked" Content="Browse..." />
+                                <Button
+                                    Click="OnChangeIconClicked"
+                                    Content="Browse..."
+                                    x:Uid="ProviderSettings_Browse" />
 
                                 <Button
                                     Click="OnRemoveIconClicked"
                                     Content="Remove Icon"
                                     Style="{StaticResource DefaultButtonStyle}"
-                                    Visibility="{x:Bind ViewModel.HasCustomIcon, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}" />
+                                    Visibility="{x:Bind ViewModel.HasCustomIcon, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}"
+                                    x:Uid="ProviderSettings_RemoveIcon" />
                             </StackPanel>
                         </StackPanel>
 
                         <StackPanel Spacing="8">
-                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Base URL" />
-                            <TextBox PlaceholderText="https://api.openai.com/v1" Text="{x:Bind ViewModel.BaseUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock
+                                Style="{StaticResource BodyStrongTextBlockStyle}"
+                                Text="Base URL"
+                                x:Uid="ProviderSettings_BaseUrl" />
+                            <TextBox
+                                PlaceholderText="https://api.openai.com/v1"
+                                Text="{x:Bind ViewModel.BaseUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                x:Uid="ProviderSettings_BaseUrlPlaceholder" />
                             <TextBlock
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                 Style="{StaticResource CaptionTextBlockStyle}"
-                                Text="The base URL of the API provider." />
+                                Text="The base URL of the API provider."
+                                x:Uid="ProviderSettings_BaseUrlDesc" />
                         </StackPanel>
 
                         <StackPanel Spacing="8">
-                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="API Mode" />
+                            <TextBlock
+                                Style="{StaticResource BodyStrongTextBlockStyle}"
+                                Text="API Mode"
+                                x:Uid="ProviderSettings_ApiMode" />
                             <ComboBox
                                 HorizontalAlignment="Stretch"
                                 ItemsSource="{x:Bind ViewModel.ProviderTypes, Mode=OneWay}"
@@ -136,7 +162,10 @@
                         </StackPanel>
 
                         <StackPanel Spacing="8">
-                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Provider Currency" />
+                            <TextBlock
+                                Style="{StaticResource BodyStrongTextBlockStyle}"
+                                Text="Provider Currency"
+                                x:Uid="ProviderSettings_ProviderCurrency" />
                             <ComboBox
                                 HorizontalAlignment="Stretch"
                                 ItemsSource="{x:Bind ViewModel.AvailableCurrencies, Mode=OneWay}"
@@ -144,11 +173,15 @@
                             <TextBlock
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                 Style="{StaticResource CaptionTextBlockStyle}"
-                                Text="The currency used by this provider for billing." />
+                                Text="The currency used by this provider for billing."
+                                x:Uid="ProviderSettings_ProviderCurrencyDesc" />
                         </StackPanel>
 
                         <StackPanel Spacing="8">
-                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Description" />
+                            <TextBlock
+                                Style="{StaticResource BodyStrongTextBlockStyle}"
+                                Text="Description"
+                                x:Uid="ProviderSettings_Description" />
                             <TextBox
                                 AcceptsReturn="True"
                                 Height="80"
@@ -160,7 +193,8 @@
                             Command="{x:Bind ViewModel.SaveCommand, Mode=OneWay}"
                             Content="Save Changes"
                             HorizontalAlignment="Right"
-                            Style="{StaticResource AccentButtonStyle}" />
+                            Style="{StaticResource AccentButtonStyle}"
+                            x:Uid="ProviderSettings_Save" />
                     </StackPanel>
                 </Grid>
 
@@ -177,11 +211,15 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel Spacing="4" x:Name="ApiKeysHeader">
-                        <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="API Keys" />
+                        <TextBlock
+                            Style="{StaticResource SubtitleTextBlockStyle}"
+                            Text="API Keys"
+                            x:Uid="ProviderSettings_ApiKeys" />
                         <TextBlock
                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                             Style="{StaticResource CaptionTextBlockStyle}"
-                            Text="Manage access keys for this provider." />
+                            Text="Manage access keys for this provider."
+                            x:Uid="ProviderSettings_ApiKeysDesc" />
                     </StackPanel>
 
                     <StackPanel
@@ -245,7 +283,8 @@
                                                         Padding="8"
                                                         ToolTipService.ToolTip="Add Tag"
                                                         VerticalAlignment="Center"
-                                                        Visibility="{x:Bind IsTagDisplayVisible, Converter={StaticResource BoolToVisConverter}, Mode=OneWay}">
+                                                        Visibility="{x:Bind IsTagDisplayVisible, Converter={StaticResource BoolToVisConverter}, Mode=OneWay}"
+                                                        x:Uid="ProviderSettings_AddTag">
                                                         <FontIcon
                                                             FontFamily="{StaticResource SymbolThemeFontFamily}"
                                                             FontSize="16"
@@ -260,7 +299,8 @@
                                                         Style="{StaticResource SubtleButtonStyle}"
                                                         ToolTipService.ToolTip="Click to edit tag"
                                                         VerticalAlignment="Center"
-                                                        Visibility="{x:Bind IsTagTextVisible, Converter={StaticResource BoolToVisConverter}, Mode=OneWay}" />
+                                                        Visibility="{x:Bind IsTagTextVisible, Converter={StaticResource BoolToVisConverter}, Mode=OneWay}"
+                                                        x:Uid="ProviderSettings_EditTag" />
 
                                                     <!--  Tag Input (shown when editing)  -->
                                                     <TextBox
@@ -269,7 +309,8 @@
                                                         Text="{x:Bind Tag, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                         VerticalAlignment="Center"
                                                         Visibility="{x:Bind IsTagEditing, Converter={StaticResource BoolToVisConverter}, Mode=OneWay}"
-                                                        Width="80" />
+                                                        Width="80"
+                                                        x:Uid="Keys_Tag" />
                                                 </Grid>
 
                                                 <controls:CopyButton
@@ -277,13 +318,15 @@
                                                     Content="&#xE8C8;"
                                                     Padding="8"
                                                     Tag="{x:Bind Id, Mode=OneWay}"
-                                                    ToolTipService.ToolTip="Copy Key" />
+                                                    ToolTipService.ToolTip="Copy Key"
+                                                    x:Uid="Keys_CopyKey" />
                                                 <Button
                                                     Background="Transparent"
                                                     BorderThickness="0"
                                                     Command="{x:Bind ToggleFavoriteCommand}"
                                                     Padding="8"
-                                                    ToolTipService.ToolTip="Favorite">
+                                                    ToolTipService.ToolTip="Favorite"
+                                                    x:Uid="ProviderSettings_Favorite">
                                                     <FontIcon
                                                         FontFamily="{StaticResource SymbolThemeFontFamily}"
                                                         FontSize="16"
@@ -294,7 +337,8 @@
                                                     BorderThickness="0"
                                                     Command="{x:Bind DeleteCommand}"
                                                     Padding="8"
-                                                    ToolTipService.ToolTip="Delete">
+                                                    ToolTipService.ToolTip="Delete"
+                                                    x:Uid="ProviderSettings_Delete">
                                                     <FontIcon
                                                         FontFamily="{StaticResource SymbolThemeFontFamily}"
                                                         FontSize="16"
@@ -311,7 +355,10 @@
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
 
-                                            <PasswordBox Password="{x:Bind NewKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Enter API Key (sk-...)" />
+                                            <PasswordBox
+                                                Password="{x:Bind NewKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                PlaceholderText="Enter API Key (sk-...)"
+                                                x:Uid="ProviderSettings_ApiKeyPlaceholder" />
 
                                             <StackPanel
                                                 Grid.Column="1"
@@ -322,18 +369,23 @@
                                                     Command="{x:Bind ConfirmAddCommand}"
                                                     CommandParameter="{x:Bind}"
                                                     Content="Confirm"
-                                                    Style="{StaticResource AccentButtonStyle}" />
+                                                    Style="{StaticResource AccentButtonStyle}"
+                                                    x:Uid="ProviderSettings_Confirm" />
                                                 <Button
                                                     Command="{x:Bind CancelAddCommand}"
                                                     CommandParameter="{x:Bind}"
-                                                    Content="Cancel" />
+                                                    Content="Cancel"
+                                                    x:Uid="ProviderSettings_Cancel" />
                                             </StackPanel>
                                         </Grid>
                                     </Grid>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                         </ListView>
-                        <Button Command="{x:Bind ViewModel.AddKeyCommand, Mode=OneWay}" Content="Add API Key" />
+                        <Button
+                            Command="{x:Bind ViewModel.AddKeyCommand, Mode=OneWay}"
+                            Content="Add API Key"
+                            x:Uid="ProviderSettings_AddApiKey" />
                     </StackPanel>
                 </Grid>
 
@@ -350,11 +402,15 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel Spacing="4" x:Name="ModelsHeader">
-                        <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="Models" />
+                        <TextBlock
+                            Style="{StaticResource SubtitleTextBlockStyle}"
+                            Text="Models"
+                            x:Uid="ProviderSettings_Models" />
                         <TextBlock
                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                             Style="{StaticResource CaptionTextBlockStyle}"
-                            Text="Configure available models." />
+                            Text="Configure available models."
+                            x:Uid="ProviderSettings_ModelsDesc" />
                     </StackPanel>
 
                     <StackPanel
@@ -426,8 +482,8 @@
                                                     Grid.Column="0"
                                                     Grid.Row="0"
                                                     HorizontalAlignment="Left"
-                                                    Text="In:"
-                                                    Visibility="{x:Bind HasInputPrice, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}" />
+                                                    Visibility="{x:Bind HasInputPrice, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}"
+                                                    x:Uid="ProviderSettings_ModelInputPriceLabel" />
                                                 <TextBlock
                                                     FontFamily="Consolas"
                                                     FontSize="12"
@@ -446,8 +502,8 @@
                                                     Grid.Column="0"
                                                     Grid.Row="1"
                                                     HorizontalAlignment="Left"
-                                                    Text="Out:"
-                                                    Visibility="{x:Bind HasOutputPrice, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}" />
+                                                    Visibility="{x:Bind HasOutputPrice, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}"
+                                                    x:Uid="ProviderSettings_ModelOutputPriceLabel" />
                                                 <TextBlock
                                                     FontFamily="Consolas"
                                                     FontSize="12"
@@ -468,13 +524,15 @@
                                                     Content="&#xE8C8;"
                                                     Padding="8"
                                                     Tag="{x:Bind Id, Mode=OneWay}"
-                                                    ToolTipService.ToolTip="Copy Model ID" />
+                                                    ToolTipService.ToolTip="Copy Model ID"
+                                                    x:Uid="ProviderSettings_CopyModelID" />
                                                 <Button
                                                     Background="Transparent"
                                                     BorderThickness="0"
                                                     Command="{x:Bind StartEditCommand}"
                                                     Padding="8"
-                                                    ToolTipService.ToolTip="Edit">
+                                                    ToolTipService.ToolTip="Edit"
+                                                    x:Uid="ProviderSettings_Edit">
                                                     <FontIcon
                                                         FontFamily="{StaticResource SymbolThemeFontFamily}"
                                                         FontSize="16"
@@ -526,16 +584,24 @@
                                                     <TextBlock
                                                         Margin="0,0,0,4"
                                                         Style="{StaticResource CaptionTextBlockStyle}"
-                                                        Text="Model ID" />
-                                                    <TextBox PlaceholderText="e.g. gpt-4" Text="{x:Bind NewId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                        Text="Model ID"
+                                                        x:Uid="ProviderSettings_ModelId" />
+                                                    <TextBox
+                                                        PlaceholderText="e.g. gpt-4"
+                                                        Text="{x:Bind NewId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                        x:Uid="ProviderSettings_ModelIdPlaceholder" />
                                                 </StackPanel>
 
                                                 <StackPanel Grid.Column="2">
                                                     <TextBlock
                                                         Margin="0,0,0,4"
                                                         Style="{StaticResource CaptionTextBlockStyle}"
-                                                        Text="Display Name (Optional)" />
-                                                    <TextBox PlaceholderText="e.g. GPT-4" Text="{x:Bind NewName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                        Text="Display Name (Optional)"
+                                                        x:Uid="ProviderSettings_ModelName" />
+                                                    <TextBox
+                                                        PlaceholderText="e.g. GPT-4"
+                                                        Text="{x:Bind NewName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                        x:Uid="ProviderSettings_ModelNamePlaceholder" />
                                                 </StackPanel>
                                             </Grid>
 
@@ -549,7 +615,10 @@
 
                                                 <StackPanel>
                                                     <StackPanel Margin="0,0,0,4" Orientation="Horizontal">
-                                                        <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="Input Price (per M tokens)" />
+                                                        <TextBlock
+                                                            Style="{StaticResource CaptionTextBlockStyle}"
+                                                            Text="Input Price (per M tokens)"
+                                                            x:Uid="ProviderSettings_InputPrice" />
                                                     </StackPanel>
                                                     <Grid ColumnSpacing="8">
                                                         <Grid.ColumnDefinitions>
@@ -570,13 +639,17 @@
                                                             SmallChange="0.01"
                                                             SpinButtonPlacementMode="Inline"
                                                             Value="{x:Bind InputPriceValue, Mode=TwoWay}"
-                                                            ValueChanged="OnPriceValueChanged" />
+                                                            ValueChanged="OnPriceValueChanged"
+                                                            x:Uid="ProviderSettings_InputPricePlaceholder" />
                                                     </Grid>
                                                 </StackPanel>
 
                                                 <StackPanel Grid.Column="2">
                                                     <StackPanel Margin="0,0,0,4" Orientation="Horizontal">
-                                                        <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="Output Price (per M tokens)" />
+                                                        <TextBlock
+                                                            Style="{StaticResource CaptionTextBlockStyle}"
+                                                            Text="Output Price (per M tokens)"
+                                                            x:Uid="ProviderSettings_OutputPrice" />
                                                     </StackPanel>
                                                     <Grid ColumnSpacing="8">
                                                         <Grid.ColumnDefinitions>
@@ -597,7 +670,8 @@
                                                             SmallChange="0.01"
                                                             SpinButtonPlacementMode="Inline"
                                                             Value="{x:Bind OutputPriceValue, Mode=TwoWay}"
-                                                            ValueChanged="OnPriceValueChanged" />
+                                                            ValueChanged="OnPriceValueChanged"
+                                                            x:Uid="ProviderSettings_OutputPricePlaceholder" />
                                                     </Grid>
                                                 </StackPanel>
                                             </Grid>
@@ -611,8 +685,12 @@
                                                 <Button
                                                     Command="{x:Bind ConfirmAddCommand}"
                                                     Content="Confirm"
-                                                    Style="{StaticResource AccentButtonStyle}" />
-                                                <Button Command="{x:Bind CancelAddCommand}" Content="Cancel" />
+                                                    Style="{StaticResource AccentButtonStyle}"
+                                                    x:Uid="ProviderSettings_Confirm" />
+                                                <Button
+                                                    Command="{x:Bind CancelAddCommand}"
+                                                    Content="Cancel"
+                                                    x:Uid="ProviderSettings_Cancel" />
                                             </StackPanel>
                                         </Grid>
                                     </Grid>
@@ -621,8 +699,14 @@
                         </ListView>
 
                         <StackPanel Orientation="Horizontal" Spacing="8">
-                            <Button Command="{x:Bind ViewModel.AddModelCommand, Mode=OneWay}" Content="Add Model" />
-                            <Button Content="Fetch Models" ToolTipService.ToolTip="Fetch available models from provider" />
+                            <Button
+                                Command="{x:Bind ViewModel.AddModelCommand, Mode=OneWay}"
+                                Content="Add Model"
+                                x:Uid="ProviderSettings_AddModel" />
+                            <Button
+                                Content="Fetch Models"
+                                ToolTipService.ToolTip="Fetch available models from provider"
+                                x:Uid="ProviderSettings_FetchModels" />
                         </StackPanel>
                     </StackPanel>
                 </Grid>
@@ -637,7 +721,8 @@
                     <TextBlock
                         Foreground="{ThemeResource SystemFillColorCriticalBrush}"
                         Style="{StaticResource SubtitleTextBlockStyle}"
-                        Text="Danger Zone" />
+                        Text="Danger Zone"
+                        x:Uid="ProviderSettings_DangerZone" />
 
                     <Border
                         BorderBrush="{ThemeResource SystemFillColorCriticalBrush}"
@@ -650,11 +735,15 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <StackPanel Spacing="4">
-                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Delete this provider" />
+                                <TextBlock
+                                    Style="{StaticResource BodyStrongTextBlockStyle}"
+                                    Text="Delete this provider"
+                                    x:Uid="ProviderSettings_DeleteProvider" />
                                 <TextBlock
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                     Style="{StaticResource CaptionTextBlockStyle}"
-                                    Text="Once you delete a provider, there is no going back. Please be certain." />
+                                    Text="Once you delete a provider, there is no going back. Please be certain."
+                                    x:Uid="ProviderSettings_DeleteProviderDesc" />
                             </StackPanel>
 
                             <Button
@@ -663,7 +752,8 @@
                                 Click="OnDeleteProviderClicked"
                                 Content="Delete this provider"
                                 Foreground="White"
-                                Grid.Column="1" />
+                                Grid.Column="1"
+                                x:Uid="ProviderSettings_DeleteProviderButton" />
                         </Grid>
                     </Border>
                 </StackPanel>

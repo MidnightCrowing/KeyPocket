@@ -24,7 +24,8 @@
             IsPaneToggleButtonVisible="True"
             PaneToggleRequested="TitleBar_OnPaneToggleRequested"
             Title="KeyPocket"
-            x:Name="titleBar">
+            x:Name="TitleBar"
+            x:Uid="AppTitleBar">
 
             <TitleBar.IconSource>
                 <ImageIconSource ImageSource="/Assets/KeyPocket.png" />
@@ -35,7 +36,8 @@
                     PlaceholderText="Search.."
                     QueryIcon="Find"
                     VerticalAlignment="Center"
-                    Width="360" />
+                    Width="360"
+                    x:Uid="Shell_SearchBox" />
             </TitleBar.Content>
         </TitleBar>
 
@@ -47,13 +49,14 @@
             IsSettingsVisible="True"
             ItemInvoked="NavigationView_ItemInvoked"
             SelectionChanged="NavigationView_SelectionChanged"
-            x:Name="navView">
+            x:Name="NavView">
 
             <NavigationView.MenuItems>
                 <NavigationViewItem
                     Content="Home"
                     Tag="HomePage"
-                    x:Name="homePage">
+                    x:Name="HomePage"
+                    x:Uid="Shell_Home">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE80F;" />
                     </NavigationViewItem.Icon>
@@ -62,7 +65,8 @@
                 <NavigationViewItem
                     Content="Models"
                     Tag="ModelsPage"
-                    x:Name="modelsPageItem">
+                    x:Name="ModelsPageItem"
+                    x:Uid="Shell_Models">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xF158;" />
                     </NavigationViewItem.Icon>
@@ -71,26 +75,31 @@
                 <NavigationViewItem
                     Content="Keys"
                     Tag="KeysPage"
-                    x:Name="keysPageItem">
+                    x:Name="KeysPageItem"
+                    x:Uid="Shell_Keys">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE8D7;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
 
-                <NavigationViewItemHeader Content="Providers" />
+                <NavigationViewItemHeader
+                    Content="Providers"
+                    Tag="ProvidersHeader"
+                    x:Uid="Shell_Providers" />
 
                 <NavigationViewItem
                     Content="Add Provider"
                     SelectsOnInvoked="False"
                     Tag="AddProvider"
-                    x:Name="addProviderItem">
+                    x:Name="AddProviderItem"
+                    x:Uid="Shell_AddProvider">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE710;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
             </NavigationView.MenuItems>
 
-            <Frame x:Name="contentFrame" />
+            <Frame x:Name="ContentFrame" />
         </NavigationView>
     </Grid>
 </Window>

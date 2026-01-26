@@ -38,7 +38,8 @@
                 HorizontalAlignment="Left"
                 PlaceholderText="Search models..."
                 Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                Width="300" />
+                Width="300"
+                x:Uid="Models_SearchBox" />
 
             <!--  Filters & Sort  -->
             <!--  Capability  -->
@@ -51,7 +52,8 @@
                 <TextBlock
                     Style="{ThemeResource BodyTextBlockStyle}"
                     Text="Capability:"
-                    VerticalAlignment="Center" />
+                    VerticalAlignment="Center"
+                    x:Uid="Models_Capability" />
                 <ComboBox
                     ItemsSource="{x:Bind ViewModel.Capabilities}"
                     SelectedItem="{x:Bind ViewModel.SelectedCapability, Mode=TwoWay}"
@@ -68,7 +70,8 @@
                 <TextBlock
                     Style="{ThemeResource BodyTextBlockStyle}"
                     Text="Sort by:"
-                    VerticalAlignment="Center" />
+                    VerticalAlignment="Center"
+                    x:Uid="Models_SortBy" />
                 <ComboBox
                     ItemsSource="{x:Bind ViewModel.SortOptions}"
                     SelectedItem="{x:Bind ViewModel.SelectedSortOption, Mode=TwoWay}"
@@ -83,7 +86,7 @@
                 VerticalAlignment="Bottom">
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <FontIcon FontSize="16" Glyph="&#xE735;" />
-                    <TextBlock Text="Favorites" />
+                    <TextBlock Text="Favorites" x:Uid="Models_Favorites" />
                 </StackPanel>
             </ToggleButton>
         </Grid>
@@ -173,14 +176,20 @@
                                         CornerRadius="4"
                                         Padding="6,2"
                                         Visibility="{x:Bind IsChatModel, Converter={StaticResource BoolToVis}}">
-                                        <TextBlock Style="{ThemeResource CaptionTextBlockStyle}" Text="Chat" />
+                                        <TextBlock
+                                            Style="{ThemeResource CaptionTextBlockStyle}"
+                                            Text="Chat"
+                                            x:Uid="Models_Tag_Chat" />
                                     </Border>
                                     <Border
                                         Background="{ThemeResource SystemFillColorSolidNeutralBackgroundBrush}"
                                         CornerRadius="4"
                                         Padding="6,2"
                                         Visibility="{x:Bind IsEmbeddingModel, Converter={StaticResource BoolToVis}}">
-                                        <TextBlock Style="{ThemeResource CaptionTextBlockStyle}" Text="Embedding" />
+                                        <TextBlock
+                                            Style="{ThemeResource CaptionTextBlockStyle}"
+                                            Text="Embedding"
+                                            x:Uid="Models_Tag_Embedding" />
                                     </Border>
                                 </StackPanel>
 
@@ -188,7 +197,8 @@
                                     <TextBlock
                                         Opacity="0.6"
                                         Style="{ThemeResource CaptionTextBlockStyle}"
-                                        Text="In:" />
+                                        Text="In:"
+                                        x:Uid="Models_Price_In" />
                                     <TextBlock
                                         FontWeight="SemiBold"
                                         Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
@@ -203,7 +213,8 @@
                                         Margin="8,0,0,0"
                                         Opacity="0.6"
                                         Style="{ThemeResource CaptionTextBlockStyle}"
-                                        Text="Out:" />
+                                        Text="Out:"
+                                        x:Uid="Models_Price_Out" />
                                     <TextBlock
                                         FontWeight="SemiBold"
                                         Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
@@ -241,7 +252,8 @@
                                     Grid.Column="1"
                                     Padding="6"
                                     Tag="{x:Bind Id, Mode=OneWay}"
-                                    ToolTipService.ToolTip="Copy ID" />
+                                    ToolTipService.ToolTip="Copy ID"
+                                    x:Uid="Models_CopyID" />
                             </Grid>
                         </Grid>
                     </Grid>

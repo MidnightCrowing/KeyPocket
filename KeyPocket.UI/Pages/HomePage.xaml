@@ -85,12 +85,14 @@
             <TextBlock
                 HorizontalAlignment="Center"
                 Style="{StaticResource SubtitleTextBlockStyle}"
-                Text="No Providers Configured" />
+                Text="No Providers Configured"
+                x:Uid="Home_NoProviders" />
             <Button
                 Click="OnAddProviderClicked"
                 Content="Add Your First Provider"
                 HorizontalAlignment="Center"
-                Style="{StaticResource AccentButtonStyle}" />
+                Style="{StaticResource AccentButtonStyle}"
+                x:Uid="Home_AddFirstProvider" />
         </StackPanel>
 
         <!--  Content Grid  -->

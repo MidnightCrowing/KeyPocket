@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using Windows.ApplicationModel;
+using Windows.ApplicationModel.Resources;
 using CommunityToolkit.Mvvm.Messaging;
 using KeyPocket.UI.Messages;
 using KeyPocket.UI.Pages;
@@ -24,23 +25,33 @@ public sealed partial class MainWindow
     {
         InitializeComponent();
 
+        try
+        {
+            var resourceLoader = ResourceLoader.GetForViewIndependentUse();
+            Title = resourceLoader.GetString("MainWindow.Title");
+        }
+        catch
+        {
+            /* Fallback to default if resource missing */
+        }
+
         ExtendsContentIntoTitleBar = true;
-        SetTitleBar(titleBar);
+        SetTitleBar(TitleBar);
 
         // 初始化 ViewModel
         ViewModel = new MainWindowViewModel(App.ProviderService);
 
         _pageToNavItem = new Dictionary<Type, NavigationViewItem>
         {
-            { typeof(HomePage), homePage },
-            { typeof(ModelsPage), modelsPageItem },
-            { typeof(KeysPage), keysPageItem }
+            { typeof(HomePage), HomePage },
+            { typeof(ModelsPage), ModelsPageItem },
+            { typeof(KeysPage), KeysPageItem }
         };
 
-        navView.SelectedItem = homePage;
-        contentFrame.Navigate(typeof(HomePage));
+        NavView.SelectedItem = HomePage;
+        ContentFrame.Navigate(typeof(HomePage));
 
-        contentFrame.Navigated += OnContentFrameNavigated;
+        ContentFrame.Navigated += OnContentFrameNavigated;
 
         // Initialize Sidebar Providers
         LoadProvidersToSidebar();
@@ -53,7 +64,7 @@ public sealed partial class MainWindow
         {
             DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
             {
-                contentFrame.Navigate(typeof(ProviderSettingsPage), m.ProviderId.ToString());
+                ContentFrame.Navigate(typeof(ProviderSettingsPage), m.ProviderId.ToString());
                 SelectProviderInSidebar(m.ProviderId);
             });
         });
@@ -68,7 +79,7 @@ public sealed partial class MainWindow
     {
         // 1. Update Sidebar items
         // Recursively or iterate menu items
-        foreach (var item in navView.MenuItems)
+        foreach (var item in NavView.MenuItems)
             if (item is NavigationViewItem navItem && navItem.Tag is string tag && tag.StartsWith("Provider_"))
                 try
                 {
@@ -110,7 +121,7 @@ public sealed partial class MainWindow
 
     private void ClearDynamicProviders()
     {
-        var menuItems = navView.MenuItems;
+        var menuItems = NavView.MenuItems;
         for (var i = menuItems.Count - 1; i >= 0; i--)
             if (menuItems[i] is NavigationViewItem item && item.Tag is string tag && tag.StartsWith("Provider_"))
                 menuItems.RemoveAt(i);
@@ -144,7 +155,7 @@ public sealed partial class MainWindow
             }
         };
 
-        navView.MenuItems.Insert(insertIndex, navItem);
+        NavView.MenuItems.Insert(insertIndex, navItem);
     }
 
     private IconElement ResolveIconElement(string? iconPath, string defaultGlyph)
@@ -192,7 +203,7 @@ public sealed partial class MainWindow
     private void RemoveProviderFromSidebar(Guid providerId)
     {
         var tag = $"Provider_{providerId}";
-        var menuItems = navView.MenuItems;
+        var menuItems = NavView.MenuItems;
         for (var i = menuItems.Count - 1; i >= 0; i--)
             if (menuItems[i] is NavigationViewItem item && item.Tag is string itemTag && itemTag == tag)
             {
@@ -203,9 +214,9 @@ public sealed partial class MainWindow
 
     private int FindProvidersHeaderIndex()
     {
-        var menuItems = navView.MenuItems;
+        var menuItems = NavView.MenuItems;
         for (var i = 0; i < menuItems.Count; i++)
-            if (menuItems[i] is NavigationViewItemHeader header && header.Content?.ToString() == "Providers")
+            if (menuItems[i] is NavigationViewItemHeader header && header.Tag?.ToString() == "ProvidersHeader")
             {
                 // 找到所有已存在的 Provider_ 项，插入到最后一个之后
                 var lastProviderIndex = i;
@@ -226,22 +237,22 @@ public sealed partial class MainWindow
     public void SelectProviderInSidebar(Guid providerId)
     {
         var tag = $"Provider_{providerId}";
-        foreach (var item in navView.MenuItems)
+        foreach (var item in NavView.MenuItems)
             if (item is NavigationViewItem navItem && navItem.Tag is string itemTag && itemTag == tag)
             {
-                navView.SelectedItem = navItem;
+                NavView.SelectedItem = navItem;
                 break;
             }
     }
 
     private void TitleBar_OnBackRequested(TitleBar sender, object args)
     {
-        if (contentFrame.CanGoBack) contentFrame.GoBack();
+        if (ContentFrame.CanGoBack) ContentFrame.GoBack();
     }
 
     private void TitleBar_OnPaneToggleRequested(TitleBar sender, object args)
     {
-        navView.IsPaneOpen = !navView.IsPaneOpen;
+        NavView.IsPaneOpen = !NavView.IsPaneOpen;
     }
 
     private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
@@ -273,7 +284,7 @@ public sealed partial class MainWindow
             if (tag.StartsWith("Provider_"))
             {
                 var providerId = tag.Substring("Provider_".Length);
-                contentFrame.Navigate(typeof(ProviderSettingsPage), providerId);
+                ContentFrame.Navigate(typeof(ProviderSettingsPage), providerId);
                 return;
             }
 
@@ -291,11 +302,11 @@ public sealed partial class MainWindow
 
     private void OnContentFrameNavigated(object sender, NavigationEventArgs e)
     {
-        var canGoBack = contentFrame?.CanGoBack ?? false;
-        titleBar.IsBackButtonVisible = canGoBack;
+        var canGoBack = ContentFrame?.CanGoBack ?? false;
+        TitleBar.IsBackButtonVisible = canGoBack;
 
         // 同步侧边栏选中状态
-        if (contentFrame?.Content is Page page)
+        if (ContentFrame?.Content is Page page)
         {
             var pageType = page.GetType();
 
@@ -307,18 +318,18 @@ public sealed partial class MainWindow
             // 如果是其他页面，同步到对应的导航项
             else if (_pageToNavItem.TryGetValue(pageType, out var navItem))
             {
-                navView.SelectedItem = navItem;
+                NavView.SelectedItem = navItem;
             }
         }
     }
 
     private void NavigateTo(Type pageType)
     {
-        if (contentFrame.Content?.GetType() != pageType) // 避免重复导航
-            contentFrame.Navigate(pageType);
+        if (ContentFrame.Content?.GetType() != pageType) // 避免重复导航
+            ContentFrame.Navigate(pageType);
 
         // 同步 NavView 选中状态
         if (_pageToNavItem.TryGetValue(pageType, out var navItem))
-            navView.SelectedItem = navItem;
+            NavView.SelectedItem = navItem;
     }
 }
