@@ -46,8 +46,7 @@ namespace KeyPocket.UI
         private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
         {
             LogException("App_UnhandledException", e.Exception);
-            // Optional: e.Handled = true; if we want to try to suppress crash, 
-            // but for global catastrophic errors, usually better to let it fail or restart.
+            // Optional: e.Handled = true; if we want to try to suppress crash
         }
 
         private void CurrentDomain_UnhandledException(object sender, System.UnhandledExceptionEventArgs e)
@@ -72,8 +71,8 @@ namespace KeyPocket.UI
                 
                 string logContent = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] [{source}]\nData: {ex.Data}\nMessage: {ex.Message}\nStack: {ex.StackTrace}\n\n";
 
-                // Use simple File.AppendAllText as it is synchronous and we might be crashing
-                File.AppendAllText(filePath, logContent);
+                // Use synchronous write as we might be crashing
+                File.AppendAllText(filePath, logContent, System.Text.Encoding.UTF8);
             }
             catch (Exception)
             {

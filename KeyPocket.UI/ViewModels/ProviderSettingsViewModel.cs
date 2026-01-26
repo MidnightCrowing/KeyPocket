@@ -31,7 +31,20 @@ public partial class ProviderSettingsViewModel : ObservableObject
     private string _name = string.Empty;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TypeIndex))]
     private string _type = "OpenAI API";
+
+    public int TypeIndex
+    {
+        get => ProviderTypes.IndexOf(Type);
+        set
+        {
+            if (value >= 0 && value < ProviderTypes.Count)
+            {
+                Type = ProviderTypes[value];
+            }
+        }
+    }
 
     [ObservableProperty]
     private string? _baseUrl;
@@ -60,7 +73,8 @@ public partial class ProviderSettingsViewModel : ObservableObject
     // Available currencies for selection
     public System.Collections.Generic.List<string> AvailableCurrencies => SettingsHelper.Current.AvailableCurrencies;
 
-    public ObservableCollection<string> ProviderTypes { get; } = new()
+    // List is sufficient for static content and lighter than ObservableCollection
+    public System.Collections.Generic.List<string> ProviderTypes { get; } = new()
     {
         "OpenAI API",
         "Claude API",
@@ -73,16 +87,19 @@ public partial class ProviderSettingsViewModel : ObservableObject
     public ObservableCollection<DefaultIconItem> DefaultIcons { get; } = new();
 
     // Track the currency currently used to display model prices in this page
-    private string _displayCurrency = SettingsHelper.Current.SelectedCurrency;
 
     public ProviderSettingsViewModel(Provider provider, ProviderService providerService)
     {
         _originalProvider = provider;
         _providerService = providerService;
 
-        // Init fields
+        // Initialize fields
         _name = provider.Name;
-        _type = provider.Type;
+        
+        // Ensure strictly matching string reference for ComboBox
+        var typeMatch = ProviderTypes.FirstOrDefault(t => t == provider.Type);
+        _type = typeMatch ?? provider.Type;
+        
         _baseUrl = provider.ApiBaseUrl;
         _description = provider.Description;
         _providerCurrency = provider.Currency;
@@ -95,11 +112,11 @@ public partial class ProviderSettingsViewModel : ObservableObject
         ApiKeys.CollectionChanged += OnApiKeysCollectionChanged;
         Models.CollectionChanged += OnModelsCollectionChanged;
 
-        // 订阅全局设置变化以更新货币符号
-        // PropertyChanged logic removed: Provider Settings should reflect stable configuration, not global display preference.
+        // Subscribe to global usage changes to update currency symbol if needed
+        // (Logic simplified intentionally)
     }
 
-    // 公开 Provider 以便访问
+    // Expose Provider for access
     public Provider Provider => _originalProvider;
 
     // Default for designer
@@ -109,9 +126,8 @@ public partial class ProviderSettingsViewModel : ObservableObject
         _originalProvider = new Provider();
     }
 
-    // 当前货币符号（基于 SettingsHelper.Current.SelectedCurrency）
-    // NOTE: This property name collided with wrapper's requirement.
-    // Ideally this VM should expose "ProviderCurrencySymbol" for the "add model" UI.
+    // Current currency symbol (based on SettingsHelper.Current.SelectedCurrency)
+    // NOTE: Ideally this VM should expose "ProviderCurrencySymbol" for the "add model" UI.
     
     public string ProviderCurrencySymbol => ExchangeRateHelper.GetCurrencySymbol(ProviderCurrency);
 
@@ -443,8 +459,7 @@ public partial class ProviderSettingsViewModel : ObservableObject
                 w.InputPriceValue = (double)(m.InputPricePerMTokens ?? 0);
                 w.OutputPriceValue = (double)(m.OutputPricePerMTokens ?? 0);
 
-                // w.InputPriceValue = inputVal; // Removed old logic
-                // w.OutputPriceValue = outputVal; // Removed old logic
+
                 w.InputPrice = w.InputPriceValue.ToString();
                 w.OutputPrice = w.OutputPriceValue.ToString();
 

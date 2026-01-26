@@ -8,7 +8,7 @@ using KeyPocket.Core.Crypto;
 namespace KeyPocket.Core.Services;
 
 /// <summary>
-/// 管理 Provider 的业务逻辑。
+/// Manages Provider business logic.
 /// </summary>
 public class ProviderService
 {
@@ -29,7 +29,7 @@ public class ProviderService
     }
 
     /// <summary>
-    /// 生成默认的供应商名称（例如 "New Provider 1"）
+    /// Generate a default provider name (e.g. "New Provider 1")
     /// </summary>
     private string GenerateDefaultProviderName()
     {
@@ -38,7 +38,7 @@ public class ProviderService
         string baseName = "New Provider";
         string name = $"{baseName} {counter}";
         
-        // 查找未使用的名称
+        // Find unused name
         while (config.Providers.Any(p => p.Name == name))
         {
             counter++;
@@ -49,7 +49,7 @@ public class ProviderService
     }
 
     /// <summary>
-    /// 创建一个默认配置的供应商
+    /// Create a provider with default configuration
     /// </summary>
     public Provider CreateProvider()
     {
@@ -82,7 +82,7 @@ public class ProviderService
         var provider = config.Providers.FirstOrDefault(p => p.Id == id);
         if (provider != null)
         {
-            // 删除图标文件（如果存在）
+            // Delete icon file if exists
             if (!string.IsNullOrEmpty(provider.IconPath))
             {
                 try
@@ -98,7 +98,7 @@ public class ProviderService
                 }
                 catch
                 {
-                    // 忽略删除图标文件的错误
+                    // Ignore errors during icon deletion
                 }
             }
             

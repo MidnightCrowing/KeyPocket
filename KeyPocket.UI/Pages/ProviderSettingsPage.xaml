@@ -125,7 +125,7 @@
                         <ComboBox
                             HorizontalAlignment="Stretch"
                             ItemsSource="{x:Bind ViewModel.ProviderTypes, Mode=OneWay}"
-                            SelectedItem="{x:Bind ViewModel.Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            SelectedIndex="{x:Bind ViewModel.TypeIndex, Mode=TwoWay}" />
                     </StackPanel>
 
                     <StackPanel Spacing="8">

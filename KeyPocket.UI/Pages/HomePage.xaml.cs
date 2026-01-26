@@ -34,11 +34,7 @@ namespace KeyPocket.UI.Pages
             };
             UpdateVisualState();
             
-            // Register for provider deletion messages
-            WeakReferenceMessenger.Default.Register<ProviderDeletedMessage>(this, (r, m) =>
-            {
-                ViewModel.Refresh();
-            });
+
 
 
 
@@ -57,16 +53,16 @@ namespace KeyPocket.UI.Pages
 
         private void OnAddProviderClicked(object sender, RoutedEventArgs e)
         {
-            // 直接创建默认供应商
+            // Create default provider directly
             var newProvider = App.ProviderService.CreateProvider();
             
-            // 发送创建消息，触发侧边栏更新和导航
+            // Send creation message to trigger side bar update and navigation
             WeakReferenceMessenger.Default.Send(new ProviderCreatedMessage(newProvider.Id));
         }
 
         private void OnCopyKeyClicked(object sender, RoutedEventArgs e)
         {
-            // Copy logic stub
+
             if (sender is Button btn && btn.Tag is string fullKey)
             {
                 // Copy to clipboard
@@ -78,7 +74,7 @@ namespace KeyPocket.UI.Pages
 
         private void OnCopyModelIdClicked(object sender, RoutedEventArgs e)
         {
-            // Copy logic stub
+
             if (sender is FrameworkElement ele && ele.Tag is string modelId)
             {
                 var dataPackage = new Windows.ApplicationModel.DataTransfer.DataPackage();
@@ -100,11 +96,11 @@ namespace KeyPocket.UI.Pages
         {
             var senderElement = sender as FrameworkElement;
             
-            // 如果点击的是按钮（复制按钮等），则忽略导航
+            // If button is clicked (e.g. copy button), ignore navigation
             if (e.OriginalSource is DependencyObject originalSource)
             {
                 var element = originalSource as FrameworkElement;
-                // 向上查找可视树，看点击源是否在 Button 内部
+                // Walk up the visual tree to check if source is within a Button
                 while (element != null && element != senderElement)
                 {
                     if (element is Button || element is KeyPocket.UI.Controls.CopyButton)

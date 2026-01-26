@@ -40,7 +40,7 @@ public sealed partial class ProviderSettingsPage : Page, System.ComponentModel.I
 
     public ProviderSettingsPage()
     {
-        // 初始化默认 ViewModel 以避免绑定错误
+        // Initialize default ViewModel to avoid binding errors
         ViewModel = new ProviderSettingsViewModel();
         
         this.InitializeComponent();
@@ -57,10 +57,11 @@ public sealed partial class ProviderSettingsPage : Page, System.ComponentModel.I
             if (provider != null)
             {
                 ViewModel = new ProviderSettingsViewModel(provider, App.ProviderService);
+
             }
             else
             {
-                // Provider 不存在（可能已被删除），返回首页
+                // Provider does not exist (may have been deleted), return to home
                 Frame.Navigate(typeof(HomePage));
             }
         }
@@ -136,13 +137,13 @@ public sealed partial class ProviderSettingsPage : Page, System.ComponentModel.I
     }
 
     /// <summary>
-    /// 清理导航历史中指向已删除 Provider 的记录
+    /// Cleanup navigation history for deleted provider
     /// </summary>
     private void CleanupNavigationHistory(Guid deletedProviderId)
     {
-        // WinUI 3 的 Frame 不支持直接操作导航历史
-        // 但我们可以通过不回退到已删除的页面来避免问题
-        // 这个方法为未来扩展预留
+        // WinUI 3 Frame does not support direct manipulation of navigation history
+        // But we can avoid issues by not navigating back to the deleted page
+        // This method is reserved for future extensions
     }
 
     private void OnCopyModelIdClicked(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
@@ -210,30 +211,8 @@ public sealed partial class ProviderSettingsPage : Page, System.ComponentModel.I
             {
                  popup.IsOpen = false;
             }
-            // The visual tree of a Button.Flyout is complex. 
-            // A common way to close a Flyout from code-behind if you don't have a reference is difficult.
-            // However, since we are inside the page, we can try to close the *active* flyout if we could find it.
-            // Alternative: Simply clicking the item usually doesn't close Flyout automatically if it's just a GridView ItemClick.
-            // We can try to name the Flyout in XAML, but I didn't.
-            // Let's rely on the command execution for now. 
-            // Users usually click away. But to be "native" it should close.
-            
-            // IMPROVEMENT: Close the flyout by finding the open one or just using the hack for now.
-            // Actually, we can use VisualTreeHelper to find the parent Flyout?
-            // FlyoutPresenters are in a separate window/popup visually.
-            
-            // Let's modify the XAML to name the Flyout if we really want to close it, 
-            // OR use a behavior. 
-            // For now, let's just execute the command.
-            
-            // Wait, if I want to close it:
-            // I can bind the Flyout's 'IsOpen' property to a boolean in ViewModel?
-            // That requires XAML change which I've already done twice.
-            // Let's stick to just executing for this iteration, unless testing shows it's annoying.
-            // Actually, I can cast sender to GridView -> find logical parent? 
-            // Flyout content is not logical child of Button.
-            
-            // Let's just execute for now.
+            // Try to close flight if possible, or rely on native behavior
+            // Current code executes the command directly.
         }
     }
 
