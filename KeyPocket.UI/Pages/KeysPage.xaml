@@ -14,6 +14,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Controls/CopyButton.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <converters:FavoriteColorConverter x:Key="FavoriteColorConverter" />
+            <converters:FavoriteIconConverter x:Key="FavoriteIconConverter" />
             <converters:BoolToVisibilityConverter x:Key="BoolToVis" />
             <converters:NegatedBoolToVisibilityConverter x:Key="NegBoolToVis" />
         </ResourceDictionary>
@@ -71,9 +73,9 @@
         <!--  Content  -->
         <GridView
             Grid.Row="1"
-            IsItemClickEnabled="False"
             ItemsSource="{x:Bind ViewModel.FilteredKeys, Mode=OneWay}"
-            SelectionMode="None">
+            SelectionMode="None"
+            IsItemClickEnabled="False">
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="vm:KeyItemViewModel">
                     <Grid
@@ -81,11 +83,11 @@
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                         BorderThickness="1"
                         CornerRadius="8"
-                        Height="180"
-                        Padding="0"
-                        Width="320">
+                        Width="280"
+                        Height="170"
+                        Padding="0">
 
-                        <Grid Padding="16" RowSpacing="12">
+                        <Grid Padding="16" RowSpacing="6">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
@@ -98,15 +100,17 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-
-                                <TextBlock
+                                <StackPanel
                                     Opacity="0.7"
-                                    Style="{ThemeResource CaptionTextBlockStyle}"
-                                    Text="{x:Bind ProviderName}"
-                                    TextTrimming="CharacterEllipsis"
-                                    VerticalAlignment="Center" />
+                                    Orientation="Horizontal"
+                                    Spacing="6">
+                                    <TextBlock
+                                        Style="{ThemeResource CaptionTextBlockStyle}"
+                                        Text="{x:Bind ProviderName}"
+                                        VerticalAlignment="Center" />
+                                </StackPanel>
 
-                                <!--  Favorite  -->
+                                <!--  Toggle Favorite Button  -->
                                 <Grid Grid.Column="1">
                                     <Button
                                         Background="Transparent"
@@ -130,93 +134,42 @@
                                 </Grid>
                             </Grid>
 
-                            <!--  Key Content  -->
-                            <Grid Grid.Row="1" VerticalAlignment="Center">
-                                <TextBlock
-                                    FontFamily="Consolas"
-                                    FontSize="16"
-                                    HorizontalAlignment="Center"
-                                    Text="{x:Bind DisplayKey, Mode=OneWay}"
-                                    TextTrimming="CharacterEllipsis"
-                                    VerticalAlignment="Center" />
-                            </Grid>
+                            <!--  Key Display (Masked)  -->
+                            <TextBlock
+                                Grid.Row="1"
+                                Text="{x:Bind DisplayKey, Mode=OneWay}"
+                                FontFamily="Consolas"
+                                FontSize="14"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center"
+                                TextTrimming="CharacterEllipsis"
+                                ToolTipService.ToolTip="API Key (Masked)" />
 
-                            <!--  Actions & Metadata  -->
-                            <Grid ColumnSpacing="8" Grid.Row="2">
+                            <!--  Footer: Tag & Copy  -->
+                            <Grid Grid.Row="2" ColumnSpacing="8">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
-                                <!--  Tag with horizontal layout  -->
-                                <StackPanel
-                                    Orientation="Horizontal"
-                                    Spacing="8"
-                                    VerticalAlignment="Center">
-                                    <TextBlock
-                                        Opacity="0.6"
-                                        Style="{ThemeResource CaptionTextBlockStyle}"
-                                        Text="Tag:"
-                                        VerticalAlignment="Center" />
-                                    <TextBox
-                                        Background="Transparent"
-                                        BorderThickness="0"
-                                        FontSize="12"
-                                        MinWidth="100"
-                                        Opacity="0.8"
-                                        PlaceholderText="Add tag..."
-                                        Text="{x:Bind Tag, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                        VerticalAlignment="Center" />
-                                </StackPanel>
+                                <TextBox
+                                    PlaceholderText="Tag"
+                                    Text="{x:Bind Tag, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                    BorderThickness="0"
+                                    Background="{ThemeResource SystemFillColorSolidNeutralBackgroundBrush}"
+                                    CornerRadius="4"
+                                    Padding="8,4" 
+                                    FontSize="12"/>
 
-                                <!--  Icons  -->
-                                <StackPanel
+                                <controls:CopyButton
                                     Grid.Column="1"
-                                    Orientation="Horizontal"
-                                    Spacing="4">
-                                    <!--  Reveal  -->
-                                    <Grid>
-                                        <Button
-                                            Background="Transparent"
-                                            BorderThickness="0"
-                                            Command="{x:Bind RevealKeyCommand}"
-                                            Padding="6"
-                                            ToolTipService.ToolTip="Show Key"
-                                            Visibility="{x:Bind IsKeyRevealed, Mode=OneWay, Converter={StaticResource NegBoolToVis}}">
-                                            <FontIcon FontSize="14" Glyph="&#xE890;" />
-                                        </Button>
-                                        <Button
-                                            Background="Transparent"
-                                            BorderThickness="0"
-                                            Command="{x:Bind RevealKeyCommand}"
-                                            Padding="6"
-                                            ToolTipService.ToolTip="Hide Key"
-                                            Visibility="{x:Bind IsKeyRevealed, Mode=OneWay, Converter={StaticResource BoolToVis}}">
-                                            <FontIcon FontSize="14" Glyph="&#xE891;" />
-                                        </Button>
-                                    </Grid>
-
-                                    <!--  Copy  -->
-                                    <controls:CopyButton
-                                        Click="CopyButton_Click"
-                                        Content="&#xE8C8;"
-                                        Padding="6"
-                                        Tag="{x:Bind Id, Mode=OneWay}"
-                                        ToolTipService.ToolTip="Copy Key" />
-                                </StackPanel>
+                                    Click="CopyButton_Click"
+                                    Content="&#xE8C8;"
+                                    Padding="6"
+                                    Tag="{x:Bind Id, Mode=OneWay}"
+                                    ToolTipService.ToolTip="Copy Key" />
                             </Grid>
                         </Grid>
-
-                        <!--  Created Date Footer (Optional, maybe overlap bottom right)  -->
-                        <TextBlock
-                            FontSize="10"
-                            HorizontalAlignment="Right"
-                            IsHitTestVisible="False"
-                            Margin="0,0,8,4"
-                            Opacity="0.4"
-                            Text="{x:Bind CreatedAtFormatted}"
-                            VerticalAlignment="Bottom" />
-
                     </Grid>
                 </DataTemplate>
             </GridView.ItemTemplate>

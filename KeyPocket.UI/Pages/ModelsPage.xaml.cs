@@ -1,20 +1,22 @@
+using Windows.ApplicationModel.DataTransfer;
+using KeyPocket.UI.Controls;
 using KeyPocket.UI.ViewModels;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
-using Windows.ApplicationModel.DataTransfer;
 
 namespace KeyPocket.UI.Pages;
 
 public sealed partial class ModelsPage : Page
 {
-    public ModelsViewModel ViewModel { get; private set; }
-
     public ModelsPage()
     {
-        this.InitializeComponent();
+        InitializeComponent();
         ViewModel = new ModelsViewModel(App.ProviderService);
         DataContext = ViewModel;
     }
+
+    public ModelsViewModel ViewModel { get; }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
@@ -23,9 +25,9 @@ public sealed partial class ModelsPage : Page
         base.OnNavigatedTo(e);
     }
 
-    private void CopyButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    private void CopyButton_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is Controls.CopyButton button && button.Tag is string text)
+        if (sender is CopyButton button && button.Tag is string text)
         {
             var package = new DataPackage();
             package.SetText(text);
@@ -33,4 +35,3 @@ public sealed partial class ModelsPage : Page
         }
     }
 }
-

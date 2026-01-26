@@ -15,9 +15,15 @@ public static class WindowHelper
 {
     private static Window? _mainWindow;
 
-    public static void SetMainWindow(Window window) => _mainWindow = window;
+    public static void SetMainWindow(Window window)
+    {
+        _mainWindow = window;
+    }
 
-    public static Window? GetMainWindow() => _mainWindow;
+    public static Window? GetMainWindow()
+    {
+        return _mainWindow;
+    }
 
     public static Window? GetWindowForElement(UIElement element)
     {
@@ -29,16 +35,5 @@ public static class WindowHelper
     public static double GetRasterizationScaleForElement(UIElement element)
     {
         return element.XamlRoot?.RasterizationScale ?? 0.0;
-    }
-
-    public static void SetWindowMinSize(Window window, double width, double height)
-    {
-        if (window.Content is not FrameworkElement windowContent) return;
-        if (windowContent.XamlRoot is null) return;
-        if (window.AppWindow.Presenter is not OverlappedPresenter presenter) return;
-
-        var scale = windowContent.XamlRoot.RasterizationScale;
-        presenter.PreferredMinimumWidth = (int)(width * scale);
-        presenter.PreferredMinimumHeight = (int)(height * scale);
     }
 }

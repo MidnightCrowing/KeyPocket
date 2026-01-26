@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
+using Windows.ApplicationModel;
 
 namespace KeyPocket.UI.Helpers;
-public static partial class ProcessInfoHelper
+
+public static class ProcessInfoHelper
 {
     private static readonly FileVersionInfo? _fileVersionInfo;
     private static readonly Process _process;
+
     static ProcessInfoHelper()
     {
         _process = Process.GetCurrentProcess();
@@ -13,39 +16,50 @@ public static partial class ProcessInfoHelper
     }
 
     /// <summary>
-    /// Returns the version string.
+    ///     Returns the version string.
     /// </summary>
     public static string Version => GetVersion()?.ToString() ?? string.Empty;
 
     /// <summary>
-    /// Returns the version string prefixed with 'v'.
+    ///     Returns the version string prefixed with 'v'.
     /// </summary>
     public static string VersionWithPrefix => $"v{Version}";
 
     /// <summary>
-    /// Retrieves the product name. If not available, it returns 'Unknown Product'.
+    ///     Retrieves the product name. If not available, it returns 'Unknown Product'.
     /// </summary>
     public static string ProductName => _fileVersionInfo?.ProductName ?? "Unknown Product";
 
     /// <summary>
-    /// Combines the product name and version into a single string. The version includes a prefix.
+    ///     Combines the product name and version into a single string. The version includes a prefix.
     /// </summary>
     public static string ProductNameAndVersion => $"{ProductName} {VersionWithPrefix}";
 
     /// <summary>
-    /// Returns the company name of the publisher. If not available, it defaults to 'Unknown Publisher'.
+    ///     Returns the company name of the publisher. If not available, it defaults to 'Unknown Publisher'.
     /// </summary>
     public static string Publisher => _fileVersionInfo?.CompanyName ?? "Unknown Publisher";
 
     public static Version? GetVersion()
     {
-        return _fileVersionInfo is null
-            ? null
-            : new Version(_fileVersionInfo.FileMajorPart, _fileVersionInfo.FileMinorPart, _fileVersionInfo.FileBuildPart, _fileVersionInfo.FilePrivatePart);
+        try
+        {
+            var packageVersion = Package.Current.Id.Version;
+            return new Version(packageVersion.Major, packageVersion.Minor, packageVersion.Build,
+                packageVersion.Revision);
+        }
+        catch
+        {
+            // Fallback to file version if package identity is missing (e.g. unpackaged run, though unlikely in this project structure)
+            return _fileVersionInfo is null
+                ? null
+                : new Version(_fileVersionInfo.FileMajorPart, _fileVersionInfo.FileMinorPart,
+                    _fileVersionInfo.FileBuildPart, _fileVersionInfo.FilePrivatePart);
+        }
     }
 
     /// <summary>
-    /// Retrieves the file version information for the current assembly.
+    ///     Retrieves the file version information for the current assembly.
     /// </summary>
     /// <returns>Returns a FileVersionInfo object containing version details.</returns>
     public static FileVersionInfo? GetFileVersionInfo()
@@ -54,7 +68,7 @@ public static partial class ProcessInfoHelper
     }
 
     /// <summary>
-    /// Retrieves the current process instance.
+    ///     Retrieves the current process instance.
     /// </summary>
     /// <returns>Returns the current Process object.</returns>
     public static Process GetProcess()

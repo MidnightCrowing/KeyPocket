@@ -9,11 +9,11 @@
   IgnorableNamespaces="uap rescap systemai">
 
   <Identity
-    Name="a2749008-9133-4ef3-a9ef-8484cd126157"
-    Publisher="CN=MidnightCrowing"
-    Version="1.0.0.0" />
+    Name="MidnightCrowing.KeyPocket"
+    Publisher="CN=B76C79F4-85EC-4CA9-BCA8-261D977D1EC3"
+    Version="1.0.1.0" />
 
-  <mp:PhoneIdentity PhoneProductId="a2749008-9133-4ef3-a9ef-8484cd126157" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="0c71cc7f-37f3-4f7a-b808-1b502c94cb5d" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>KeyPocket</DisplayName>

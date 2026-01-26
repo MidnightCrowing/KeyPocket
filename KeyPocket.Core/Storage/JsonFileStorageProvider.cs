@@ -1,21 +1,20 @@
-using System;
-using System.IO;
 using System.Text.Json;
 using KeyPocket.Core.Models;
 
 namespace KeyPocket.Core.Storage;
 
 /// <summary>
-/// 基于 JSON 文件的存储实现。
+///     基于 JSON 文件的存储实现。
 /// </summary>
 public class JsonFileStorageProvider : IStorageProvider
 {
-    private readonly string _filePath;
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         WriteIndented = true,
         PropertyNameCaseInsensitive = true
     };
+
+    private readonly string _filePath;
 
     public JsonFileStorageProvider(string filePath)
     {
@@ -24,14 +23,11 @@ public class JsonFileStorageProvider : IStorageProvider
 
     public KeyPocketConfig Load()
     {
-        if (!File.Exists(_filePath))
-        {
-            return new KeyPocketConfig();
-        }
+        if (!File.Exists(_filePath)) return new KeyPocketConfig();
 
         try
         {
-            string json = File.ReadAllText(_filePath);
+            var json = File.ReadAllText(_filePath);
             return JsonSerializer.Deserialize<KeyPocketConfig>(json, JsonOptions) ?? new KeyPocketConfig();
         }
         catch (Exception)
@@ -43,38 +39,43 @@ public class JsonFileStorageProvider : IStorageProvider
 
     public void Save(KeyPocketConfig config)
     {
-        string? directory = Path.GetDirectoryName(_filePath);
-        if (!string.IsNullOrEmpty(directory))
-        {
-            if (!Directory.Exists(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
-        }
+        var directory = Path.GetDirectoryName(_filePath);
+        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+            Directory.CreateDirectory(directory);
 
-        string tempPath = _filePath + ".tmp";
+        var tempPath = _filePath + ".tmp";
+        var backupPath = _filePath + ".bak";
+
         try
         {
-            // 原子写入的第一步：先写到临时文件
-            string json = JsonSerializer.Serialize(config, JsonOptions);
+            // 1. 先写临时文件
+            var json = JsonSerializer.Serialize(config, JsonOptions);
             File.WriteAllText(tempPath, json);
 
-            // 原子写入的第二步：将临时文件重命名（覆盖）原文件
+            // 2. 如果目标存在，先移到备份
             if (File.Exists(_filePath))
             {
-                File.Replace(tempPath, _filePath, null);
+                File.Move(_filePath, backupPath, true);
             }
-            else
+
+            // 3. 将临时文件移正
+            File.Move(tempPath, _filePath);
+
+            // 4. 成功后删除备份
+            if (File.Exists(backupPath))
             {
-                File.Move(tempPath, _filePath);
+                File.Delete(backupPath);
             }
         }
         catch (Exception)
         {
-            if (File.Exists(tempPath))
+            // 如果出错了（比如第3步失败），尝试用备份恢复
+            if (!File.Exists(_filePath) && File.Exists(backupPath))
             {
-                File.Delete(tempPath);
+                try { File.Move(backupPath, _filePath); } catch { }
             }
+
+            if (File.Exists(tempPath)) File.Delete(tempPath);
             throw;
         }
     }

@@ -5,6 +5,7 @@
     <TargetPlatformIdentifier>Windows</TargetPlatformIdentifier>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
