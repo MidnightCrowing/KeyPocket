@@ -39,9 +39,18 @@ public static partial class ProcessInfoHelper
 
     public static Version? GetVersion()
     {
-        return _fileVersionInfo is null
-            ? null
-            : new Version(_fileVersionInfo.FileMajorPart, _fileVersionInfo.FileMinorPart, _fileVersionInfo.FileBuildPart, _fileVersionInfo.FilePrivatePart);
+        try 
+        {
+            var packageVersion = Windows.ApplicationModel.Package.Current.Id.Version;
+            return new Version(packageVersion.Major, packageVersion.Minor, packageVersion.Build, packageVersion.Revision);
+        }
+        catch
+        {
+            // Fallback to file version if package identity is missing (e.g. unpackaged run, though unlikely in this project structure)
+            return _fileVersionInfo is null
+                ? null
+                : new Version(_fileVersionInfo.FileMajorPart, _fileVersionInfo.FileMinorPart, _fileVersionInfo.FileBuildPart, _fileVersionInfo.FilePrivatePart);
+        }
     }
 
     /// <summary>
