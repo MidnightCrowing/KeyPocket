@@ -42,6 +42,11 @@ public partial class ExchangeRateItem : ObservableObject
     }
 }
 
+public class AddRatePlaceholder 
+{ 
+    // Just a placeholder type
+}
+
 public partial class SettingsViewModel : ObservableObject
 {
     [ObservableProperty]
@@ -171,7 +176,10 @@ public partial class SettingsViewModel : ObservableObject
 
     // --- Exchange Rates ---
 
-    public ObservableCollection<ExchangeRateItem> Rates { get; private set; } = new();
+    // --- Exchange Rates ---
+
+    // 使用 object 以容纳 ExchangeRateItem 和 AddRatePlaceholder
+    public ObservableCollection<object> Rates { get; private set; } = new();
 
     // New Custom Rate Input
     [ObservableProperty]
@@ -243,7 +251,8 @@ public partial class SettingsViewModel : ObservableObject
     private void LoadRates()
     {
         Rates.Clear();
-        foreach (var kvp in SettingsHelper.Current.ExchangeRates)
+        var exchangeRates = SettingsHelper.Current.ExchangeRates;
+        foreach (var kvp in exchangeRates)
         {
             // Key format: SOURCE_TARGET
             var parts = kvp.Key.Split('_');
@@ -252,6 +261,9 @@ public partial class SettingsViewModel : ObservableObject
                 Rates.Add(new ExchangeRateItem(parts[0], parts[1], kvp.Value, OnRateItemChanged));
             }
         }
+        
+        // 始终在最后添加 Placeholder
+        Rates.Add(new AddRatePlaceholder());
     }
 
     private void OnRateItemChanged(string key, decimal newRate)
@@ -275,6 +287,12 @@ public partial class SettingsViewModel : ObservableObject
         {
             rates.Remove(key);
             SettingsHelper.Current.ExchangeRates = rates; // Save
+        }
+        
+        // 确保 Placeholder 还在
+        if (!Rates.Any(x => x is AddRatePlaceholder))
+        {
+             Rates.Add(new AddRatePlaceholder());
         }
     }
 
@@ -315,8 +333,21 @@ public partial class SettingsViewModel : ObservableObject
             rates[key] = (decimal)NewRateValue;
             SettingsHelper.Current.ExchangeRates = rates; // Trigger save
 
-            // Visual update
-            LoadRates(); // Reload list to show new item
+            // Visual update - insert BEFORE the placeholder
+            var newItem = new ExchangeRateItem(NewRateSource.Trim().ToUpper(), NewRateTarget.Trim().ToUpper(), (decimal)NewRateValue, OnRateItemChanged);
+            
+            // 找到 Placeholder 的位置
+            var placeholder = Rates.FirstOrDefault(x => x is AddRatePlaceholder);
+            if (placeholder != null)
+            {
+                int index = Rates.IndexOf(placeholder);
+                Rates.Insert(index, newItem);
+            }
+            else
+            {
+                Rates.Add(newItem);
+                Rates.Add(new AddRatePlaceholder());
+            }
 
             IsAddingRate = false;
             NewRateValue = double.NaN;

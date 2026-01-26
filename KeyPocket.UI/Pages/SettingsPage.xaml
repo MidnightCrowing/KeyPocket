@@ -8,6 +8,7 @@
     xmlns:global="using:Windows.Globalization.NumberFormatting"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
+    xmlns:selectors="using:KeyPocket.UI.Selectors"
     xmlns:vm="using:KeyPocket.UI.ViewModels"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
@@ -29,10 +30,128 @@
             BasedOn="{StaticResource BodyStrongTextBlockStyle}"
             TargetType="TextBlock"
             x:Key="SettingsSectionHeaderTextBlockStyle">
-            <Style.Setters>
+                <Style.Setters>
                 <Setter Property="Margin" Value="1,30,0,6" />
             </Style.Setters>
         </Style>
+
+        <DataTemplate x:Key="RateTemplate" x:DataType="vm:ExchangeRateItem">
+            <toolkit:SettingsCard IsClickEnabled="False">
+                <toolkit:SettingsCard.Header>
+                    <StackPanel
+                        Orientation="Horizontal"
+                        Spacing="8">
+                        <TextBlock FontWeight="SemiBold" Text="{x:Bind Source}" />
+                        <FontIcon
+                            FontSize="12"
+                            Glyph="&#xE72A;"
+                            Opacity="0.6" />
+                        <TextBlock FontWeight="SemiBold" Text="{x:Bind Target}" />
+                    </StackPanel>
+                </toolkit:SettingsCard.Header>
+
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <NumberBox
+                        LargeChange="1.0"
+                        NumberFormatter="{StaticResource RateFormatter}"
+                        SmallChange="0.01"
+                        SpinButtonPlacementMode="Compact"
+                        Value="{x:Bind RateValue, Mode=TwoWay}"
+                        Width="140" />
+                    <Button
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Command="{Binding ElementName=RootPage, Path=ViewModel.DeleteRateCommand}"
+                        CommandParameter="{x:Bind}"
+                        Height="32"
+                        Padding="0"
+                        ToolTipService.ToolTip="Remove"
+                        Width="32">
+                        <FontIcon
+                            FontSize="16"
+                            Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                            Glyph="&#xE74D;" />
+                    </Button>
+                </StackPanel>
+            </toolkit:SettingsCard>
+        </DataTemplate>
+
+        <DataTemplate x:Key="AddFooterTemplate">
+            <!-- DataContext is AddRatePlaceholder, so we must bind to ElementName=RootPage ViewModel -->
+            <toolkit:SettingsCard
+                Command="{Binding ElementName=RootPage, Path=ViewModel.StartAddRateCommand}"
+                HorizontalContentAlignment="Left"
+                IsActionIconVisible="False"
+                IsClickEnabled="{Binding ElementName=RootPage, Path=ViewModel.IsAddingRate, Converter={StaticResource BoolNegation}, Mode=OneWay}">
+                <toolkit:SettingsCard.Resources>
+                    <x:Double x:Key="SettingsCardWrapThreshold">10000</x:Double>
+                </toolkit:SettingsCard.Resources>
+                <Grid>
+                    <!--  View Mode: "Add Exchange Rate" Label (Replaces Header)  -->
+                    <StackPanel
+                        Orientation="Horizontal"
+                        Padding="0,10"
+                        Spacing="8"
+                        Visibility="{Binding ElementName=RootPage, Path=ViewModel.IsAddingRate, Converter={StaticResource NegBoolToVis}, Mode=OneWay}">
+                        <FontIcon FontSize="14" Glyph="&#xE710;" />
+                        <TextBlock
+                            FontWeight="SemiBold"
+                            Text="Add Exchange Rate"
+                            VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <!--  Edit Mode: Inputs  -->
+                    <StackPanel
+                        HorizontalAlignment="Left"
+                        Orientation="Horizontal"
+                        Spacing="12"
+                        Visibility="{Binding ElementName=RootPage, Path=ViewModel.IsAddingRate, Converter={StaticResource BoolToVis}, Mode=OneWay}">
+                        <ComboBox
+                            ItemsSource="{Binding ElementName=RootPage, Path=ViewModel.AvailableCurrencies}"
+                            PlaceholderText="From"
+                            SelectedItem="{Binding ElementName=RootPage, Path=ViewModel.NewRateSource, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Width="100" />
+                        <FontIcon
+                            FontSize="12"
+                            Glyph="&#xE72A;"
+                            Opacity="0.5"
+                            VerticalAlignment="Center" />
+                        <ComboBox
+                            ItemsSource="{Binding ElementName=RootPage, Path=ViewModel.AvailableCurrencies}"
+                            PlaceholderText="To"
+                            SelectedItem="{Binding ElementName=RootPage, Path=ViewModel.NewRateTarget, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Width="100" />
+                        <TextBlock
+                            Opacity="0.5"
+                            Text="="
+                            VerticalAlignment="Center" />
+                        <NumberBox
+                            NumberFormatter="{StaticResource RateFormatter}"
+                            PlaceholderText="Rate"
+                            SmallChange="0.01"
+                            SpinButtonPlacementMode="Inline"
+                            Value="{Binding ElementName=RootPage, Path=ViewModel.NewRateValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Width="160" />
+
+                        <Button
+                            Command="{Binding ElementName=RootPage, Path=ViewModel.AddCustomRateCommand}"
+                            Padding="8"
+                            Style="{StaticResource AccentButtonStyle}">
+                            <FontIcon FontSize="14" Glyph="&#xE73E;" />
+                        </Button>
+                        <Button Command="{Binding ElementName=RootPage, Path=ViewModel.CancelAddRateCommand}" Padding="8">
+                            <FontIcon FontSize="14" Glyph="&#xE711;" />
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </toolkit:SettingsCard>
+        </DataTemplate>
+
+        <selectors:SettingsItemTemplateSelector
+            x:Key="SettingsRateSelector"
+            AddFooterTemplate="{StaticResource AddFooterTemplate}"
+            RateTemplate="{StaticResource RateTemplate}" />
+
     </Page.Resources>
 
     <ScrollView
@@ -126,131 +245,15 @@
                 </toolkit:SettingsCard>
 
                 <!--  2. Exchange Rates Expander  -->
-                <toolkit:SettingsExpander Description="Configure exchange rates between currencies" Header="Exchange Rate Details">
+                <toolkit:SettingsExpander
+                    x:Name="RatesExpander"
+                    Description="Configure exchange rates between currencies"
+                    Header="Exchange Rate Details"
+                    IsExpanded="False">
                     <toolkit:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE825;" />
                     </toolkit:SettingsExpander.HeaderIcon>
-
-                    <toolkit:SettingsExpander.Items>
-                        <!--  Existing Rates List (Using ItemsControl inside SettingsExpander.Items)  -->
-                        <ItemsControl ItemsSource="{x:Bind ViewModel.Rates}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="vm:ExchangeRateItem">
-                                    <toolkit:SettingsCard>
-                                        <toolkit:SettingsCard.Header>
-                                            <StackPanel
-                                                Margin="48,0,0,0"
-                                                Orientation="Horizontal"
-                                                Spacing="8">
-                                                <TextBlock FontWeight="SemiBold" Text="{x:Bind Source}" />
-                                                <FontIcon
-                                                    FontSize="12"
-                                                    Glyph="&#xE72A;"
-                                                    Opacity="0.6" />
-                                                <TextBlock FontWeight="SemiBold" Text="{x:Bind Target}" />
-                                            </StackPanel>
-                                        </toolkit:SettingsCard.Header>
-
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <NumberBox
-                                                LargeChange="1.0"
-                                                NumberFormatter="{StaticResource RateFormatter}"
-                                                SmallChange="0.01"
-                                                SpinButtonPlacementMode="Compact"
-                                                Value="{x:Bind RateValue, Mode=TwoWay}"
-                                                Width="140" />
-                                            <Button
-                                                Background="Transparent"
-                                                BorderThickness="0"
-                                                Command="{Binding ElementName=RootPage, Path=ViewModel.DeleteRateCommand}"
-                                                CommandParameter="{x:Bind}"
-                                                Height="32"
-                                                Padding="0"
-                                                ToolTipService.ToolTip="Remove"
-                                                Width="32">
-                                                <FontIcon
-                                                    FontSize="16"
-                                                    Foreground="{ThemeResource SystemFillColorCriticalBrush}"
-                                                    Glyph="&#xE74D;" />
-                                            </Button>
-                                        </StackPanel>
-                                    </toolkit:SettingsCard>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                        <!--  Add Custom Rate Footer  -->
-                        <toolkit:SettingsCard
-                            Command="{x:Bind ViewModel.StartAddRateCommand}"
-                            HorizontalContentAlignment="Left"
-                            IsActionIconVisible="False"
-                            IsClickEnabled="{x:Bind ViewModel.IsAddingRate, Converter={StaticResource BoolNegation}, Mode=OneWay}">
-                            <toolkit:SettingsCard.Resources>
-                                <x:Double x:Key="SettingsCardWrapThreshold">10000</x:Double>
-                            </toolkit:SettingsCard.Resources>
-                            <Grid>
-                                <!--  View Mode: "Add Exchange Rate" Label (Replaces Header)  -->
-                                <StackPanel
-                                    Orientation="Horizontal"
-                                    Padding="0,10"
-                                    Spacing="8"
-                                    Visibility="{x:Bind ViewModel.IsAddingRate, Converter={StaticResource NegBoolToVis}, Mode=OneWay}">
-                                    <FontIcon FontSize="14" Glyph="&#xE710;" />
-                                    <TextBlock
-                                        FontWeight="SemiBold"
-                                        Text="Add Exchange Rate"
-                                        VerticalAlignment="Center" />
-                                </StackPanel>
-
-                                <!--  Edit Mode: Inputs  -->
-                                <StackPanel
-                                    HorizontalAlignment="Left"
-                                    Orientation="Horizontal"
-                                    Spacing="12"
-                                    Visibility="{x:Bind ViewModel.IsAddingRate, Converter={StaticResource BoolToVis}, Mode=OneWay}">
-                                    <ComboBox
-                                        ItemsSource="{x:Bind ViewModel.AvailableCurrencies}"
-                                        PlaceholderText="From"
-                                        SelectedItem="{x:Bind ViewModel.NewRateSource, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                        Width="100" />
-                                    <FontIcon
-                                        FontSize="12"
-                                        Glyph="&#xE72A;"
-                                        Opacity="0.5"
-                                        VerticalAlignment="Center" />
-                                    <ComboBox
-                                        ItemsSource="{x:Bind ViewModel.AvailableCurrencies}"
-                                        PlaceholderText="To"
-                                        SelectedItem="{x:Bind ViewModel.NewRateTarget, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                        Width="100" />
-                                    <TextBlock
-                                        Opacity="0.5"
-                                        Text="="
-                                        VerticalAlignment="Center" />
-                                    <NumberBox
-                                        NumberFormatter="{StaticResource RateFormatter}"
-                                        PlaceholderText="Rate"
-                                        SmallChange="0.01"
-                                        SpinButtonPlacementMode="Inline"
-                                        Value="{x:Bind ViewModel.NewRateValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                        Width="160" />
-
-                                    <Button
-                                        Command="{x:Bind ViewModel.AddCustomRateCommand}"
-                                        Padding="8"
-                                        Style="{StaticResource AccentButtonStyle}">
-                                        <FontIcon FontSize="14" Glyph="&#xE73E;" />
-                                    </Button>
-                                    <Button Command="{x:Bind ViewModel.CancelAddRateCommand}" Padding="8">
-                                        <FontIcon FontSize="14" Glyph="&#xE711;" />
-                                    </Button>
-                                </StackPanel>
-                            </Grid>
-                        </toolkit:SettingsCard>
-
-                    </toolkit:SettingsExpander.Items>
                 </toolkit:SettingsExpander>
-
 
                 <!--  About  -->
                 <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="About" />
