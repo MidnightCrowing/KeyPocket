@@ -71,7 +71,7 @@
                                 <Button.Flyout>
                                     <Flyout Placement="Bottom">
                                         <GridView 
-                                            ItemsSource="{x:Bind ViewModel.DefaultIcons}" 
+                                            ItemsSource="{x:Bind ViewModel.DefaultIcons, Mode=OneWay}" 
                                             SelectionMode="None"
                                             IsItemClickEnabled="True"
                                             ItemClick="OnDefaultIconItemClick"
@@ -124,7 +124,7 @@
                         <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="API Mode" />
                         <ComboBox
                             HorizontalAlignment="Stretch"
-                            ItemsSource="{x:Bind ViewModel.ProviderTypes}"
+                            ItemsSource="{x:Bind ViewModel.ProviderTypes, Mode=OneWay}"
                             SelectedItem="{x:Bind ViewModel.Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
 
@@ -132,7 +132,7 @@
                         <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Provider Currency" />
                         <ComboBox
                             HorizontalAlignment="Stretch"
-                            ItemsSource="{x:Bind ViewModel.AvailableCurrencies}"
+                            ItemsSource="{x:Bind ViewModel.AvailableCurrencies, Mode=OneWay}"
                             SelectedItem="{x:Bind ViewModel.ProviderCurrency, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         <TextBlock
                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
@@ -150,7 +150,7 @@
                     </StackPanel>
 
                     <Button
-                        Command="{x:Bind ViewModel.SaveCommand}"
+                        Command="{x:Bind ViewModel.SaveCommand, Mode=OneWay}"
                         Content="Save Changes"
                         HorizontalAlignment="Right"
                         Style="{StaticResource AccentButtonStyle}" />
@@ -326,7 +326,7 @@
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
-                    <Button Command="{x:Bind ViewModel.AddKeyCommand}" Content="Add API Key" />
+                    <Button Command="{x:Bind ViewModel.AddKeyCommand, Mode=OneWay}" Content="Add API Key" />
                 </StackPanel>
             </Grid>
 
@@ -541,7 +541,7 @@
                     </ListView>
 
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Button Command="{x:Bind ViewModel.AddModelCommand}" Content="Add Model" />
+                        <Button Command="{x:Bind ViewModel.AddModelCommand, Mode=OneWay}" Content="Add Model" />
                         <Button Content="Fetch Models" ToolTipService.ToolTip="Fetch available models from provider" />
                     </StackPanel>
                 </StackPanel>
