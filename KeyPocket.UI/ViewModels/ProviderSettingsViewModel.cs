@@ -949,10 +949,24 @@ public partial class ModelWrapper : ObservableObject
     private string _newName = "";
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(InputPriceDisplay))]
+    [NotifyPropertyChangedFor(nameof(HasInputPrice))]
     private double _inputPriceValue;
 
+    partial void OnInputPriceValueChanged(double value)
+    {
+        if (value < 0) InputPriceValue = 0;
+    }
+
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(OutputPriceDisplay))]
+    [NotifyPropertyChangedFor(nameof(HasOutputPrice))]
     private double _outputPriceValue;
+
+    partial void OnOutputPriceValueChanged(double value)
+    {
+        if (value < 0) OutputPriceValue = 0;
+    }
 
     // Display strings
     [ObservableProperty]
