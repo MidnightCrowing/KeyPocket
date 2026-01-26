@@ -386,15 +386,70 @@
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
 
                                         <TextBlock
+                                            Grid.Column="0"
                                             Style="{StaticResource BodyStrongTextBlockStyle}"
                                             Text="{x:Bind Name, Mode=OneWay}"
                                             VerticalAlignment="Center" />
 
+                                        <!-- Price Info -->
+                                        <Grid 
+                                            Grid.Column="1" 
+                                            VerticalAlignment="Center" 
+                                            Margin="0,0,24,0"
+                                            RowSpacing="2"
+                                            ColumnSpacing="4">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- Input Price -->
+                                            <TextBlock 
+                                                Grid.Row="0" Grid.Column="0"
+                                                Text="In:" 
+                                                Visibility="{x:Bind HasInputPrice, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" 
+                                                FontSize="12"
+                                                FontFamily="Consolas"
+                                                HorizontalAlignment="Left"/>
+                                            <TextBlock 
+                                                Grid.Row="0" Grid.Column="1"
+                                                Text="{x:Bind InputPriceDisplay, Mode=OneWay}" 
+                                                Visibility="{x:Bind HasInputPrice, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" 
+                                                FontSize="12"
+                                                FontFamily="Consolas"
+                                                HorizontalAlignment="Right"/>
+
+                                            <!-- Output Price -->
+                                            <TextBlock 
+                                                Grid.Row="1" Grid.Column="0"
+                                                Text="Out:" 
+                                                Visibility="{x:Bind HasOutputPrice, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" 
+                                                FontSize="12"
+                                                FontFamily="Consolas"
+                                                HorizontalAlignment="Left"/>
+                                            <TextBlock 
+                                                Grid.Row="1" Grid.Column="1"
+                                                Text="{x:Bind OutputPriceDisplay, Mode=OneWay}" 
+                                                Visibility="{x:Bind HasOutputPrice, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" 
+                                                FontSize="12"
+                                                FontFamily="Consolas"
+                                                HorizontalAlignment="Right"/>
+                                        </Grid>
+
                                         <StackPanel
-                                            Grid.Column="1"
+                                            Grid.Column="2"
                                             Orientation="Horizontal"
                                             Spacing="4">
                                             <controls:CopyButton
@@ -485,40 +540,54 @@
                                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                                     <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="Input Price (per M tokens)" />
                                                 </StackPanel>
-                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <Grid ColumnSpacing="8">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
                                                     <TextBlock 
+                                                        Grid.Column="0"
                                                         Text="{x:Bind ProviderSymbol, Mode=OneWay}" 
                                                         VerticalAlignment="Center" 
                                                         FontWeight="SemiBold"
                                                         FontSize="16"/>
                                                     <NumberBox
+                                                        Grid.Column="1"
+                                                        HorizontalAlignment="Stretch"
                                                         LargeChange="0.1"
                                                         PlaceholderText="e.g. 0.03"
                                                         SmallChange="0.01"
-                                                        SpinButtonPlacementMode="Compact"
+                                                        SpinButtonPlacementMode="Inline"
                                                         Value="{x:Bind InputPriceValue, Mode=TwoWay}"
                                                         ValueChanged="OnPriceValueChanged" />
-                                                </StackPanel>
+                                                </Grid>
                                             </StackPanel>
 
                                             <StackPanel Grid.Column="2">
                                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                                     <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="Output Price (per M tokens)" />
                                                 </StackPanel>
-                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <Grid ColumnSpacing="8">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
                                                     <TextBlock 
+                                                        Grid.Column="0"
                                                         Text="{x:Bind ProviderSymbol, Mode=OneWay}" 
                                                         VerticalAlignment="Center" 
                                                         FontWeight="SemiBold"
                                                         FontSize="16"/>
                                                     <NumberBox
+                                                        Grid.Column="1"
+                                                        HorizontalAlignment="Stretch"
                                                         LargeChange="0.1"
                                                         PlaceholderText="e.g. 0.06"
                                                         SmallChange="0.01"
-                                                        SpinButtonPlacementMode="Compact"
+                                                        SpinButtonPlacementMode="Inline"
                                                         Value="{x:Bind OutputPriceValue, Mode=TwoWay}"
                                                         ValueChanged="OnPriceValueChanged" />
-                                                </StackPanel>
+                                                </Grid>
                                             </StackPanel>
                                          </Grid>
 

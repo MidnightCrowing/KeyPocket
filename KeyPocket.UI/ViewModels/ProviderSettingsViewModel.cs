@@ -512,7 +512,7 @@ public partial class ProviderSettingsViewModel : ObservableObject
             var model = new ModelInfo
             {
                 Id = item.NewId,
-                DisplayName = string.IsNullOrWhiteSpace(item.NewName) ? item.NewId : item.NewName,
+                DisplayName = string.IsNullOrWhiteSpace(item.NewName) ? FormatDefaultModelName(item.NewId) : item.NewName,
                 ProviderId = _originalProvider.Id,
                 InputPricePerMTokens = inputPrice,
                 OutputPricePerMTokens = outputPrice
@@ -964,6 +964,13 @@ public partial class ModelWrapper : ObservableObject
     // Provide currency symbol for each wrapper local editing context
     public string ProviderSymbol => ExchangeRateHelper.GetCurrencySymbol(InputCurrency);
 
+    // Formatted display properties for UI read-only view
+    // Using N3 to ensure decimal alignment visually if font is monospaced or widths match
+    public string InputPriceDisplay => InputPriceValue > 0 ? $"{ProviderSymbol}{InputPriceValue:N3}" : "";
+    public string OutputPriceDisplay => OutputPriceValue > 0 ? $"{ProviderSymbol}{OutputPriceValue:N3}" : "";
+    public bool HasInputPrice => InputPriceValue > 0;
+    public bool HasOutputPrice => OutputPriceValue > 0;
+
     // Provide currency symbol for each wrapper (updates via RefreshCurrencySymbol)
     public string CurrencySymbol => SettingsHelper.Current.SelectedCurrency == "CNY" ? "¥" : "$";
     
@@ -983,5 +990,12 @@ public partial class ModelWrapper : ObservableObject
     public ICommand? CancelAddCommand { get; set; }
     public ICommand? StartEditCommand { get; set; }
     public ICommand? ConfirmEditCommand { get; set; }
-    public ICommand? CancelEditCommand { get; set; }
+    public ICommand? CancelEditCommand { get; set;     private string FormatDefaultModelName(string id)
+    {
+        if (string.IsNullOrWhiteSpace(id)) return id;
+        // Convert to Title Case (e.g. "gpt-4" -> "Gpt-4", "deepseek" -> "Deepseek")
+        // ToLower() first to ensure ToTitleCase processes it correctly even if input is ALLCAPS or mixed.
+        return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(id.ToLower());
+    }
+}
 }
