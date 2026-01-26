@@ -7,7 +7,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:global="using:Windows.Globalization.NumberFormatting"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:selectors="using:KeyPocket.UI.Selectors"
     xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
     xmlns:vm="using:KeyPocket.UI.ViewModels"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
@@ -15,7 +14,6 @@
     <Page.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVis" />
         <converters:NegatedBoolToVisibilityConverter x:Key="NegBoolToVis" />
-        <converters:BoolNegationConverter x:Key="BoolNegation" />
         <global:DecimalFormatter
             FractionDigits="2"
             IntegerDigits="1"
@@ -73,77 +71,6 @@
             </toolkit:SettingsCard>
         </DataTemplate>
 
-        <DataTemplate x:Key="AddFooterTemplate">
-            <!--  DataContext is AddRatePlaceholder, so we must bind to ElementName=RootPage ViewModel  -->
-            <toolkit:SettingsCard
-                Command="{Binding ElementName=RootPage, Path=ViewModel.StartAddRateCommand}"
-                HorizontalContentAlignment="Left"
-                IsActionIconVisible="False"
-                IsClickEnabled="{Binding ElementName=RootPage, Path=ViewModel.IsAddingRate, Converter={StaticResource BoolNegation}, Mode=OneWay}">
-                <toolkit:SettingsCard.Resources>
-                    <x:Double x:Key="SettingsCardWrapThreshold">10000</x:Double>
-                </toolkit:SettingsCard.Resources>
-                <Grid>
-                    <!--  View Mode: "Add Exchange Rate" Label (Replaces Header)  -->
-                    <StackPanel
-                        Orientation="Horizontal"
-                        Padding="0,10"
-                        Spacing="8"
-                        Visibility="{Binding ElementName=RootPage, Path=ViewModel.IsAddingRate, Converter={StaticResource NegBoolToVis}, Mode=OneWay}">
-                        <FontIcon FontSize="14" Glyph="&#xE710;" />
-                        <TextBlock
-                            FontWeight="SemiBold"
-                            Text="Add Exchange Rate"
-                            VerticalAlignment="Center" />
-                    </StackPanel>
-
-                    <!--  Edit Mode: Inputs  -->
-                    <StackPanel
-                        HorizontalAlignment="Left"
-                        Orientation="Horizontal"
-                        Spacing="12"
-                        Visibility="{Binding ElementName=RootPage, Path=ViewModel.IsAddingRate, Converter={StaticResource BoolToVis}, Mode=OneWay}">
-                        <ComboBox
-                            ItemsSource="{Binding ElementName=RootPage, Path=ViewModel.AvailableCurrencies}"
-                            PlaceholderText="From"
-                            SelectedItem="{Binding ElementName=RootPage, Path=ViewModel.NewRateSource, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                            Width="100" />
-                        <FontIcon
-                            FontSize="12"
-                            Glyph="&#xE72A;"
-                            Opacity="0.5"
-                            VerticalAlignment="Center" />
-                        <ComboBox
-                            ItemsSource="{Binding ElementName=RootPage, Path=ViewModel.AvailableCurrencies}"
-                            PlaceholderText="To"
-                            SelectedItem="{Binding ElementName=RootPage, Path=ViewModel.NewRateTarget, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                            Width="100" />
-                        <TextBlock
-                            Opacity="0.5"
-                            Text="="
-                            VerticalAlignment="Center" />
-                        <NumberBox
-                            NumberFormatter="{StaticResource RateFormatter}"
-                            PlaceholderText="Rate"
-                            SmallChange="0.01"
-                            SpinButtonPlacementMode="Inline"
-                            Value="{Binding ElementName=RootPage, Path=ViewModel.NewRateValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                            Width="160" />
-
-                        <Button
-                            Command="{Binding ElementName=RootPage, Path=ViewModel.AddCustomRateCommand}"
-                            Padding="8"
-                            Style="{StaticResource AccentButtonStyle}">
-                            <FontIcon FontSize="14" Glyph="&#xE73E;" />
-                        </Button>
-                        <Button Command="{Binding ElementName=RootPage, Path=ViewModel.CancelAddRateCommand}" Padding="8">
-                            <FontIcon FontSize="14" Glyph="&#xE711;" />
-                        </Button>
-                    </StackPanel>
-                </Grid>
-            </toolkit:SettingsCard>
-        </DataTemplate>
-
     </Page.Resources>
 
     <ScrollView
@@ -161,26 +88,62 @@
                     Margin="1,24,36,0"
                     MaxWidth="1064"
                     Style="{StaticResource TitleTextBlockStyle}"
-                    Text="Settings" />
+                    Text="Settings"
+                    x:Uid="Settings_Title" />
 
                 <!--  Appearance  -->
-                <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="Appearance" />
-                <toolkit:SettingsCard Description="Select which app theme to display" Header="App theme">
+                <TextBlock
+                    Style="{StaticResource SettingsSectionHeaderTextBlockStyle}"
+                    Text="Appearance"
+                    x:Uid="Settings_Appearance" />
+
+                <toolkit:SettingsCard
+                    Description="Select which app theme to display"
+                    Header="App theme"
+                    x:Uid="Settings_Theme">
                     <toolkit:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE790;" />
                     </toolkit:SettingsCard.HeaderIcon>
                     <ComboBox AutomationProperties.AutomationId="themeModeComboBox" SelectedIndex="{x:Bind ViewModel.ThemeIndex, Mode=TwoWay}">
-                        <ComboBoxItem Content="Light" />
-                        <ComboBoxItem Content="Dark" />
-                        <ComboBoxItem Content="Use system setting" />
+                        <ComboBoxItem Content="Light" x:Uid="Settings_Theme_Light" />
+                        <ComboBoxItem Content="Dark" x:Uid="Settings_Theme_Dark" />
+                        <ComboBoxItem Content="Use system setting" x:Uid="Settings_Theme_System" />
                     </ComboBox>
                 </toolkit:SettingsCard>
 
+                <toolkit:SettingsCard
+                    Description="Select application language"
+                    Header="Language"
+                    x:Uid="Settings_Language">
+                    <toolkit:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE775;" />
+                    </toolkit:SettingsCard.HeaderIcon>
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <TextBlock
+                            Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                            VerticalAlignment="Center"
+                            Visibility="{x:Bind ViewModel.ShowRestartWarning, Mode=OneWay, Converter={StaticResource BoolToVis}}"
+                            x:Uid="Settings_RestartRequired" />
+                        <ComboBox SelectedIndex="{x:Bind ViewModel.LanguageIndex, Mode=TwoWay}">
+                            <ComboBoxItem Content="Use system setting" x:Uid="Settings_Language_Auto" />
+                            <ComboBoxItem Content="English" x:Uid="Settings_Language_En" />
+                            <ComboBoxItem Content="Simplified Chinese" x:Uid="Settings_Language_Zh" />
+                            <ComboBoxItem Content="Traditional Chinese" x:Uid="Settings_Language_ZhTw" />
+                        </ComboBox>
+                    </StackPanel>
+                </toolkit:SettingsCard>
+
                 <!--  Currency Exchange Section  -->
-                <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="Exchange Rates" />
+                <TextBlock
+                    Style="{StaticResource SettingsSectionHeaderTextBlockStyle}"
+                    Text="Exchange Rates"
+                    x:Uid="Settings_ExchangeRates" />
 
                 <!--  1. Display Currency Selection  -->
-                <toolkit:SettingsCard Description="Set default display currency" Header="Display Currency">
+                <toolkit:SettingsCard
+                    Description="Set default display currency"
+                    Header="Display Currency"
+                    x:Uid="Settings_DisplayCurrency">
                     <toolkit:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE1D0;" />
                     </toolkit:SettingsCard.HeaderIcon>
@@ -241,18 +204,23 @@
                     Description="Configure exchange rates between currencies"
                     Header="Exchange Rate Details"
                     IsExpanded="False"
-                    x:Name="RatesExpander">
+                    x:Name="RatesExpander"
+                    x:Uid="Settings_ExchangeRateDetails">
                     <toolkit:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE825;" />
                     </toolkit:SettingsExpander.HeaderIcon>
                 </toolkit:SettingsExpander>
 
                 <!--  About  -->
-                <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="About" />
+                <TextBlock
+                    Style="{StaticResource SettingsSectionHeaderTextBlockStyle}"
+                    Text="About"
+                    x:Uid="Settings_About" />
                 <toolkit:SettingsExpander
                     Description="© 2026 MidnightCrowing."
                     Header="{StaticResource AppTitleName}"
-                    Margin="0,0,0,36">
+                    Margin="0,0,0,36"
+                    x:Uid="Settings_AboutExpander">
                     <toolkit:SettingsExpander.HeaderIcon>
                         <BitmapIcon ShowAsMonochrome="False" UriSource="/Assets/KeyPocket.png" />
                     </toolkit:SettingsExpander.HeaderIcon>
@@ -265,7 +233,8 @@
                         <toolkit:SettingsCard
                             Command="{x:Bind ViewModel.OpenGitHubCommand}"
                             Header="GitHub"
-                            IsClickEnabled="True">
+                            IsClickEnabled="True"
+                            x:Uid="Settings_GitHub">
                             <toolkit:SettingsCard.ActionIcon>
                                 <FontIcon Glyph="&#xE8A7;" />
                             </toolkit:SettingsCard.ActionIcon>
@@ -275,7 +244,8 @@
                         <toolkit:SettingsCard
                             Command="{x:Bind ViewModel.OpenFeedbackCommand}"
                             Header="Open an issue or pull request"
-                            IsClickEnabled="True">
+                            IsClickEnabled="True"
+                            x:Uid="Settings_Issue">
                             <toolkit:SettingsCard.ActionIcon>
                                 <FontIcon Glyph="&#xE8A7;" />
                             </toolkit:SettingsCard.ActionIcon>
@@ -285,9 +255,13 @@
                         <toolkit:SettingsCard
                             ContentAlignment="Vertical"
                             Header="Resources &amp; Sources"
-                            HorizontalContentAlignment="Left">
+                            HorizontalContentAlignment="Left"
+                            x:Uid="Settings_Resources">
                             <StackPanel Margin="-12,0,0,0" Orientation="Vertical">
-                                <HyperlinkButton Content="AI &#47; LLM Model Icon" NavigateUri="https://lobehub.com/icons" />
+                                <HyperlinkButton
+                                    Content="AI &#47; LLM Model Icon"
+                                    NavigateUri="https://lobehub.com/icons"
+                                    x:Uid="Settings_IconLink" />
                             </StackPanel>
                         </toolkit:SettingsCard>
 
@@ -295,7 +269,8 @@
                         <toolkit:SettingsCard
                             ContentAlignment="Vertical"
                             Header="License"
-                            HorizontalContentAlignment="Left">
+                            HorizontalContentAlignment="Left"
+                            x:Uid="Settings_License">
                             <StackPanel Margin="-12,0,0,0" Orientation="Vertical">
                                 <HyperlinkButton Content="MIT License" NavigateUri="https://github.com/MidnightCrowing/KeyPocket/blob/main/LICENSE" />
                             </StackPanel>

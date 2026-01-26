@@ -2,6 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Windows.Globalization;
 using Windows.System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -53,6 +54,8 @@ public partial class SettingsViewModel : ObservableObject
     // New Custom Rate Input
     [ObservableProperty] private bool _isAddingRate;
 
+    [ObservableProperty] private int _languageIndex;
+
     [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(ConfirmAddCurrencyCommand))]
     private string _newCurrencyCode = string.Empty;
 
@@ -72,6 +75,8 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(DeleteSelectedCurrencyCommand))]
     private string _selectedCurrency;
 
+    [ObservableProperty] private bool _showRestartWarning;
+
     [ObservableProperty] private int _themeIndex;
 
     public SettingsViewModel()
@@ -83,6 +88,22 @@ public partial class SettingsViewModel : ObservableObject
             ElementTheme.Dark => 1,
             _ => 2
         };
+
+        // 1.5 Language
+        var lang = ApplicationLanguages.PrimaryLanguageOverride;
+        if (string.IsNullOrEmpty(lang))
+            _languageIndex = 0; // Auto
+        else if (lang.StartsWith("en", StringComparison.OrdinalIgnoreCase))
+            _languageIndex = 1;
+        else if (lang.StartsWith("zh-CN", StringComparison.OrdinalIgnoreCase) ||
+                 lang.StartsWith("zh-Hans", StringComparison.OrdinalIgnoreCase))
+            _languageIndex = 2;
+        else if (lang.StartsWith("zh-TW", StringComparison.OrdinalIgnoreCase) ||
+                 lang.StartsWith("zh-Hant", StringComparison.OrdinalIgnoreCase))
+            _languageIndex = 3;
+        else
+            _languageIndex = 0; // Default to Auto for others
+
 
         // 2. Currencies
         LoadCurrencies();
@@ -339,6 +360,23 @@ public partial class SettingsViewModel : ObservableObject
             1 => ElementTheme.Dark,
             _ => ElementTheme.Default
         };
+    }
+
+    partial void OnLanguageIndexChanged(int value)
+    {
+        var newLang = value switch
+        {
+            1 => "en-US",
+            2 => "zh-CN",
+            3 => "zh-TW",
+            _ => string.Empty // Auto
+        };
+
+        if (ApplicationLanguages.PrimaryLanguageOverride != newLang)
+        {
+            ApplicationLanguages.PrimaryLanguageOverride = newLang;
+            ShowRestartWarning = true;
+        }
     }
 
     [RelayCommand]
