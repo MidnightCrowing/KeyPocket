@@ -156,7 +156,7 @@
                                                 LargeChange="1.0"
                                                 NumberFormatter="{StaticResource RateFormatter}"
                                                 SmallChange="0.01"
-                                                SpinButtonPlacementMode="Inline"
+                                                SpinButtonPlacementMode="Compact"
                                                 Value="{x:Bind RateValue, Mode=TwoWay}"
                                                 Width="140" />
                                             <Button

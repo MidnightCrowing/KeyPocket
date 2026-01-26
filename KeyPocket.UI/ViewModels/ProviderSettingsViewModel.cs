@@ -840,10 +840,7 @@ public partial class ProviderSettingsViewModel : ObservableObject
         if (item == null || _providerService == null) return;
         
         try
-        {
-             // When selecting a preset, we just save the name!
-             // The main window will resolve it to Assets/ProviderIcons/{Name}-{Theme}.png
-             
+        {             
              // When selecting a preset, we just save the name!
              // The main window will resolve it to Assets/ProviderIcons/{Name}-{Theme}.png
              
@@ -864,6 +861,13 @@ public partial class ProviderSettingsViewModel : ObservableObject
         {
             // Logging?
         }
+    }
+    private string FormatDefaultModelName(string id)
+    {
+        if (string.IsNullOrWhiteSpace(id)) return id;
+        // Convert to Title Case (e.g. "gpt-4" -> "Gpt-4", "deepseek" -> "Deepseek")
+        // ToLower() first to ensure ToTitleCase processes it correctly even if input is ALLCAPS or mixed.
+        return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(id.ToLower());
     }
 }
 
@@ -990,12 +994,5 @@ public partial class ModelWrapper : ObservableObject
     public ICommand? CancelAddCommand { get; set; }
     public ICommand? StartEditCommand { get; set; }
     public ICommand? ConfirmEditCommand { get; set; }
-    public ICommand? CancelEditCommand { get; set;     private string FormatDefaultModelName(string id)
-    {
-        if (string.IsNullOrWhiteSpace(id)) return id;
-        // Convert to Title Case (e.g. "gpt-4" -> "Gpt-4", "deepseek" -> "Deepseek")
-        // ToLower() first to ensure ToTitleCase processes it correctly even if input is ALLCAPS or mixed.
-        return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(id.ToLower());
-    }
-}
+    public ICommand? CancelEditCommand { get; set; }
 }
