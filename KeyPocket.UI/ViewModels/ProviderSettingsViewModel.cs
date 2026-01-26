@@ -280,7 +280,7 @@ public partial class ProviderSettingsViewModel : ObservableObject
         // Use closures to capture 'w' so explicit CommandParameter is not needed in XAML for simple buttons
         w.ToggleFavoriteCommand = new RelayCommand(() => ToggleFavoriteKey(w));
         w.DeleteCommand = new RelayCommand(() => DeleteKey(w));
-        w.ConfirmAddCommand = new RelayCommand(() => ConfirmAddKey(w));
+        w.ConfirmAddCommand = new RelayCommand(() => ConfirmAddKey(w), () => !string.IsNullOrWhiteSpace(w.NewKey));
         w.CancelAddCommand = new RelayCommand(() => CancelAddKey(w));
         w.CopyKeyCommand = new RelayCommand(() => CopyKey(w));
 
@@ -463,7 +463,7 @@ public partial class ProviderSettingsViewModel : ObservableObject
     {
         w.ToggleFavoriteCommand = new RelayCommand(() => ToggleFavoriteModel(w));
         w.DeleteCommand = new RelayCommand(() => DeleteModel(w));
-        w.ConfirmAddCommand = new RelayCommand(() => ConfirmAddModel(w));
+        w.ConfirmAddCommand = new RelayCommand(() => ConfirmAddModel(w), () => !string.IsNullOrWhiteSpace(w.NewId));
         w.CancelAddCommand = new RelayCommand(() => CancelAddModel(w));
         w.StartEditCommand = new RelayCommand(() => StartEditModel(w));
         w.ConfirmEditCommand = new RelayCommand(() => ConfirmEditModel(w));
@@ -906,11 +906,19 @@ public partial class KeyWrapper : ObservableObject
     public ICommand? CommitTagEditCommand { get; set; }
 
     public string FavoriteIcon => IsFavorite ? "\uE735" : "\uE734";
+
+    partial void OnNewKeyChanged(string value)
+    {
+        (ConfirmAddCommand as IRelayCommand)?.NotifyCanExecuteChanged();
+    }
 }
 
 public partial class ModelWrapper : ObservableObject
 {
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(ProviderSymbol))]
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ProviderSymbol))]
+    [NotifyPropertyChangedFor(nameof(InputPriceDisplay))]
+    [NotifyPropertyChangedFor(nameof(OutputPriceDisplay))]
     private string _inputCurrency = "USD";
 
     // Display strings
@@ -931,6 +939,11 @@ public partial class ModelWrapper : ObservableObject
 
     // For new model entry
     [ObservableProperty] private string _newId = "";
+
+    partial void OnNewIdChanged(string value)
+    {
+        (ConfirmAddCommand as IRelayCommand)?.NotifyCanExecuteChanged();
+    }
 
     [ObservableProperty] private string _newName = "";
 

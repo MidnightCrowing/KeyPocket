@@ -14,8 +14,6 @@ public partial class KeyItemViewModel : ObservableObject
 
     [ObservableProperty] private string _displayKey = string.Empty;
 
-    [ObservableProperty] private bool _isKeyRevealed;
-
     [ObservableProperty] private string _maskedKey = "Loading...";
 
     [ObservableProperty] private string? _providerIcon;
@@ -28,6 +26,21 @@ public partial class KeyItemViewModel : ObservableObject
         _providerService = providerService;
 
         Initialize();
+    }
+
+    private void Initialize()
+    {
+        // Decrypt to generate mask
+        var rawKey = _providerService.GetDecryptedApiKey(_apiKey.ProviderId, _apiKey.Id);
+        if (string.IsNullOrEmpty(rawKey))
+        {
+            MaskedKey = "Error: Cannot Decrypt";
+            DisplayKey = MaskedKey; // Ensure DisplayKey is set
+            return;
+        }
+
+        MaskedKey = GenerateMask(rawKey);
+        DisplayKey = MaskedKey;
     }
 
     public Guid Id => _apiKey.Id;
@@ -44,15 +57,6 @@ public partial class KeyItemViewModel : ObservableObject
             if (_apiKey.Tag != value)
             {
                 OnPropertyChanging();
-                _providerService.UpdateApiKeyTag(ProviderId, Id,
-                    value); // ProviderService needs this method? It only has AddApiKey/RemoveApiKey.
-                // Wait, checking ProviderService... 
-                // It currently DOES NOT have UpdateApiKeyTag. I recall seeing only Add/Remove/ToggleFavorite in my read. 
-                // Ah, I need to check if I can update Tag. 
-                // If not, I should add it to ProviderService later. 
-                // For now, let's assume I will add it or it exists (I'll double check file content in memory).
-                // Re-reading ProviderService content from Step 21...
-                // line 168: public void UpdateApiKeyTag(Guid providerId, Guid keyId, string? tag) -> YES IT EXISTS! Perfect.
                 _providerService.UpdateApiKeyTag(ProviderId, Id, value);
                 _apiKey.Tag = value;
                 OnPropertyChanged();
@@ -84,29 +88,10 @@ public partial class KeyItemViewModel : ObservableObject
             {
                 OnPropertyChanging();
                 _apiKey.IsDisabled = value;
-                // We need to persist this. I will assume I'll add the method `ToggleDisableApiKey` or `UpdateApiKeyStatus`.
-                // For this file generation, I'll comment it out or call a method I'll create.
-                // call _providerService.ToggleDisableApiKey(ProviderId, Id);
-                // I'll create the method in ProviderService next.
                 ToggleDisableServiceCall();
                 OnPropertyChanged();
             }
         }
-    }
-
-    private void Initialize()
-    {
-        // Decrypt to generate mask, but don't store full key in memory permanently if possible.
-        // For 'Reveal', we will fetch again.
-        var rawKey = _providerService.GetDecryptedApiKey(_apiKey.ProviderId, _apiKey.Id);
-        if (string.IsNullOrEmpty(rawKey))
-        {
-            MaskedKey = "Error: Cannot Decrypt";
-            return;
-        }
-
-        MaskedKey = GenerateMask(rawKey);
-        DisplayKey = MaskedKey;
     }
 
     private string GenerateMask(string key)
@@ -151,24 +136,6 @@ public partial class KeyItemViewModel : ObservableObject
             var package = new DataPackage();
             package.SetText(rawKey);
             Clipboard.SetContent(package);
-        }
-    }
-
-    [RelayCommand]
-    private void RevealKey()
-    {
-        if (IsKeyRevealed)
-        {
-            // Hide
-            DisplayKey = MaskedKey;
-            IsKeyRevealed = false;
-        }
-        else
-        {
-            // Show
-            var rawKey = _providerService.GetDecryptedApiKey(ProviderId, Id);
-            DisplayKey = rawKey;
-            IsKeyRevealed = true;
         }
     }
 }

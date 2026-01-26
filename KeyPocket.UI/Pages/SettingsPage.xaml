@@ -290,6 +290,16 @@
                                 <HyperlinkButton Content="AI &#47; LLM Model Icon" NavigateUri="https://lobehub.com/icons" />
                             </StackPanel>
                         </toolkit:SettingsCard>
+
+                        <!--  License  -->
+                        <toolkit:SettingsCard
+                            ContentAlignment="Vertical"
+                            Header="License"
+                            HorizontalContentAlignment="Left">
+                            <StackPanel Margin="-12,0,0,0" Orientation="Vertical">
+                                <HyperlinkButton Content="MIT License" NavigateUri="https://github.com/MidnightCrowing/KeyPocket/blob/main/LICENSE" />
+                            </StackPanel>
+                        </toolkit:SettingsCard>
                     </toolkit:SettingsExpander.Items>
                 </toolkit:SettingsExpander>
 
