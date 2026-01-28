@@ -22,6 +22,10 @@ public sealed partial class ModelsPage : Page
     {
         // Reload data when navigated to ensure we have latest providers/models
         ViewModel.LoadData();
+
+        // 如果提供了搜索参数（模型 ID），设置搜索文本
+        if (e.Parameter is string modelId && !string.IsNullOrEmpty(modelId)) ViewModel.SearchText = modelId;
+
         base.OnNavigatedTo(e);
     }
 

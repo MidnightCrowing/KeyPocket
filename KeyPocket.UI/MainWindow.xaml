@@ -7,6 +7,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:KeyPocket.UI.Models"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Window.SystemBackdrop>
@@ -33,11 +34,67 @@
 
             <TitleBar.Content>
                 <AutoSuggestBox
+                    ItemsSource="{x:Bind SearchViewModel.SearchResults, Mode=OneWay}"
                     PlaceholderText="Search.."
                     QueryIcon="Find"
+                    QuerySubmitted="SearchBox_OnQuerySubmitted"
+                    SuggestionChosen="SearchBox_OnSuggestionChosen"
+                    TextChanged="SearchBox_OnTextChanged"
                     VerticalAlignment="Center"
                     Width="360"
-                    x:Uid="Shell_SearchBox" />
+                    x:Name="SearchBox"
+                    x:Uid="Shell_SearchBox">
+
+                    <AutoSuggestBox.ItemTemplate>
+                        <DataTemplate x:DataType="models:SearchResultItem">
+                            <Grid Padding="8,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <!--  Icon (Glyph or Image)  -->
+                                <Grid
+                                    Height="16"
+                                    Margin="0,0,12,0"
+                                    Width="16">
+                                    <!--  FontIcon for Glyph  -->
+                                    <FontIcon
+                                        FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                        FontSize="16"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Glyph="{x:Bind Icon}"
+                                        Visibility="{x:Bind IsGlyphIcon}" />
+
+                                    <!--  BitmapIcon for Custom Icon  -->
+                                    <BitmapIcon
+                                        ShowAsMonochrome="False"
+                                        UriSource="{x:Bind IconPath}"
+                                        Visibility="{x:Bind IsImageIcon}" />
+                                </Grid>
+
+                                <!--  Title & Description  -->
+                                <StackPanel Grid.Column="1" Spacing="2">
+                                    <TextBlock Text="{x:Bind Title}" />
+                                    <TextBlock
+                                        FontSize="11"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Text="{x:Bind Description}" />
+                                </StackPanel>
+
+                                <!--  crash.log 特殊图标  -->
+                                <FontIcon
+                                    FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                    FontSize="14"
+                                    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                    Glyph="&#xE8A7;"
+                                    Grid.Column="2"
+                                    Visibility="{x:Bind IsSystemFile}" />
+                            </Grid>
+                        </DataTemplate>
+                    </AutoSuggestBox.ItemTemplate>
+                </AutoSuggestBox>
             </TitleBar.Content>
         </TitleBar>
 

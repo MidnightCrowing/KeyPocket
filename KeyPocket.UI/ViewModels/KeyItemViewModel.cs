@@ -108,10 +108,6 @@ public partial class KeyItemViewModel : ObservableObject
 
     private void ToggleDisableServiceCall()
     {
-        // Placeholder for the service call I will add
-        // Reflection or just direct call if I update service first. 
-        // Best practice: Update service first. But I am writing this file first. 
-        // I'll assume the method exists `ToggleDisableApiKey`.
         _providerService.ToggleDisableApiKey(ProviderId, Id);
     }
 

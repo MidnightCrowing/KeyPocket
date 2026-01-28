@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.IO;
 using System.Linq;
-using Windows.ApplicationModel;
 using Windows.ApplicationModel.Resources;
 using CommunityToolkit.Mvvm.Messaging;
+using KeyPocket.UI.Helpers;
 using KeyPocket.UI.Messages;
+using KeyPocket.UI.Models;
 using KeyPocket.UI.Pages;
 using KeyPocket.UI.ViewModels;
 using Microsoft.UI.Dispatching;
@@ -40,6 +40,7 @@ public sealed partial class MainWindow
 
         // 初始化 ViewModel
         ViewModel = new MainWindowViewModel(App.ProviderService);
+        SearchViewModel = new SearchViewModel(App.ProviderService);
 
         _pageToNavItem = new Dictionary<Type, NavigationViewItem>
         {
@@ -74,6 +75,7 @@ public sealed partial class MainWindow
     }
 
     public MainWindowViewModel ViewModel { get; }
+    public SearchViewModel SearchViewModel { get; }
 
     private void UpdateAllSidebarIcons()
     {
@@ -162,42 +164,26 @@ public sealed partial class MainWindow
     {
         if (string.IsNullOrEmpty(iconPath)) return new FontIcon { Glyph = defaultGlyph };
 
-        // If path contains specific characters, treat as file path
-        if (iconPath.Contains('/') || iconPath.Contains('\\') || iconPath.Contains('.'))
-            // Custom file matching absolute path
-            try
-            {
-                return new ImageIcon { Source = new BitmapImage(new Uri(iconPath)) };
-            }
-            catch
-            {
-                return new FontIcon { Glyph = defaultGlyph };
-            }
+        // 判断是否为预设名称
+        if (ProviderIconHelper.IsPresetName(iconPath))
+        {
+            // 预设名称（如 "openai"）
+            var isDark = true;
+            if (Content is FrameworkElement root) isDark = root.ActualTheme == ElementTheme.Dark;
 
-        // Preset Name (e.g. "Openai")
-        // Determine theme
-        var isDark = true;
-        if (Content is FrameworkElement root) isDark = root.ActualTheme == ElementTheme.Dark;
+            var uri = ProviderIconHelper.GetPresetIconUri(iconPath, isDark);
+            return new ImageIcon { Source = new BitmapImage(uri) };
+        }
 
-        // Normalize name to lowercase for filename base
-        var baseName = iconPath.ToLower();
-
-        // Construct path based on availability
-        // Try to find {baseName}-{theme}.png, otherwise {baseName}.png
-
-        var appInstalledPath = Package.Current.InstalledLocation.Path;
-        var assetsPath = Path.Combine(appInstalledPath, "Assets", "ProviderIcons");
-        var suffix = isDark ? "-dark" : "-light";
-        var themeSpecificPath = Path.Combine(assetsPath, $"{baseName}{suffix}.png");
-
-        string uriToUse;
-        if (File.Exists(themeSpecificPath))
-            uriToUse = $"ms-appx:///Assets/ProviderIcons/{baseName}{suffix}.png";
-        else
-            // Fallback to base
-            uriToUse = $"ms-appx:///Assets/ProviderIcons/{baseName}.png";
-
-        return new ImageIcon { Source = new BitmapImage(new Uri(uriToUse)) };
+        // 自定义文件路径
+        try
+        {
+            return new ImageIcon { Source = new BitmapImage(new Uri(iconPath)) };
+        }
+        catch
+        {
+            return new FontIcon { Glyph = defaultGlyph };
+        }
     }
 
     private void RemoveProviderFromSidebar(Guid providerId)
@@ -331,5 +317,58 @@ public sealed partial class MainWindow
         // 同步 NavView 选中状态
         if (_pageToNavItem.TryGetValue(pageType, out var navItem))
             NavView.SelectedItem = navItem;
+    }
+
+    // ========== 搜索框事件处理 ==========
+
+    private void SearchBox_OnTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+    {
+        if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput) SearchViewModel.PerformSearch(sender.Text);
+    }
+
+    private void SearchBox_OnSuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+    {
+        if (args.SelectedItem is SearchResultItem item) sender.Text = item.Title;
+    }
+
+    private void SearchBox_OnQuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+    {
+        if (args.ChosenSuggestion is SearchResultItem item) HandleSearchResultSelected(item);
+    }
+
+    private async void HandleSearchResultSelected(SearchResultItem item)
+    {
+        switch (item.Type)
+        {
+            case SearchResultType.Provider:
+                // 导航到服务商设置页
+                if (item.Data is Guid providerId)
+                {
+                    ContentFrame.Navigate(typeof(ProviderSettingsPage), providerId.ToString());
+                    SelectProviderInSidebar(providerId);
+                }
+
+                break;
+
+            case SearchResultType.Model:
+                // 导航到模型页，并设置搜索文本
+                if (item.Data is string modelId)
+                {
+                    ContentFrame.Navigate(typeof(ModelsPage), modelId);
+                    NavView.SelectedItem = ModelsPageItem;
+                }
+
+                break;
+
+            case SearchResultType.SystemFile:
+                // 打开文件
+                if (item.Data is string filePath)
+                    await CrashLogHelper.OpenFileWithDefaultEditorAsync(filePath, Content.XamlRoot);
+                break;
+        }
+
+        // 清空搜索框并关闭下拉列表
+        SearchBox.Text = string.Empty;
+        SearchBox.IsSuggestionListOpen = false;
     }
 }

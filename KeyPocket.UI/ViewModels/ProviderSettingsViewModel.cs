@@ -6,7 +6,6 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Windows.ApplicationModel;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -16,7 +15,7 @@ using KeyPocket.Core.Models;
 using KeyPocket.Core.Services;
 using KeyPocket.UI.Helpers;
 using KeyPocket.UI.Messages;
-using Microsoft.UI.Xaml;
+using Microsoft.UI.Dispatching;
 
 namespace KeyPocket.UI.ViewModels;
 
@@ -721,104 +720,34 @@ public partial class ProviderSettingsViewModel : ObservableObject
 
     private async void LoadDefaultIcons()
     {
-        try
+        // Capture dispatcher from UI thread
+        var dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+
+        // Capture theme on UI thread
+        var isDark = ThemeHelper.IsDarkTheme();
+
+        await Task.Run(() =>
         {
-            DefaultIcons.Clear();
-            var installLocation = Package.Current.InstalledLocation;
+            var iconNames = ProviderIconHelper.GetAllPresetIconNames();
 
-            var assetsFolder = await installLocation.GetFolderAsync("Assets");
-            var providerIconsFolder = await assetsFolder.GetFolderAsync("ProviderIcons");
-            var files = await providerIconsFolder.GetFilesAsync();
-
-            // Determine current effective theme
-            // Handled simply by checking application requested theme or settings
-            // For now, checking the actual UI theme is complex in VM without UI thread access usually.
-            // We'll rely on a heuristic: 
-            // If we are in "Dark" mode (SettingsHelper), prefer -dark.
-            // If "Light", prefer -light.
-            // If "System", well, let's just default to one or try to guess.
-            // Actually, let's just load ALL of them but simplify the display?
-            // User requirement: "Icons ... are used in Dark theme". 
-            // Logic: Group by "Base Name". Pick the best match.
-
-            var isDark = true; // Default assumption or check settings
-            var currentTheme = SettingsHelper.Current.SelectedAppTheme;
-
-            if (currentTheme == ElementTheme.Light) isDark = false;
-            else if (currentTheme == ElementTheme.Dark) isDark = true;
-            else
-                // System - could check Application.Current.RequestedTheme if on UI thread
-                // For safety in VM, let's check the global state if possible or default to Dark (popular)
-                // Accessing Window.Current might throw if on background thread, but LoadDefaultIcons is called from ctor (UI thread usually) or command.
-                // However, Application.Current.RequestedTheme is safer.
-                try
-                {
-                    if (Application.Current.RequestedTheme == ApplicationTheme.Light)
-                        isDark = false;
-                    else
-                        isDark = true;
-                }
-                catch
-                {
-                    // Fallback
-                    isDark = true;
-                }
-
-            var iconGroups = files
-                .Where(f => f.FileType.ToLower() == ".png" || f.FileType.ToLower() == ".svg")
-                .GroupBy(f =>
-                {
-                    var name = f.DisplayName.ToLower();
-                    if (name.EndsWith("-dark")) return name.Substring(0, name.Length - 5);
-                    if (name.EndsWith("-light")) return name.Substring(0, name.Length - 6);
-                    return name;
-                });
-
-            foreach (var group in iconGroups)
+            dispatcherQueue?.TryEnqueue(() =>
             {
-                StorageFile? bestMatch = null;
-
-                if (isDark)
+                DefaultIcons.Clear();
+                foreach (var iconName in iconNames)
                 {
-                    // Try -dark, then base, then -light
-                    bestMatch = group.FirstOrDefault(f => f.DisplayName.ToLower().EndsWith("-dark"));
-                    if (bestMatch == null)
-                        bestMatch = group.FirstOrDefault(f => !f.DisplayName.ToLower().Contains("-"));
-                    if (bestMatch == null)
-                        bestMatch = group.FirstOrDefault(f => f.DisplayName.ToLower().EndsWith("-light"));
-                }
-                else
-                {
-                    // Try -light, then base, then -dark
-                    bestMatch = group.FirstOrDefault(f => f.DisplayName.ToLower().EndsWith("-light"));
-                    if (bestMatch == null)
-                        bestMatch = group.FirstOrDefault(f => !f.DisplayName.ToLower().Contains("-"));
-                    if (bestMatch == null)
-                        bestMatch = group.FirstOrDefault(f => f.DisplayName.ToLower().EndsWith("-dark"));
-                }
-
-                if (bestMatch != null)
-                {
-                    var name = group.Key;
-                    if (name.Length > 0) name = char.ToUpper(name[0]) + name.Substring(1);
-
-                    // Use ms-appx URI for reliable display in WinUI
-                    // bestMatch.Name is safe
-                    var relativePath = $"ms-appx:///Assets/ProviderIcons/{bestMatch.Name}";
+                    var displayName = iconName.Length > 0
+                        ? char.ToUpper(iconName[0]) + iconName.Substring(1)
+                        : iconName;
 
                     DefaultIcons.Add(new DefaultIconItem
                     {
-                        Name = name,
-                        Path = relativePath, // Bindable URI
-                        FileName = bestMatch.Name
+                        Name = displayName,
+                        Path = ProviderIconHelper.GetPresetIconUri(iconName, isDark).ToString(),
+                        FileName = $"{iconName}.png"
                     });
                 }
-            }
-        }
-        catch (Exception)
-        {
-            // Ignore
-        }
+            });
+        });
     }
 
     [RelayCommand]
@@ -940,11 +869,6 @@ public partial class ModelWrapper : ObservableObject
     // For new model entry
     [ObservableProperty] private string _newId = "";
 
-    partial void OnNewIdChanged(string value)
-    {
-        (ConfirmAddCommand as IRelayCommand)?.NotifyCanExecuteChanged();
-    }
-
     [ObservableProperty] private string _newName = "";
 
     [ObservableProperty] private string _outputPrice = "0";
@@ -982,6 +906,11 @@ public partial class ModelWrapper : ObservableObject
     public ICommand? StartEditCommand { get; set; }
     public ICommand? ConfirmEditCommand { get; set; }
     public ICommand? CancelEditCommand { get; set; }
+
+    partial void OnNewIdChanged(string value)
+    {
+        (ConfirmAddCommand as IRelayCommand)?.NotifyCanExecuteChanged();
+    }
 
     partial void OnInputPriceValueChanged(double value)
     {
