@@ -49,7 +49,7 @@ public partial class App : Application
         LogException("CurrentDomain_UnhandledException", e.ExceptionObject as Exception);
     }
 
-    private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+    private void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
         LogException("TaskScheduler_UnobservedTaskException", e.Exception);
         e.SetObserved();

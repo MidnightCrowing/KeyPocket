@@ -50,4 +50,9 @@ public class Provider
     ///     自定义图标的相对路径 (e.g. "Icons/my-icon.png")。
     /// </summary>
     public string? IconPath { get; set; }
+
+    /// <summary>
+    ///     在列表中的排序位置。数字越小越靠前。
+    /// </summary>
+    public int SortOrder { get; set; }
 }

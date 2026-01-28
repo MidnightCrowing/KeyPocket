@@ -43,6 +43,7 @@ public partial class ProviderViewModel : ObservableObject
         Description = provider.Description;
         Type = provider.Type;
         BaseUrl = provider.ApiBaseUrl;
+        SortOrder = provider.SortOrder;
         UpdateIcon(provider.Type, provider.IconPath);
 
         // Populate favorite models
@@ -79,6 +80,8 @@ public partial class ProviderViewModel : ObservableObject
     }
 
     public Guid Id { get; private set; }
+
+    public int SortOrder { get; set; }
 
     public bool HasDescription => !string.IsNullOrWhiteSpace(Description);
 

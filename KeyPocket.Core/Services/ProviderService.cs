@@ -22,7 +22,7 @@ public class ProviderService
 
     public List<Provider> GetAllProviders()
     {
-        return _storage.Load().Providers;
+        return _storage.Load().Providers.OrderBy(p => p.SortOrder).ToList();
     }
 
     /// <summary>
@@ -59,12 +59,17 @@ public class ProviderService
     public Provider CreateProvider(string name, string type, string? baseUrl = null, string? description = null)
     {
         var config = _storage.Load();
+
+        // 为新服务商分配排序位置（当前最大值 + 1）
+        var maxSortOrder = config.Providers.Any() ? config.Providers.Max(p => p.SortOrder) : -1;
+
         var newProvider = new Provider
         {
             Name = name,
             Type = type,
             ApiBaseUrl = baseUrl,
-            Description = description
+            Description = description,
+            SortOrder = maxSortOrder + 1
         };
         config.Providers.Add(newProvider);
         _storage.Save(config);
@@ -289,5 +294,21 @@ public class ProviderService
             return string.Empty;
 
         return _secretProtector.Unprotect(key.EncryptedKey);
+    }
+
+    /// <summary>
+    ///     重新排序服务商列表
+    /// </summary>
+    /// <param name="orderedProviderIds">按新顺序排列的服务商 ID 列表</param>
+    public void ReorderProviders(List<Guid> orderedProviderIds)
+    {
+        var config = _storage.Load();
+        for (var i = 0; i < orderedProviderIds.Count; i++)
+        {
+            var provider = config.Providers.FirstOrDefault(p => p.Id == orderedProviderIds[i]);
+            if (provider != null) provider.SortOrder = i;
+        }
+
+        _storage.Save(config);
     }
 }

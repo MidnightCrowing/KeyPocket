@@ -14,6 +14,10 @@ namespace KeyPocket.UI.Pages;
 
 public sealed partial class HomePage : Page
 {
+    // ========== 手动拖拽事件处理 ==========
+
+    private ProviderViewModel? _draggingProvider;
+
     public HomePage()
     {
         InitializeComponent();
@@ -62,14 +66,48 @@ public sealed partial class HomePage : Page
         }
     }
 
-    private void OnCopyModelIdClicked(object sender, RoutedEventArgs e)
+    private void OnCardDragStarting(UIElement sender, DragStartingEventArgs args)
     {
-        if (sender is FrameworkElement ele && ele.Tag is string modelId)
+        if (sender is FrameworkElement element && element.DataContext is ProviderViewModel provider)
         {
-            var dataPackage = new DataPackage();
-            dataPackage.SetText(modelId);
-            Clipboard.SetContent(dataPackage);
+            _draggingProvider = provider;
+            args.Data.RequestedOperation = DataPackageOperation.Move;
+            // 设置拖拽数据
+            args.Data.Properties.Add("ProviderId", provider.Id.ToString());
         }
+    }
+
+    private void OnCardDragOver(object sender, DragEventArgs e)
+    {
+        // 允许放置
+        e.AcceptedOperation = DataPackageOperation.Move;
+        e.DragUIOverride.Caption = "Move";
+        e.DragUIOverride.IsGlyphVisible = true;
+    }
+
+    private void OnCardDrop(object sender, DragEventArgs e)
+    {
+        if (_draggingProvider == null) return;
+
+        // 获取目标位置的 Provider
+        if (sender is FrameworkElement element && element.DataContext is ProviderViewModel targetProvider)
+        {
+            if (_draggingProvider.Id == targetProvider.Id) return; // 同一个项，忽略
+
+            // 获取当前索引
+            var oldIndex = ViewModel.Providers.IndexOf(_draggingProvider);
+            var newIndex = ViewModel.Providers.IndexOf(targetProvider);
+
+            if (oldIndex == -1 || newIndex == -1) return;
+
+            // 移动项
+            ViewModel.Providers.Move(oldIndex, newIndex);
+
+            // 保存新顺序
+            ViewModel.UpdateProviderOrder();
+        }
+
+        _draggingProvider = null;
     }
 
     private void OnProviderTapped(object sender, TappedRoutedEventArgs e)
@@ -89,6 +127,16 @@ public sealed partial class HomePage : Page
         }
 
         if (senderElement?.DataContext is ProviderViewModel item) NavigateToProvider(item.Id);
+    }
+
+    private void OnCopyModelIdClicked(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement ele && ele.Tag is string modelId)
+        {
+            var dataPackage = new DataPackage();
+            dataPackage.SetText(modelId);
+            Clipboard.SetContent(dataPackage);
+        }
     }
 
     private void NavigateToProvider(Guid providerId)

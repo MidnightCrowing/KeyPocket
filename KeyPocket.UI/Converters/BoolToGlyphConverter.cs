@@ -8,7 +8,7 @@ public class BoolToGlyphConverter : IValueConverter
     public object Convert(object value, Type targetType, object parameter, string language)
     {
         bool state = value is bool b && b;
-        string param = parameter as string;
+        string? param = parameter as string;
 
         if (string.Equals(param, "Reveal", StringComparison.OrdinalIgnoreCase))
         {

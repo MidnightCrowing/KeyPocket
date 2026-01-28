@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using KeyPocket.Core.Services;
@@ -50,5 +51,22 @@ public partial class HomeViewModel : ObservableObject
     public void Refresh()
     {
         LoadProviders();
+    }
+
+    /// <summary>
+    ///     更新服务商排序
+    /// </summary>
+    public void UpdateProviderOrder()
+    {
+        if (_providerService == null) return;
+
+        // 收集当前顺序的服务商 ID 列表
+        var orderedIds = Providers.Select(p => p.Id).ToList();
+
+        // 调用服务更新排序
+        _providerService.ReorderProviders(orderedIds);
+
+        // 更新 ViewModel 中的 SortOrder 属性
+        for (var i = 0; i < Providers.Count; i++) Providers[i].SortOrder = i;
     }
 }
