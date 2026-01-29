@@ -86,6 +86,14 @@ you can download the packaged version from the Microsoft Store:
   </a>
 </p>
 
+> [!IMPORTANT]
+> **Security Notice: Official Distribution Only**
+>
+> We currently **only** publish KeyPocket on the **Microsoft Store** and **GitHub Releases**.
+>
+> Please **DO NOT** download installers from any third-party software sites. Packages from unauthorized sources may be
+> tampered with or contain malware.
+
 ## Contributing
 
 Contributions are welcome!
