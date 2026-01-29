@@ -4,7 +4,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/MidnightCrowing/KeyPocket/tags">
+  <a style="text-decoration:none" href="https://github.com/MidnightCrowing/KeyPocket/tags">
     <img src="https://img.shields.io/github/tag/MidnightCrowing/KeyPocket.svg?style=flat-square&color=F9B81F&label=Version" alt="Latest Version" />
   </a>
 
@@ -12,7 +12,7 @@
 
   <img src="https://img.shields.io/badge/Data-Local_Storage_Only-44CC6f?style=flat-square" alt="Local Storage" />
 
-  <a href="https://github.com/MidnightCrowing/KeyPocket/blob/main/LICENSE">
+  <a style="text-decoration:none" href="https://github.com/MidnightCrowing/KeyPocket/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-9F9F9F?style=flat-square" alt="License" />
   </a>
 </p>
@@ -77,7 +77,7 @@ KeyPocket 主要用於本機開發和除錯場景，適合個人開發者管理�
 </p>
 
 > [!IMPORTANT]
-> **安全提示：請認準官方管道**
+> 安全提示：
 >
 > 我們目前**僅**在 **Microsoft Store** 和本倉庫的 **GitHub Releases** 發布 KeyPocket。
 >
