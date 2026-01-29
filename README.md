@@ -49,7 +49,7 @@ multiple AI service configurations.
 
 * Centralized Hub: Manage multi-platform configurations (OpenAI, Claude, Ollama, etc.) in one place.
 * Development Ready: Copy API Keys and Endpoints with a single click.
-* Native Experience: Built with WinUI 3 and .NET 8, offering a modern Windows 11 look and feel.
+* Native Experience: Built with WinUI 3 and .NET 10, offering a modern Windows 10 / 11 look and feel.
 
 ## Security & Privacy
 
@@ -73,7 +73,7 @@ you to audit the code and ensure exactly what is running on your device.
 
 [View Detailed Build Instructions](./Docs/Building.md)
 
-*(Requires Visual Studio 2022 with Windows App SDK workload)*
+*(Requires Visual Studio 2026 with Windows App SDK workload)*
 
 ### Option 2: Microsoft Store
 

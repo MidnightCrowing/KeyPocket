@@ -43,7 +43,7 @@ KeyPocket 主要用於本機開發和除錯場景，適合個人開發者管理�
 
 * 集中管理：在一個地方管理多平台設定（OpenAI, Claude, Ollama 等）。
 * 開發就緒：一鍵複製 API Key 和服務端點 (Endpoints)。
-* 原生體驗：基於 WinUI 3 和 .NET 8 構建，提供現代化的 Windows 11 外觀和手感。
+* 原生體驗：基於 WinUI 3 和 .NET 10 構建，提供現代化的 Windows 10 / 11 外觀和手感。
 
 ## 安全與隱私
 
@@ -64,7 +64,7 @@ KeyPocket 主要用於本機開發和除錯場景，適合個人開發者管理�
 
 [查看詳細建置說明](./Building.md)
 
-*(需要安裝了 Windows App SDK 工作負載的 Visual Studio 2022)*
+*(需要安裝了 Windows App SDK 工作負載的 Visual Studio 2026)*
 
 ### 選項 2：微軟商店
 
@@ -86,4 +86,4 @@ KeyPocket 主要用於本機開發和除錯場景，適合個人開發者管理�
 
 ## 授權
 
-本專案採用 MIT 授權。詳情請參閱 [LICENSE](LICENSE) 文件。
+本專案採用 MIT 授權。詳情請參閱 [LICENSE](../LICENSE) 文件。

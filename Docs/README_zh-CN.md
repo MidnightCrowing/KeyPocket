@@ -43,7 +43,7 @@ KeyPocket 主要用于本地开发和调试场景，适合个人开发者管理�
 
 * 集中管理：在一个地方管理多平台配置（OpenAI, Claude, Ollama 等）。
 * 开发就绪：一键复制 API Key 和服务端点 (Endpoints)。
-* 原生体验：基于 WinUI 3 和 .NET 8 构建，提供现代化的 Windows 11 外观和手感。
+* 原生体验：基于 WinUI 3 和 .NET 10 构建，提供现代化的 Windows 10 / 11 外观和手感。
 
 ## 安全与隐私
 
@@ -64,7 +64,7 @@ KeyPocket 主要用于本地开发和调试场景，适合个人开发者管理�
 
 [查看详细构建说明](./Building.md)
 
-*(需要安装了 Windows App SDK 工作负载的 Visual Studio 2022)*
+*(需要安装了 Windows App SDK 工作负载的 Visual Studio 2026)*
 
 ### 选项 2：微软商店
 
@@ -86,4 +86,4 @@ KeyPocket 主要用于本地开发和调试场景，适合个人开发者管理�
 
 ## 许可证
 
-本项目采用 MIT 许可证。详情请参阅 [LICENSE](LICENSE) 文件。
+本项目采用 MIT 许可证。详情请参阅 [LICENSE](../LICENSE) 文件。
