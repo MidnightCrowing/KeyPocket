@@ -11,7 +11,7 @@
   <Identity
     Name="MidnightCrowing.KeyPocket"
     Publisher="CN=B76C79F4-85EC-4CA9-BCA8-261D977D1EC3"
-    Version="1.0.1.0" />
+    Version="1.0.2.0" />
 
   <mp:PhoneIdentity PhoneProductId="0c71cc7f-37f3-4f7a-b808-1b502c94cb5d" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
@@ -27,7 +27,9 @@
   </Dependencies>
 
   <Resources>
-    <Resource Language="x-generate"/>
+    <Resource Language="en-US"/>
+    <Resource Language="zh-CN"/>
+    <Resource Language="zh-TW"/>
   </Resources>
 
   <Applications>

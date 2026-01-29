@@ -2,7 +2,6 @@ using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using Windows.ApplicationModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using KeyPocket.Core.Models;
 using KeyPocket.Core.Services;
@@ -17,7 +16,8 @@ public partial class ProviderViewModel : ObservableObject
 {
     [ObservableProperty] private string? _baseUrl;
 
-    [ObservableProperty] private ImageSource? _customIconSource;
+    // Manual implementation to avoid ObjectDisposedException during comparison
+    private ImageSource? _customIconSource;
 
     [ObservableProperty] private string? _description;
 
@@ -43,6 +43,7 @@ public partial class ProviderViewModel : ObservableObject
         Description = provider.Description;
         Type = provider.Type;
         BaseUrl = provider.ApiBaseUrl;
+        SortOrder = provider.SortOrder;
         UpdateIcon(provider.Type, provider.IconPath);
 
         // Populate favorite models
@@ -78,7 +79,20 @@ public partial class ProviderViewModel : ObservableObject
         }
     }
 
+    public ImageSource? CustomIconSource
+    {
+        get => _customIconSource;
+        set
+        {
+            // Completely bypass equality check to avoid accessing properties of potentially disposed objects
+            _customIconSource = value;
+            OnPropertyChanged();
+        }
+    }
+
     public Guid Id { get; private set; }
+
+    public int SortOrder { get; set; }
 
     public bool HasDescription => !string.IsNullOrWhiteSpace(Description);
 
@@ -106,55 +120,40 @@ public partial class ProviderViewModel : ObservableObject
         // 1. Try resolving Icon
         if (!string.IsNullOrEmpty(iconPath))
         {
-            // Case A: Custom File (contains path separators or dot, though presets don't have dot)
-            // But wait, presets were stored as "Openai". No dot.
-            // Custom files: "GUID_123.png". Has dot.
+            // 判断是否为预设名称
+            if (ProviderIconHelper.IsPresetName(iconPath))
+            {
+                // 预设名称（如 "openai"）
+                var isDark = ThemeHelper.IsDarkTheme();
+                var uri = ProviderIconHelper.GetPresetIconUri(iconPath, isDark);
+                CustomIconSource = new BitmapImage(uri);
+                IsCustomIcon = true;
+                return;
+            }
 
-            if (iconPath.Contains('/') || iconPath.Contains('\\') || iconPath.Contains('.'))
-                try
+            // 自定义文件路径
+            try
+            {
+                // Direct absolute path check
+                if (File.Exists(iconPath))
                 {
-                    // Direct absolute path check
-                    if (File.Exists(iconPath))
-                    {
-                        CustomIconSource = new BitmapImage(new Uri(iconPath));
-                        IsCustomIcon = true;
-                        return;
-                    }
-                }
-                catch
-                {
-                    /* Ignore load errors, fallback to glyph */
-                }
-            else
-                // Case B: Preset Name (e.g. "Openai")
-                try
-                {
-                    var baseName = iconPath.ToLower();
-                    var isDark = ThemeHelper.IsDarkTheme();
-
-                    var appInstalledPath = Package.Current.InstalledLocation.Path;
-                    var assetsPath = Path.Combine(appInstalledPath, "Assets", "ProviderIcons");
-                    var suffix = isDark ? "-dark" : "-light";
-                    var themeSpecificPath = Path.Combine(assetsPath, $"{baseName}{suffix}.png");
-
-                    string uriToUse;
-                    if (File.Exists(themeSpecificPath))
-                        uriToUse = $"ms-appx:///Assets/ProviderIcons/{baseName}{suffix}.png";
-                    else
-                        // Fallback to base
-                        uriToUse = $"ms-appx:///Assets/ProviderIcons/{baseName}.png";
-
-                    CustomIconSource = new BitmapImage(new Uri(uriToUse));
+                    CustomIconSource = new BitmapImage(new Uri(iconPath));
                     IsCustomIcon = true;
                     return;
                 }
-                catch
-                {
-                    /* Ignore */
-                }
+
+                // Try as URI (e.g., web URL or appx URI not covered by File.Exists)
+                CustomIconSource = new BitmapImage(new Uri(iconPath));
+                IsCustomIcon = true;
+                return;
+            }
+            catch
+            {
+                // Fall through to default
+            }
         }
 
-        // 2. Fallback to Glyph
+        // 2. Fallback to default icon based on type
         IsCustomIcon = false;
         CustomIconSource = null;
         Icon = "\uE99A"; // Default icon for all types

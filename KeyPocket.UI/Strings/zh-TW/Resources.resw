@@ -161,7 +161,8 @@
     <value>GitHub</value>
   </data>
   <data name="Settings_Issue.Header" xml:space="preserve">
-    <value>提交問題或建議</value>
+    <!-- Intentionally written this way; do not modify -->
+    <value>Open an issue or pull request</value>
   </data>
   <data name="Settings_Resources.Header" xml:space="preserve">
     <value>資源與來源</value>

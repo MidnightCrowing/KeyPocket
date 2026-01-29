@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
 using KeyPocket.Core.Crypto;
@@ -40,40 +39,19 @@ public partial class App : Application
 
     private void App_UnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
-        LogException("App_UnhandledException", e.Exception);
+        CrashLogHelper.LogException("App_UnhandledException", e.Exception);
         // Optional: e.Handled = true; if we want to try to suppress crash
     }
 
     private void CurrentDomain_UnhandledException(object sender, System.UnhandledExceptionEventArgs e)
     {
-        LogException("CurrentDomain_UnhandledException", e.ExceptionObject as Exception);
+        CrashLogHelper.LogException("CurrentDomain_UnhandledException", e.ExceptionObject as Exception);
     }
 
-    private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+    private void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
-        LogException("TaskScheduler_UnobservedTaskException", e.Exception);
+        CrashLogHelper.LogException("TaskScheduler_UnobservedTaskException", e.Exception);
         e.SetObserved();
-    }
-
-    private void LogException(string source, Exception? ex)
-    {
-        if (ex == null) return;
-
-        try
-        {
-            var folder = ApplicationData.Current.LocalFolder;
-            var filePath = Path.Combine(folder.Path, "crash.log");
-
-            var logContent =
-                $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] [{source}]\nData: {ex.Data}\nMessage: {ex.Message}\nStack: {ex.StackTrace}\n\n";
-
-            // Use synchronous write as we might be crashing
-            File.AppendAllText(filePath, logContent, Encoding.UTF8);
-        }
-        catch (Exception)
-        {
-            // Last ditch effort: suppress so we don't throw inside an exception handler
-        }
     }
 
     /// <summary>
