@@ -4,7 +4,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/MidnightCrowing/KeyPocket/tags">
+  <a style="text-decoration:none" href="https://github.com/MidnightCrowing/KeyPocket/tags">
     <img src="https://img.shields.io/github/tag/MidnightCrowing/KeyPocket.svg?style=flat-square&color=F9B81F&label=Version" alt="Latest Version" />
   </a>
 
@@ -12,7 +12,7 @@
 
   <img src="https://img.shields.io/badge/Data-Local_Storage_Only-44CC6f?style=flat-square" alt="Local Storage" />
 
-  <a href="https://github.com/MidnightCrowing/KeyPocket/blob/main/LICENSE">
+  <a style="text-decoration:none" href="https://github.com/MidnightCrowing/KeyPocket/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-9F9F9F?style=flat-square" alt="License" />
   </a>
 </p>
@@ -87,7 +87,7 @@ you can download the packaged version from the Microsoft Store:
 </p>
 
 > [!IMPORTANT]
-> **Security Notice: Official Distribution Only**
+> Security Notice: 
 >
 > We currently **only** publish KeyPocket on the **Microsoft Store** and **GitHub Releases**.
 >
