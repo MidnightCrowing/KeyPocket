@@ -9,6 +9,7 @@ namespace KeyPocket.UI.ViewModels;
 /// </summary>
 public class ProviderGroupViewModel
 {
+    public Guid ProviderId { get; set; }
     public string ProviderName { get; set; } = string.Empty;
     public string? ProviderIcon { get; set; }
     public List<ModelItemViewModel> Models { get; set; } = new();

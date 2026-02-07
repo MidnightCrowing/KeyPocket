@@ -258,14 +258,6 @@ public static class ProviderIconHelper
 
         foreach (var mapping in _modelIconMappings)
         {
-            // Case-insensitive check
-            // "gpt" matches "gpt-4", "chatgpt", etc? 
-            // User requirement: "-" belongs to match content, "dall-e" matches "dall-e" but not "dall" if "dall" is not in keywords?
-            // User said: "dall-e" as whole match instead of split "dall" and "e".
-            // Implementation: Simple Contains check handles "dall-e" correctly. 
-            // If keywords=["gpt"], "gpt-4" contains "gpt".
-            // If keywords=["dall-e"], "dall-e-3" contains "dall-e".
-            
             foreach (var keyword in mapping.Keywords)
             {
                 if (string.IsNullOrWhiteSpace(keyword)) continue;

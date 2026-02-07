@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -11,6 +13,9 @@ public partial class ModelsViewModel : ObservableObject
 {
     private readonly ObservableCollection<ModelItemViewModel> _allModels = new();
     private readonly ProviderService _providerService;
+    private readonly ModelFilterService _filterService;
+
+    [ObservableProperty] private string _currencySymbol = "$";
 
     [ObservableProperty] private ObservableCollection<ModelItemViewModel> _filteredModels = new();
 
@@ -18,15 +23,27 @@ public partial class ModelsViewModel : ObservableObject
 
     [ObservableProperty] private string _searchText = string.Empty;
 
-    [ObservableProperty] private string _selectedCapability = "All";
+    // Capability 多选属性(默认全选)
+    [ObservableProperty] private bool _isTextSelected = true;
+    [ObservableProperty] private bool _isFileSelected = true;
+    [ObservableProperty] private bool _isImageSelected = true;
+    [ObservableProperty] private bool _isAudioSelected = true;
+    [ObservableProperty] private bool _isVideoSelected = true;
+    [ObservableProperty] private bool _isEmbeddingsSelected = true;
 
-    [ObservableProperty] private string _selectedSortOption = "Provider"; // Provider, Name, Price
+    // 价格范围索引(非线性刻度: Free=0, 0.1=1, 0.2=2, 0.5=3, 1=4, 5=5, 10+=6)
+    [ObservableProperty] private int _minPriceIndex = 0;
+    [ObservableProperty] private int _maxPriceIndex = 6;
+
+    // 排序选项
+    [ObservableProperty] private ModelSortOption _sortOption = ModelSortOption.NameAsc;
 
     [ObservableProperty] private bool _showFavoritesOnly;
 
-    public ModelsViewModel(ProviderService providerService)
+    public ModelsViewModel(ProviderService providerService, ModelFilterService filterService)
     {
         _providerService = providerService;
+        _filterService = filterService;
         LoadData();
 
         // Register for theme changes to update icons
@@ -34,21 +51,18 @@ public partial class ModelsViewModel : ObservableObject
         {
             App.MainWindow.DispatcherQueue.TryEnqueue(ApplyFilters);
         });
+
+        UpdateCurrencySymbol();
     }
 
-    public ObservableCollection<string> Capabilities { get; } = new()
+    private void UpdateCurrencySymbol()
     {
-        "All",
-        "Chat",
-        "Embedding"
-    };
+        var currency = Helpers.SettingsHelper.Current.SelectedCurrency;
+        var symbols = Helpers.SettingsHelper.Current.CurrencySymbols;
+        CurrencySymbol = symbols.TryGetValue(currency, out var symbol) ? symbol : currency;
+    }
 
-    public ObservableCollection<string> SortOptions { get; } = new()
-    {
-        "Provider",
-        "Name",
-        "Price"
-    };
+
 
     public void LoadData()
     {
@@ -64,6 +78,14 @@ public partial class ModelsViewModel : ObservableObject
                     _providerService));
         }
 
+        // 显式触发一次属性更改通知，确保 UI 同步（解决 Capability 打开时未选中的问题）
+        OnPropertyChanged(nameof(IsTextSelected));
+        OnPropertyChanged(nameof(IsFileSelected));
+        OnPropertyChanged(nameof(IsImageSelected));
+        OnPropertyChanged(nameof(IsAudioSelected));
+        OnPropertyChanged(nameof(IsVideoSelected));
+        OnPropertyChanged(nameof(IsEmbeddingsSelected));
+
         ApplyFilters();
     }
 
@@ -77,72 +99,123 @@ public partial class ModelsViewModel : ObservableObject
         ApplyFilters();
     }
 
-    partial void OnSelectedCapabilityChanged(string value)
-    {
-        ApplyFilters();
-    }
-
-    partial void OnSelectedSortOptionChanged(string value)
-    {
-        ApplyFilters();
-    }
+    partial void OnIsTextSelectedChanged(bool value) => ApplyFilters();
+    partial void OnIsFileSelectedChanged(bool value) => ApplyFilters();
+    partial void OnIsImageSelectedChanged(bool value) => ApplyFilters();
+    partial void OnIsAudioSelectedChanged(bool value) => ApplyFilters();
+    partial void OnIsVideoSelectedChanged(bool value) => ApplyFilters();
+    partial void OnIsEmbeddingsSelectedChanged(bool value) => ApplyFilters();
+    partial void OnMinPriceIndexChanged(int value) => ApplyFilters();
+    partial void OnMaxPriceIndexChanged(int value) => ApplyFilters();
+    partial void OnSortOptionChanged(ModelSortOption value) => ApplyFilters();
 
     private void ApplyFilters()
     {
-        var query = _allModels.AsEnumerable();
-
-        // 1. Search Text
-        if (!string.IsNullOrWhiteSpace(SearchText))
+        // 构建过滤条件
+        var criteria = new ModelFilterCriteria
         {
-            var lowerSearch = SearchText.ToLowerInvariant();
-            query = query.Where(m =>
-                m.DisplayName.ToLowerInvariant().Contains(lowerSearch) ||
-                m.Id.ToLowerInvariant().Contains(lowerSearch) ||
-                m.ProviderName.ToLowerInvariant().Contains(lowerSearch));
-        }
-
-        // 2. Favorites
-        if (ShowFavoritesOnly) query = query.Where(m => m.IsFavorite);
-
-        // 3. Capability
-        if (SelectedCapability == "Chat")
-            query = query.Where(m => m.IsChatModel);
-        else if (SelectedCapability == "Embedding") query = query.Where(m => m.IsEmbeddingModel);
-
-        // 4. Sorting
-        // This sorting applies to the flat list (FilteredModels)
-        query = SelectedSortOption switch
-        {
-            "Name" => query.OrderBy(m => m.DisplayName),
-            "Price" => query.OrderBy(m => m.ConvertedInputPrice.HasValue ? 0 : 1)
-                .ThenBy(m => m.ConvertedInputPrice ?? m.InputPrice ?? decimal.MaxValue),
-            _ => query.OrderBy(m => m.ProviderName).ThenBy(m => m.DisplayName) // Default: Provider
+            SearchText = SearchText,
+            ShowFavoritesOnly = ShowFavoritesOnly,
+            SelectedCapabilities = GetSelectedCapabilities(),
+            MinPrice = ConvertPriceIndexToValue(MinPriceIndex),
+            MaxPrice = ConvertPriceIndexToValue(MaxPriceIndex),
+            SortOption = SortOption
         };
 
-        FilteredModels = new ObservableCollection<ModelItemViewModel>(query);
+        // 调用 Core 层服务进行过滤
+        var allModelsData = _allModels.Select(vm => new Core.Models.ModelInfo
+        {
+            Id = vm.Id,
+            DisplayName = vm.DisplayName,
+            IsFavorite = vm.IsFavorite,
+            IsChatModel = vm.IsChatModel,
+            IsEmbeddingModel = vm.IsEmbeddingModel,
+            InputPricePerMTokens = vm.InputPrice
+        }).ToList();
 
-        // 5. Generate Grouped Data for Tree View
-        // Define explicit provider order based on _providerService.GetAllProviders()
-        // We can re-fetch or cache. LoadData already fetches, let's rely on _sortedProviders from there if we add it, 
-        // or just fetch here since it's cheap (local JSON config).
+        var filtered = _filterService.ApplyFilters(allModelsData, criteria);
+
+        // 将过滤结果映射回 ViewModel
+        var filteredIds = filtered.Select(m => m.Id).ToHashSet();
+        var filteredVMs = _allModels.Where(vm => filteredIds.Contains(vm.Id));
+
+        // 应用排序(Core 层已排序,保持顺序)
+        var orderedVMs = filtered.Select(m => _allModels.First(vm => vm.Id == m.Id)).ToList();
+
+        FilteredModels = new ObservableCollection<ModelItemViewModel>(orderedVMs);
+
+        // 生成分组数据
+        GenerateGroupedModels(orderedVMs);
+    }
+
+    private List<string> GetSelectedCapabilities()
+    {
+        var list = new List<string>();
+        if (IsTextSelected) list.Add("Text");
+        if (IsFileSelected) list.Add("File");
+        if (IsImageSelected) list.Add("Image");
+        if (IsAudioSelected) list.Add("Audio");
+        if (IsVideoSelected) list.Add("Video");
+        if (IsEmbeddingsSelected) list.Add("Embeddings");
+        return list;
+    }
+
+    /// <summary>
+    /// 将价格索引转换为实际价格值
+    /// 索引映射: 0=Free(0), 1=0.1, 2=0.2, 3=0.5, 4=1, 5=5, 6=10+
+    /// </summary>
+    private decimal? ConvertPriceIndexToValue(int index)
+    {
+        return index switch
+        {
+            0 => 0m,
+            1 => 0.1m,
+            2 => 0.2m,
+            3 => 0.5m,
+            4 => 1m,
+            5 => 5m,
+            6 => null, // 10+ 表示无上限
+            _ => null
+        };
+    }
+
+    private void GenerateGroupedModels(List<ModelItemViewModel> models)
+    {
         var providers = _providerService.GetAllProviders();
         var providerOrderMap = providers
             .Select((p, index) => new { p.Name, Index = index })
             .ToDictionary(x => x.Name, x => x.Index);
 
-        var grouped = query
+        var grouped = models
             .GroupBy(m => new { m.ProviderName, m.ProviderIcon })
-            .AsEnumerable() // Switch to client-side eval (safe for lists) to use custom sort
             .OrderBy(g => providerOrderMap.TryGetValue(g.Key.ProviderName, out var index) ? index : int.MaxValue)
             .Select(g => new ProviderGroupViewModel
             {
+                ProviderId = providers.FirstOrDefault(p => p.Name == g.Key.ProviderName)?.Id ?? Guid.Empty,
                 ProviderName = g.Key.ProviderName,
                 ProviderIcon = g.Key.ProviderIcon,
-                // Inner sorting: Alphabetical by DisplayName
-                Models = g.OrderBy(m => m.DisplayName).ToList()
+                Models = g.ToList()
             })
             .ToList();
 
         GroupedModels = new ObservableCollection<ProviderGroupViewModel>(grouped);
+    }
+
+
+
+    /// <summary>
+    /// 重置所有过滤条件
+    /// </summary>
+    public void ResetFilters()
+    {
+        IsTextSelected = true;
+        IsFileSelected = true;
+        IsImageSelected = true;
+        IsAudioSelected = true;
+        IsVideoSelected = true;
+        IsEmbeddingsSelected = true;
+        MinPriceIndex = 0;
+        MaxPriceIndex = 6;
+        SortOption = ModelSortOption.NameAsc;
     }
 }

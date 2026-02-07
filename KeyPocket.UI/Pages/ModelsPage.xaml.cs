@@ -1,10 +1,13 @@
+using System;
 using System.ComponentModel;
 using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
+using KeyPocket.Core.Services;
 using KeyPocket.UI.Controls;
 using KeyPocket.UI.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Navigation;
 
 namespace KeyPocket.UI.Pages;
@@ -14,7 +17,7 @@ public sealed partial class ModelsPage : Page
     public ModelsPage()
     {
         InitializeComponent();
-        ViewModel = new ModelsViewModel(App.ProviderService);
+        ViewModel = new ModelsViewModel(App.ProviderService, App.ModelFilterService);
         DataContext = ViewModel;
     }
 
@@ -131,4 +134,27 @@ public sealed partial class ModelsPage : Page
             }
         }
     }
+
+    private void SortOption_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuFlyoutItem item && item.Tag is string tag)
+        {
+            ViewModel.SortOption = Enum.Parse<ModelSortOption>(tag);
+        }
+    }
+
+    private void ResetFilters_Click(object sender, RoutedEventArgs e)
+    {
+        ViewModel.ResetFilters();
+    }
+
+    private void ProviderGroup_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
+    {
+        if (sender is FrameworkElement element && element.DataContext is TreeViewNode node &&
+            node.Content is ProviderGroupViewModel group && group.ProviderId != Guid.Empty)
+        {
+            Frame.Navigate(typeof(ProviderSettingsPage), group.ProviderId.ToString());
+        }
+    }
+
 }

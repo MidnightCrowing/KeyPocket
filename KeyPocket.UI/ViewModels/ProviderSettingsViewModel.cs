@@ -1162,9 +1162,6 @@ public partial class ModelWrapper : ObservableObject
     {
         get
         {
-            // Use Name if Id lookup fails? Or just Id? ModelItemViewModel uses Id then DisplayName.
-            // ModelWrapper has Name property for DisplayName.
-            // Use Id first, then Name.
             var iconName = ProviderIconHelper.GetIconForModel(Id) ?? ProviderIconHelper.GetIconForModel(Name);
             if (!string.IsNullOrEmpty(iconName))
             {

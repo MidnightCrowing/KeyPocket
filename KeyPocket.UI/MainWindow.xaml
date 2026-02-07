@@ -24,7 +24,7 @@
             BackRequested="TitleBar_OnBackRequested"
             IsPaneToggleButtonVisible="True"
             PaneToggleRequested="TitleBar_OnPaneToggleRequested"
-            Title="KeyPocket"
+            Title="{StaticResource AppTitleName}"
             x:Name="TitleBar"
             x:Uid="AppTitleBar">
 

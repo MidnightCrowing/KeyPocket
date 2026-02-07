@@ -298,7 +298,7 @@ public sealed partial class ProviderSettingsPage : Page, INotifyPropertyChanged
     {
         var resourceLoader = ResourceLoader.GetForViewIndependentUse();
 
-        // Create sticky header for General (no badge)
+        // Create sticky header for General
         _stickyGeneral = CreateStickyHeaderBorder(
             resourceLoader.GetString("ProviderSettings_General/Text"),
             resourceLoader.GetString("ProviderSettings_GeneralDesc/Text"));

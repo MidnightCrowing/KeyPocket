@@ -18,12 +18,27 @@
                 <ResourceDictionary Source="../Controls/CopyButton.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Converters -->
+            <!--  Converters  -->
             <converters:BoolToVisibilityConverter x:Key="BoolToVis" />
             <converters:NegatedBoolToVisibilityConverter x:Key="NegBoolToVis" />
             <converters:BoolToDoubleConverter x:Key="BoolToOpacity" />
             <converters:FavoriteIconConverter x:Key="BoolToGlyphConverter" />
             <converters:FavoriteColorConverter x:Key="BoolToBrushConverter" />
+            <converters:EnumToBoolConverter x:Key="EnumToBoolConverter" />
+
+            <!--  Custom Segmented Item Style  -->
+            <Style
+                BasedOn="{StaticResource ButtonSegmentedItemStyle}"
+                TargetType="ctk:SegmentedItem"
+                x:Key="CustomSegmentedItemStyle">
+                <Setter Property="Padding" Value="8,5" />
+            </Style>
+
+            <!--  Template Selector  -->
+            <helpers:ModelsItemTemplateSelector
+                ModelTemplate="{StaticResource ModelItemTemplate}"
+                ProviderTemplate="{StaticResource ProviderGroupTemplate}"
+                x:Key="ModelsItemTemplateSelector" />
 
             <!--  Model Item Template  -->
             <DataTemplate x:DataType="muxc:TreeViewNode" x:Key="ModelItemTemplate">
@@ -32,10 +47,13 @@
                     <TextBlock />
 
                     <!--  Model Name + Actions (Favorite/Copy)  -->
-                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center"
-                          PointerEntered="ModelItem_PointerEntered"
-                          PointerExited="ModelItem_PointerExited"
-                          Background="Transparent"> <!-- Transparent background to catch pointer events -->
+                    <Grid
+                        Background="Transparent"
+                        HorizontalAlignment="Stretch"
+                        PointerEntered="ModelItem_PointerEntered"
+                        PointerExited="ModelItem_PointerExited"
+                        VerticalAlignment="Center">
+                        <!--  Transparent background to catch pointer events  -->
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
@@ -44,56 +62,71 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <!-- Derived Model Icon (Custom Avatar Style) -->
-                        <Grid Width="20" Height="20" Margin="0,0,8,0" VerticalAlignment="Center">
-                            <Border CornerRadius="10"
-                                    Background="{ThemeResource LayerFillColorDefaultBrush}"
-                                    BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
-                                    BorderThickness="1.5"
-                                    Visibility="{x:Bind ((vm:ModelItemViewModel)Content).HasModelIcon, Converter={StaticResource BoolToVis}, Mode=OneWay}">
-                                <BitmapIcon UriSource="{x:Bind ((vm:ModelItemViewModel)Content).ModelIconUri, Mode=OneWay}"
-                                            ShowAsMonochrome="False"
-                                            Width="12" Height="12"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"/>
+                        <!--  Derived Model Icon (Custom Avatar Style)  -->
+                        <Grid
+                            Height="20"
+                            Margin="0,0,8,0"
+                            VerticalAlignment="Center"
+                            Width="20">
+                            <Border
+                                Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
+                                BorderThickness="1.5"
+                                CornerRadius="10"
+                                Visibility="{x:Bind ((vm:ModelItemViewModel)Content).HasModelIcon, Converter={StaticResource BoolToVis}, Mode=OneWay}">
+                                <BitmapIcon
+                                    Height="12"
+                                    HorizontalAlignment="Center"
+                                    ShowAsMonochrome="False"
+                                    UriSource="{x:Bind ((vm:ModelItemViewModel)Content).ModelIconUri, Mode=OneWay}"
+                                    VerticalAlignment="Center"
+                                    Width="12" />
                             </Border>
                         </Grid>
 
-                        <!-- Name -->
+                        <!--  Name  -->
                         <TextBlock
                             Grid.Column="1"
                             Text="{x:Bind ((vm:ModelItemViewModel)Content).DisplayName}"
                             TextTrimming="CharacterEllipsis"
                             VerticalAlignment="Center" />
 
-                        <!-- Actions - Copy (Next to Name) -->
-                        <controls:CopyButton Grid.Column="2" x:Name="CopyBtn"
-                                Click="CopyButton_Click"
-                                Background="Transparent"
-                                BorderThickness="0"
-                                Padding="4"
-                                Width="28" Height="28"
-                                Margin="4,0,0,0"
-                                Tag="{x:Bind ((vm:ModelItemViewModel)Content).Id, Mode=OneWay}"
-                                VerticalAlignment="Center"
-                                ToolTipService.ToolTip="Copy ID"
-                                Opacity="0"> <!-- Interaction handled in code-behind -->
-                            <FontIcon Glyph="&#xE8C8;" FontSize="14"/>
+                        <!--  Actions - Copy (Next to Name)  -->
+                        <controls:CopyButton
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Click="CopyButton_Click"
+                            Grid.Column="2"
+                            Height="28"
+                            Margin="4,0,0,0"
+                            Opacity="0"
+                            Padding="4"
+                            Tag="{x:Bind ((vm:ModelItemViewModel)Content).Id, Mode=OneWay}"
+                            ToolTipService.ToolTip="Copy ID"
+                            VerticalAlignment="Center"
+                            Width="28"
+                            x:Name="CopyBtn">
+                            <!--  Interaction handled in code-behind  -->
+                            <FontIcon FontSize="14" Glyph="&#xE8C8;" />
                         </controls:CopyButton>
 
-                        <!-- Actions - Favorite (Far Right) -->
-                        <Button Grid.Column="4" x:Name="FavoriteBtn"
-                                Command="{x:Bind ((vm:ModelItemViewModel)Content).ToggleFavoriteCommand}"
-                                Background="Transparent"
-                                BorderThickness="0"
-                                Padding="4"
-                                Width="28" Height="28"
-                                VerticalAlignment="Center"
-                                ToolTipService.ToolTip="Favorite"
-                                Opacity="{x:Bind ((vm:ModelItemViewModel)Content).IsFavorite, Converter={StaticResource BoolToOpacity}, Mode=OneWay}">
-                            <FontIcon Glyph="{x:Bind ((vm:ModelItemViewModel)Content).IsFavorite, Mode=OneWay, Converter={StaticResource BoolToGlyphConverter}, ConverterParameter='Fill'}" 
-                                      FontSize="14" 
-                                      Foreground="{x:Bind ((vm:ModelItemViewModel)Content).IsFavorite, Mode=OneWay, Converter={StaticResource BoolToBrushConverter}}"/>
+                        <!--  Actions - Favorite (Far Right)  -->
+                        <Button
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Command="{x:Bind ((vm:ModelItemViewModel)Content).ToggleFavoriteCommand}"
+                            Grid.Column="4"
+                            Height="28"
+                            Opacity="{x:Bind ((vm:ModelItemViewModel)Content).IsFavorite, Converter={StaticResource BoolToOpacity}, Mode=OneWay}"
+                            Padding="4"
+                            ToolTipService.ToolTip="Favorite"
+                            VerticalAlignment="Center"
+                            Width="28"
+                            x:Name="FavoriteBtn">
+                            <FontIcon
+                                FontSize="14"
+                                Foreground="{x:Bind ((vm:ModelItemViewModel)Content).IsFavorite, Mode=OneWay, Converter={StaticResource BoolToBrushConverter}}"
+                                Glyph="{x:Bind ((vm:ModelItemViewModel)Content).IsFavorite, Mode=OneWay, Converter={StaticResource BoolToGlyphConverter}, ConverterParameter='Fill'}" />
                         </Button>
                     </Grid>
 
@@ -135,23 +168,35 @@
             <DataTemplate x:DataType="muxc:TreeViewNode" x:Key="ProviderGroupTemplate">
                 <ctk:DataRow>
                     <!--  Provider Name & Icon  -->
-                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                         <!-- Icon -->
-                         <Grid AllowDrop="False" Width="16" Height="16">
-                             <FontIcon Glyph="{x:Bind ((vm:ProviderGroupViewModel)Content).DefaultGlyph}" 
-                                       Visibility="{x:Bind ((vm:ProviderGroupViewModel)Content).IsCustomIcon, Converter={StaticResource NegBoolToVis}, Mode=OneWay}"
-                                       FontSize="16"/>
-                             <BitmapIcon UriSource="{x:Bind ((vm:ProviderGroupViewModel)Content).IconUri, Mode=OneWay}"
-                                         ShowAsMonochrome="False"
-                                         Visibility="{x:Bind ((vm:ProviderGroupViewModel)Content).IsCustomIcon, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
-                         </Grid>
-                         
-                         <TextBlock
+                    <StackPanel
+                        Background="Transparent"
+                        DoubleTapped="ProviderGroup_DoubleTapped"
+                        MinHeight="24"
+                        Orientation="Horizontal"
+                        Spacing="8"
+                        ToolTipService.ToolTip="Double click to edit provider settings"
+                        VerticalAlignment="Center">
+                        <!--  Icon  -->
+                        <Grid
+                            AllowDrop="False"
+                            Height="16"
+                            Width="16">
+                            <FontIcon
+                                FontSize="16"
+                                Glyph="{x:Bind ((vm:ProviderGroupViewModel)Content).DefaultGlyph}"
+                                Visibility="{x:Bind ((vm:ProviderGroupViewModel)Content).IsCustomIcon, Converter={StaticResource NegBoolToVis}, Mode=OneWay}" />
+                            <BitmapIcon
+                                ShowAsMonochrome="False"
+                                UriSource="{x:Bind ((vm:ProviderGroupViewModel)Content).IconUri, Mode=OneWay}"
+                                Visibility="{x:Bind ((vm:ProviderGroupViewModel)Content).IsCustomIcon, Converter={StaticResource BoolToVis}, Mode=OneWay}" />
+                        </Grid>
+
+                        <TextBlock
                             FontWeight="SemiBold"
                             Text="{x:Bind ((vm:ProviderGroupViewModel)Content).ProviderName}"
                             VerticalAlignment="Center" />
                     </StackPanel>
-                    
+
                     <!--  Empty cells for alignment  -->
                     <TextBlock />
                     <TextBlock />
@@ -159,11 +204,6 @@
                 </ctk:DataRow>
             </DataTemplate>
 
-            <!--  Template Selector  -->
-            <helpers:ModelsItemTemplateSelector
-                ModelTemplate="{StaticResource ModelItemTemplate}"
-                ProviderTemplate="{StaticResource ProviderGroupTemplate}"
-                x:Key="ModelsItemTemplateSelector" />
         </ResourceDictionary>
     </Page.Resources>
 
@@ -174,7 +214,7 @@
         </Grid.RowDefinitions>
 
         <!--  Header  -->
-        <Grid ColumnSpacing="24">
+        <Grid ColumnSpacing="12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
@@ -182,66 +222,273 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
+            <!--  Search Box  -->
             <TextBox
-                HorizontalAlignment="Left"
+                Grid.Column="1"
+                HorizontalAlignment="Right"
                 PlaceholderText="Search models..."
                 Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 Width="300"
                 x:Uid="Models_SearchBox" />
 
-            <!--  Filters & Sort  -->
-            <!--  Capability  -->
-            <StackPanel
-                Grid.Column="1"
-                Margin="0,0,0,6"
-                Orientation="Horizontal"
-                Spacing="8"
-                VerticalAlignment="Bottom">
-                <TextBlock
-                    Style="{ThemeResource BodyTextBlockStyle}"
-                    Text="Capability:"
-                    VerticalAlignment="Center"
-                    x:Uid="Models_Capability" />
-                <ComboBox
-                    ItemsSource="{x:Bind ViewModel.Capabilities}"
-                    SelectedItem="{x:Bind ViewModel.SelectedCapability, Mode=TwoWay}"
-                    Width="140" />
-            </StackPanel>
+            <!--  Filter Button  -->
+            <DropDownButton Grid.Column="2" ToolTipService.ToolTip="Filter">
+                <DropDownButton.Content>
+                    <FontIcon FontSize="16" Glyph="&#xE71C;" />
+                </DropDownButton.Content>
+                <DropDownButton.Flyout>
+                    <Flyout Placement="Bottom">
+                        <StackPanel Spacing="16" Width="350">
+                            <!--  Header + Reset Button  -->
+                            <Grid>
+                                <TextBlock
+                                    FontWeight="SemiBold"
+                                    Text="Filters"
+                                    VerticalAlignment="Center" />
+                                <Button
+                                    Click="ResetFilters_Click"
+                                    Content="Reset"
+                                    HorizontalAlignment="Right"
+                                    Style="{StaticResource TextBlockButtonStyle}" />
+                            </Grid>
 
-            <!--  Sort  -->
-            <StackPanel
-                Grid.Column="2"
-                Margin="0,0,0,6"
-                Orientation="Horizontal"
-                Spacing="8"
-                VerticalAlignment="Bottom">
-                <TextBlock
-                    Style="{ThemeResource BodyTextBlockStyle}"
-                    Text="Sort by:"
-                    VerticalAlignment="Center"
-                    x:Uid="Models_SortBy" />
-                <ComboBox
-                    ItemsSource="{x:Bind ViewModel.SortOptions}"
-                    SelectedItem="{x:Bind ViewModel.SelectedSortOption, Mode=TwoWay}"
-                    Width="140" />
-            </StackPanel>
+                            <!--  Capability Section  -->
+                            <StackPanel Spacing="8">
+                                <TextBlock FontWeight="SemiBold" Text="Capability" />
+                                <ctk:Segmented
+                                    ItemContainerStyle="{StaticResource CustomSegmentedItemStyle}"
+                                    SelectionMode="Multiple"
+                                    Style="{StaticResource ButtonSegmentedStyle}">
+                                    <ctk:SegmentedItem
+                                        Content="Text"
+                                        IsSelected="{x:Bind ViewModel.IsTextSelected, Mode=TwoWay}"
+                                        ToolTipService.ToolTip="Text/Chat models" />
+                                    <ctk:SegmentedItem
+                                        Content="File"
+                                        IsSelected="{x:Bind ViewModel.IsFileSelected, Mode=TwoWay}"
+                                        ToolTipService.ToolTip="File processing models" />
+                                    <ctk:SegmentedItem
+                                        Content="Image"
+                                        IsSelected="{x:Bind ViewModel.IsImageSelected, Mode=TwoWay}"
+                                        ToolTipService.ToolTip="Image models" />
+                                    <ctk:SegmentedItem
+                                        Content="Audio"
+                                        IsSelected="{x:Bind ViewModel.IsAudioSelected, Mode=TwoWay}"
+                                        ToolTipService.ToolTip="Audio models" />
+                                    <ctk:SegmentedItem
+                                        Content="Video"
+                                        IsSelected="{x:Bind ViewModel.IsVideoSelected, Mode=TwoWay}"
+                                        ToolTipService.ToolTip="Video models" />
+                                    <ctk:SegmentedItem
+                                        Content="Embeddings"
+                                        IsSelected="{x:Bind ViewModel.IsEmbeddingsSelected, Mode=TwoWay}"
+                                        ToolTipService.ToolTip="Embedding models" />
+                                </ctk:Segmented>
+                            </StackPanel>
 
+                            <!--  Price Range Section  -->
+                            <StackPanel Spacing="4">
+                                <TextBlock FontWeight="SemiBold" Text="Prompt Pricing" />
 
-            <ToggleButton
-                Grid.Column="3"
-                IsChecked="{x:Bind ViewModel.ShowFavoritesOnly, Mode=TwoWay}"
-                Margin="0,0,0,6"
-                VerticalAlignment="Bottom">
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <FontIcon FontSize="16" Glyph="&#xE735;" />
-                    <TextBlock Text="Favorites" x:Uid="Models_Favorites" />
-                </StackPanel>
-            </ToggleButton>
+                                <ctk:RangeSelector
+                                    Maximum="6"
+                                    Minimum="0"
+                                    RangeEnd="{x:Bind ViewModel.MaxPriceIndex, Mode=TwoWay}"
+                                    RangeStart="{x:Bind ViewModel.MinPriceIndex, Mode=TwoWay}"
+                                    StepFrequency="1"
+                                    x:Name="PriceRangeSelector" />
+
+                                <!--  Ticks  -->
+                                <Grid Margin="0,-8,0,0" Padding="8,0,8,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Rectangle
+                                        Fill="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Grid.Column="0"
+                                        Height="4"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Top"
+                                        Width="1" />
+                                    <Rectangle
+                                        Fill="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Grid.Column="1"
+                                        Height="4"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Top"
+                                        Width="1" />
+                                    <Rectangle
+                                        Fill="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Grid.Column="2"
+                                        Height="4"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Top"
+                                        Width="1" />
+                                    <Rectangle
+                                        Fill="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Grid.Column="3"
+                                        Height="4"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Top"
+                                        Width="1" />
+                                    <Rectangle
+                                        Fill="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Grid.Column="4"
+                                        Height="4"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Top"
+                                        Width="1" />
+                                    <Rectangle
+                                        Fill="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Grid.Column="5"
+                                        Height="4"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Top"
+                                        Width="1" />
+                                    <Rectangle
+                                        Fill="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Grid.Column="5"
+                                        Height="4"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Top"
+                                        Width="1" />
+                                </Grid>
+
+                                <!--  Tick Labels  -->
+                                <Grid Margin="0,0,0,-4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <!--  0: Free  -->
+                                    <TextBlock
+                                        FontSize="10"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Grid.Column="0"
+                                        HorizontalAlignment="Left"
+                                        Text="Free" />
+
+                                    <!--  1: 0.1  -->
+                                    <TextBlock
+                                        FontSize="10"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Grid.Column="0"
+                                        Grid.ColumnSpan="2"
+                                        HorizontalAlignment="Center">
+                                        <Run Text="{x:Bind ViewModel.CurrencySymbol, Mode=OneWay}" /><Run Text="0.1" />
+                                    </TextBlock>
+
+                                    <!--  2: 0.2  -->
+                                    <TextBlock
+                                        FontSize="10"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Grid.Column="1"
+                                        Grid.ColumnSpan="2"
+                                        HorizontalAlignment="Center">
+                                        <Run Text="{x:Bind ViewModel.CurrencySymbol, Mode=OneWay}" /><Run Text="0.2" />
+                                    </TextBlock>
+
+                                    <!--  3: 0.5  -->
+                                    <TextBlock
+                                        FontSize="10"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Grid.Column="2"
+                                        Grid.ColumnSpan="2"
+                                        HorizontalAlignment="Center">
+                                        <Run Text="{x:Bind ViewModel.CurrencySymbol, Mode=OneWay}" /><Run Text="0.5" />
+                                    </TextBlock>
+
+                                    <!--  4: 1  -->
+                                    <TextBlock
+                                        FontSize="10"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Grid.Column="3"
+                                        Grid.ColumnSpan="2"
+                                        HorizontalAlignment="Center">
+                                        <Run Text="{x:Bind ViewModel.CurrencySymbol, Mode=OneWay}" /><Run Text="1" />
+                                    </TextBlock>
+
+                                    <!--  5: 5  -->
+                                    <TextBlock
+                                        FontSize="10"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Grid.Column="4"
+                                        Grid.ColumnSpan="2"
+                                        HorizontalAlignment="Center">
+                                        <Run Text="{x:Bind ViewModel.CurrencySymbol, Mode=OneWay}" /><Run Text="5" />
+                                    </TextBlock>
+
+                                    <!--  6: 10+  -->
+                                    <TextBlock
+                                        FontSize="10"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Grid.Column="5"
+                                        HorizontalAlignment="Right">
+                                        <Run Text="{x:Bind ViewModel.CurrencySymbol, Mode=OneWay}" /><Run Text="10+" />
+                                    </TextBlock>
+                                </Grid>
+                            </StackPanel>
+
+                            <!--  Favorites Filter  -->
+                            <StackPanel Spacing="8">
+                                <TextBlock FontWeight="SemiBold" Text="Status" />
+                                <CheckBox Content="Show favorites only" IsChecked="{x:Bind ViewModel.ShowFavoritesOnly, Mode=TwoWay}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Flyout>
+                </DropDownButton.Flyout>
+            </DropDownButton>
+
+            <!--  Sort Button  -->
+            <DropDownButton Grid.Column="3" ToolTipService.ToolTip="Sort">
+                <DropDownButton.Content>
+                    <FontIcon FontSize="16" Glyph="&#xE8CB;" />
+                </DropDownButton.Content>
+                <DropDownButton.Flyout>
+                    <MenuFlyout Placement="Bottom">
+                        <RadioMenuFlyoutItem
+                            Click="SortOption_Click"
+                            GroupName="Sort"
+                            IsChecked="{x:Bind ViewModel.SortOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=NameAsc, Mode=OneWay}"
+                            Tag="NameAsc"
+                            Text="Name (A-Z)" />
+                        <RadioMenuFlyoutItem
+                            Click="SortOption_Click"
+                            GroupName="Sort"
+                            IsChecked="{x:Bind ViewModel.SortOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=NameDesc, Mode=OneWay}"
+                            Tag="NameDesc"
+                            Text="Name (Z-A)" />
+                        <MenuFlyoutSeparator />
+                        <RadioMenuFlyoutItem
+                            Click="SortOption_Click"
+                            GroupName="Sort"
+                            IsChecked="{x:Bind ViewModel.SortOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=PriceLowHigh, Mode=OneWay}"
+                            Tag="PriceLowHigh"
+                            Text="Pricing: Low to High" />
+                        <RadioMenuFlyoutItem
+                            Click="SortOption_Click"
+                            GroupName="Sort"
+                            IsChecked="{x:Bind ViewModel.SortOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=PriceHighLow, Mode=OneWay}"
+                            Tag="PriceHighLow"
+                            Text="Pricing: High to Low" />
+
+                    </MenuFlyout>
+                </DropDownButton.Flyout>
+            </DropDownButton>
+
         </Grid>
 
-        <!--  Content: HeaderedTreeView with DataTable  -->
-        <!--  Grid.ColumnSpan="4" to fix width issue if Grid has columns defined in prev implementation (it doesn't, main grid has 1 col usually)  -->
-        <!--  Wait, main grid has 2 rows.  -->
+        <!--  HeaderedTreeView with DataTable  -->
         <ctk:HeaderedTreeView
             Grid.Row="1"
             ItemTemplateSelector="{StaticResource ModelsItemTemplateSelector}"
@@ -253,9 +500,9 @@
                     <!--  Model Name Column  -->
                     <ctk:DataColumn Content="Model Name" DesiredWidth="*" />
                     <!--  Input Price Column  -->
-                    <ctk:DataColumn Content="Input ($/1M)" DesiredWidth="150" />
+                    <ctk:DataColumn Content="Input ($/1M)" DesiredWidth="160" />
                     <!--  Output Price Column  -->
-                    <ctk:DataColumn Content="Output ($/1M)" DesiredWidth="150" />
+                    <ctk:DataColumn Content="Output ($/1M)" DesiredWidth="160" />
                 </ctk:DataTable>
             </ctk:HeaderedTreeView.Header>
         </ctk:HeaderedTreeView>

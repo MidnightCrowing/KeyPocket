@@ -152,8 +152,6 @@ public partial class SettingsViewModel : ObservableObject
         if (string.IsNullOrWhiteSpace(NewCurrencyCode) || string.IsNullOrWhiteSpace(NewCurrencySymbol))
             return false;
 
-        // Code usually 3 letters, but user said 'specifications'
-        // Let's enforce non-empty and maybe no digits for code, max len is controlled by UI
         var code = NewCurrencyCode.Trim();
         if (code.Any(char.IsDigit) || code.Length < 2) return false;
 
@@ -313,8 +311,6 @@ public partial class SettingsViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanAddCustomRate))]
     private void AddCustomRate()
     {
-        // Check for NaN or 0/negative if applicable, though 0 might be valid technically but weird for rate. 
-        // Let's assume > 0 is required usually, but user didn't specify validation strictness.
         if (!double.IsNaN(NewRateValue))
         {
             if (string.IsNullOrWhiteSpace(NewRateSource) || string.IsNullOrWhiteSpace(NewRateTarget)) return;
