@@ -22,11 +22,49 @@ public sealed partial class ModelsPage : Page
     {
         // Reload data when navigated to ensure we have latest providers/models
         ViewModel.LoadData();
+        UpdateTreeView();
+
+        // Subscribe to property changes to update tree
+        ViewModel.PropertyChanged += ViewModel_PropertyChanged;
 
         // 如果提供了搜索参数（模型 ID），设置搜索文本
         if (e.Parameter is string modelId && !string.IsNullOrEmpty(modelId)) ViewModel.SearchText = modelId;
 
         base.OnNavigatedTo(e);
+    }
+
+    protected override void OnNavigatedFrom(NavigationEventArgs e)
+    {
+        ViewModel.PropertyChanged -= ViewModel_PropertyChanged;
+        base.OnNavigatedFrom(e);
+    }
+
+    private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ModelsViewModel.GroupedModels))
+        {
+            UpdateTreeView();
+        }
+    }
+
+    private void UpdateTreeView()
+    {
+        ModelsTreeView.RootNodes.Clear();
+
+        if (ViewModel.GroupedModels == null) return;
+
+        foreach (var group in ViewModel.GroupedModels)
+        {
+            var groupNode = new TreeViewNode { Content = group, IsExpanded = true };
+            
+            foreach (var model in group.Models)
+            {
+                var modelNode = new TreeViewNode { Content = model };
+                groupNode.Children.Add(modelNode);
+            }
+
+            ModelsTreeView.RootNodes.Add(groupNode);
+        }
     }
 
     private void CopyButton_Click(object sender, RoutedEventArgs e)

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -11,6 +12,8 @@ public partial class ModelsViewModel : ObservableObject
     private readonly ProviderService _providerService;
 
     [ObservableProperty] private ObservableCollection<ModelItemViewModel> _filteredModels = new();
+    
+    [ObservableProperty] private ObservableCollection<ProviderGroupViewModel> _groupedModels = new();
 
     [ObservableProperty] private string _searchText = string.Empty;
 
@@ -100,6 +103,7 @@ public partial class ModelsViewModel : ObservableObject
         else if (SelectedCapability == "Embedding") query = query.Where(m => m.IsEmbeddingModel);
 
         // 4. Sorting
+        // This sorting applies to the flat list (FilteredModels)
         query = SelectedSortOption switch
         {
             "Name" => query.OrderBy(m => m.DisplayName),
@@ -109,5 +113,29 @@ public partial class ModelsViewModel : ObservableObject
         };
 
         FilteredModels = new ObservableCollection<ModelItemViewModel>(query);
+        
+        // 5. Generate Grouped Data for Tree View
+        // Define explicit provider order based on _providerService.GetAllProviders()
+        // We can re-fetch or cache. LoadData already fetches, let's rely on _sortedProviders from there if we add it, 
+        // or just fetch here since it's cheap (local JSON config).
+        var providers = _providerService.GetAllProviders();
+        var providerOrderMap = providers
+            .Select((p, index) => new { p.Name, Index = index })
+            .ToDictionary(x => x.Name, x => x.Index);
+
+        var grouped = query
+            .GroupBy(m => new { m.ProviderName, m.ProviderIcon })
+            .AsEnumerable() // Switch to client-side eval (safe for lists) to use custom sort
+            .OrderBy(g => providerOrderMap.TryGetValue(g.Key.ProviderName, out var index) ? index : int.MaxValue)
+            .Select(g => new ProviderGroupViewModel
+            {
+                ProviderName = g.Key.ProviderName,
+                ProviderIcon = g.Key.ProviderIcon,
+                // Inner sorting: Alphabetical by DisplayName
+                Models = g.OrderBy(m => m.DisplayName).ToList()
+            })
+            .ToList();
+            
+        GroupedModels = new ObservableCollection<ProviderGroupViewModel>(grouped);
     }
 }
