@@ -17,8 +17,13 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Controls/CopyButton.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <!-- Converters -->
             <converters:BoolToVisibilityConverter x:Key="BoolToVis" />
             <converters:NegatedBoolToVisibilityConverter x:Key="NegBoolToVis" />
+            <converters:BoolToDoubleConverter x:Key="BoolToOpacity" />
+            <converters:FavoriteIconConverter x:Key="BoolToGlyphConverter" />
+            <converters:FavoriteColorConverter x:Key="BoolToBrushConverter" />
 
             <!--  Model Item Template  -->
             <DataTemplate x:DataType="muxc:TreeViewNode" x:Key="ModelItemTemplate">
@@ -26,27 +31,70 @@
                     <!--  Provider column (Spacer)  -->
                     <TextBlock />
 
-                    <!--  Model Name + Copy Button  -->
-                    <Grid HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <!--  Model Name + Actions (Favorite/Copy)  -->
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                          PointerEntered="ModelItem_PointerEntered"
+                          PointerExited="ModelItem_PointerExited"
+                          Background="Transparent"> <!-- Transparent background to catch pointer events -->
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
+
+                        <!-- Derived Model Icon (Custom Avatar Style) -->
+                        <Grid Width="20" Height="20" Margin="0,0,8,0" VerticalAlignment="Center">
+                            <Border CornerRadius="10"
+                                    Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                    BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
+                                    BorderThickness="1.5"
+                                    Visibility="{x:Bind ((vm:ModelItemViewModel)Content).HasModelIcon, Converter={StaticResource BoolToVis}, Mode=OneWay}">
+                                <BitmapIcon UriSource="{x:Bind ((vm:ModelItemViewModel)Content).ModelIconUri, Mode=OneWay}"
+                                            ShowAsMonochrome="False"
+                                            Width="12" Height="12"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"/>
+                            </Border>
+                        </Grid>
+
+                        <!-- Name -->
                         <TextBlock
+                            Grid.Column="1"
                             Text="{x:Bind ((vm:ModelItemViewModel)Content).DisplayName}"
                             TextTrimming="CharacterEllipsis"
                             VerticalAlignment="Center" />
-                        <controls:CopyButton
-                            Click="CopyButton_Click"
-                            Content="&#xE8C8;"
-                            Grid.Column="1"
-                            Height="28"
-                            Margin="8,0,0,0"
-                            Padding="4"
-                            Tag="{x:Bind ((vm:ModelItemViewModel)Content).Id, Mode=OneWay}"
-                            ToolTipService.ToolTip="Copy ID"
-                            Width="28"
-                            x:Uid="Models_CopyID" />
+
+                        <!-- Actions - Copy (Next to Name) -->
+                        <controls:CopyButton Grid.Column="2" x:Name="CopyBtn"
+                                Click="CopyButton_Click"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Padding="4"
+                                Width="28" Height="28"
+                                Margin="4,0,0,0"
+                                Tag="{x:Bind ((vm:ModelItemViewModel)Content).Id, Mode=OneWay}"
+                                VerticalAlignment="Center"
+                                ToolTipService.ToolTip="Copy ID"
+                                Opacity="0"> <!-- Interaction handled in code-behind -->
+                            <FontIcon Glyph="&#xE8C8;" FontSize="14"/>
+                        </controls:CopyButton>
+
+                        <!-- Actions - Favorite (Far Right) -->
+                        <Button Grid.Column="4" x:Name="FavoriteBtn"
+                                Command="{x:Bind ((vm:ModelItemViewModel)Content).ToggleFavoriteCommand}"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Padding="4"
+                                Width="28" Height="28"
+                                VerticalAlignment="Center"
+                                ToolTipService.ToolTip="Favorite"
+                                Opacity="{x:Bind ((vm:ModelItemViewModel)Content).IsFavorite, Converter={StaticResource BoolToOpacity}, Mode=OneWay}">
+                            <FontIcon Glyph="{x:Bind ((vm:ModelItemViewModel)Content).IsFavorite, Mode=OneWay, Converter={StaticResource BoolToGlyphConverter}, ConverterParameter='Fill'}" 
+                                      FontSize="14" 
+                                      Foreground="{x:Bind ((vm:ModelItemViewModel)Content).IsFavorite, Mode=OneWay, Converter={StaticResource BoolToBrushConverter}}"/>
+                        </Button>
                     </Grid>
 
                     <!--  Input Price  -->
@@ -86,11 +134,24 @@
             <!--  Provider Group Template  -->
             <DataTemplate x:DataType="muxc:TreeViewNode" x:Key="ProviderGroupTemplate">
                 <ctk:DataRow>
-                    <!--  Provider Name  -->
-                    <TextBlock
-                        FontWeight="SemiBold"
-                        Text="{x:Bind ((vm:ProviderGroupViewModel)Content).ProviderName}"
-                        VerticalAlignment="Center" />
+                    <!--  Provider Name & Icon  -->
+                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                         <!-- Icon -->
+                         <Grid AllowDrop="False" Width="16" Height="16">
+                             <FontIcon Glyph="{x:Bind ((vm:ProviderGroupViewModel)Content).DefaultGlyph}" 
+                                       Visibility="{x:Bind ((vm:ProviderGroupViewModel)Content).IsCustomIcon, Converter={StaticResource NegBoolToVis}, Mode=OneWay}"
+                                       FontSize="16"/>
+                             <BitmapIcon UriSource="{x:Bind ((vm:ProviderGroupViewModel)Content).IconUri, Mode=OneWay}"
+                                         ShowAsMonochrome="False"
+                                         Visibility="{x:Bind ((vm:ProviderGroupViewModel)Content).IsCustomIcon, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+                         </Grid>
+                         
+                         <TextBlock
+                            FontWeight="SemiBold"
+                            Text="{x:Bind ((vm:ProviderGroupViewModel)Content).ProviderName}"
+                            VerticalAlignment="Center" />
+                    </StackPanel>
+                    
                     <!--  Empty cells for alignment  -->
                     <TextBlock />
                     <TextBlock />

@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.ApplicationModel.DataTransfer;
-using Windows.ApplicationModel.Resources;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -21,8 +19,8 @@ using KeyPocket.Core.Services;
 using KeyPocket.UI.Helpers;
 using KeyPocket.UI.Messages;
 using Microsoft.UI.Dispatching;
-using Microsoft.UI.Xaml.Controls;
 using WinRT.Interop;
+using UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding;
 
 namespace KeyPocket.UI.ViewModels;
 
@@ -72,7 +70,7 @@ public partial class ProviderSettingsViewModel : ObservableObject
         _providerCurrency = provider.Currency;
         LoadKeys(Provider);
         LoadModels(Provider);
-        HasCustomIcon = !string.IsNullOrEmpty(provider.IconPath);
+        HasCustomIcon = ProviderIconHelper.HasCustomIcon(provider.IconPath);
 
         LoadDefaultIcons();
 
@@ -171,7 +169,7 @@ public partial class ProviderSettingsViewModel : ObservableObject
             }
 
             // Update property
-            HasCustomIcon = !string.IsNullOrEmpty(Provider.IconPath);
+            HasCustomIcon = ProviderIconHelper.HasCustomIcon(Provider.IconPath);
 
             // Notify sidebar to update icon
             WeakReferenceMessenger.Default.Send(new ProviderUpdatedMessage(Provider.Id));
@@ -424,8 +422,8 @@ public partial class ProviderSettingsViewModel : ObservableObject
     // --- Models ---
 
     /// <summary>
-    /// Refreshes the Models collection incrementally, preserving editing state.
-    /// Only updates/adds changed models, does not clear the entire list.
+    ///     Refreshes the Models collection incrementally, preserving editing state.
+    ///     Only updates/adds changed models, does not clear the entire list.
     /// </summary>
     /// <param name="current">Optional provider to load from, otherwise reloads from service</param>
     private void RefreshModels(Provider? current = null)
@@ -438,10 +436,9 @@ public partial class ProviderSettingsViewModel : ObservableObject
         try
         {
             var existingWrapperIds = Models.Select(w => w.Id).ToHashSet(StringComparer.OrdinalIgnoreCase);
-            
+
             // Add new models that don't exist in UI
             foreach (var model in Provider.Models)
-            {
                 if (!existingWrapperIds.Contains(model.Id))
                 {
                     var wrapper = new ModelWrapper
@@ -454,19 +451,19 @@ public partial class ProviderSettingsViewModel : ObservableObject
                         IsFavorite = model.IsFavorite,
                         IsEditing = false
                     };
-                    
+
                     wrapper.InputPrice = wrapper.InputPriceValue.ToString();
                     wrapper.OutputPrice = wrapper.OutputPriceValue.ToString();
-                    
+
                     InjectModelCommands(wrapper);
                     Models.Add(wrapper);
                 }
-            }
-            
+
             // Update existing wrappers that were modified (only if not editing)
             foreach (var wrapper in Models.ToList())
             {
-                var model = Provider.Models.FirstOrDefault(m => m.Id.Equals(wrapper.Id, StringComparison.OrdinalIgnoreCase));
+                var model = Provider.Models.FirstOrDefault(m =>
+                    m.Id.Equals(wrapper.Id, StringComparison.OrdinalIgnoreCase));
                 if (model != null && !wrapper.IsEditing)
                 {
                     // Update wrapper properties from reloaded model
@@ -475,7 +472,7 @@ public partial class ProviderSettingsViewModel : ObservableObject
                     wrapper.OutputPriceValue = (double)(model.OutputPricePerMTokens ?? 0);
                     wrapper.InputCurrency = Provider.Currency ?? "USD";
                     wrapper.IsFavorite = model.IsFavorite;
-                    
+
                     wrapper.InputPrice = wrapper.InputPriceValue.ToString();
                     wrapper.OutputPrice = wrapper.OutputPriceValue.ToString();
                 }
@@ -493,8 +490,8 @@ public partial class ProviderSettingsViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Loads models from scratch, clearing the entire list. 
-    /// Use RefreshModels() instead to preserve editing state.
+    ///     Loads models from scratch, clearing the entire list.
+    ///     Use RefreshModels() instead to preserve editing state.
     /// </summary>
     [Obsolete("Use RefreshModels() instead to preserve editing state")]
     private void LoadModels(Provider? current = null)
@@ -736,7 +733,6 @@ public partial class ProviderSettingsViewModel : ObservableObject
     private void OnApiKeysCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (_isSyncingOrder || _providerService == null) return;
-        if (_isSyncingOrder || _providerService == null) return;
         SyncApiKeysOrder();
     }
 
@@ -768,7 +764,6 @@ public partial class ProviderSettingsViewModel : ObservableObject
 
     private void OnModelsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        if (_isSyncingOrder || _providerService == null) return;
         if (_isSyncingOrder || _providerService == null) return;
         SyncModelsOrder();
     }
@@ -890,7 +885,7 @@ public partial class ProviderSettingsViewModel : ObservableObject
             csvContent.AppendLine("eg:gpt-3.5-turbo,GPT-3.5 Turbo,0.001,0.002,Chat");
             csvContent.AppendLine("eg:text-embedding-3-small,Text Embedding Small,0.000,,Embedding");
 
-            await FileIO.WriteTextAsync(file, csvContent.ToString(), Windows.Storage.Streams.UnicodeEncoding.Utf8);
+            await FileIO.WriteTextAsync(file, csvContent.ToString(), UnicodeEncoding.Utf8);
         }
         catch (Exception)
         {
@@ -914,7 +909,7 @@ public partial class ProviderSettingsViewModel : ObservableObject
             var file = await openPicker.PickSingleFileAsync();
             if (file == null) return;
 
-            var csvText = await FileIO.ReadTextAsync(file, Windows.Storage.Streams.UnicodeEncoding.Utf8);
+            var csvText = await FileIO.ReadTextAsync(file, UnicodeEncoding.Utf8);
             var lines = csvText.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
             if (lines.Length < 2)
@@ -927,8 +922,10 @@ public partial class ProviderSettingsViewModel : ObservableObject
             var header = ParseCsvLine(lines[0]);
             var modelIdIndex = Array.FindIndex(header, h => h.Equals("ModelId", StringComparison.OrdinalIgnoreCase));
             var nameIndex = Array.FindIndex(header, h => h.Equals("Name", StringComparison.OrdinalIgnoreCase));
-            var inputPriceIndex = Array.FindIndex(header, h => h.Equals("InputPrice", StringComparison.OrdinalIgnoreCase));
-            var outputPriceIndex = Array.FindIndex(header, h => h.Equals("OutputPrice", StringComparison.OrdinalIgnoreCase));
+            var inputPriceIndex =
+                Array.FindIndex(header, h => h.Equals("InputPrice", StringComparison.OrdinalIgnoreCase));
+            var outputPriceIndex =
+                Array.FindIndex(header, h => h.Equals("OutputPrice", StringComparison.OrdinalIgnoreCase));
             var typeIndex = Array.FindIndex(header, h => h.Equals("Type", StringComparison.OrdinalIgnoreCase));
 
             if (modelIdIndex == -1)
@@ -937,11 +934,10 @@ public partial class ProviderSettingsViewModel : ObservableObject
                 return;
             }
 
-            int successCount = 0;
-            int skipCount = 0;
+            var successCount = 0;
+            var skipCount = 0;
 
-            for (int i = 1; i < lines.Length; i++)
-            {
+            for (var i = 1; i < lines.Length; i++)
                 try
                 {
                     var fields = ParseCsvLine(lines[i]);
@@ -952,7 +948,7 @@ public partial class ProviderSettingsViewModel : ObservableObject
                     }
 
                     var modelId = fields[modelIdIndex].Trim();
-                    
+
                     // Skip example data with eg: prefix
                     if (modelId.StartsWith("eg:", StringComparison.OrdinalIgnoreCase))
                     {
@@ -960,26 +956,25 @@ public partial class ProviderSettingsViewModel : ObservableObject
                         continue;
                     }
 
-                    var displayName = nameIndex >= 0 && nameIndex < fields.Length && !string.IsNullOrWhiteSpace(fields[nameIndex])
+                    var displayName = nameIndex >= 0 && nameIndex < fields.Length &&
+                                      !string.IsNullOrWhiteSpace(fields[nameIndex])
                         ? fields[nameIndex].Trim()
                         : FormatDefaultModelName(modelId);
 
                     decimal? inputPrice = null;
                     if (inputPriceIndex >= 0 && inputPriceIndex < fields.Length)
-                    {
-                        if (decimal.TryParse(fields[inputPriceIndex], NumberStyles.Any, CultureInfo.InvariantCulture, out var ip))
+                        if (decimal.TryParse(fields[inputPriceIndex], NumberStyles.Any, CultureInfo.InvariantCulture,
+                                out var ip))
                             inputPrice = Math.Round(ip, 3);
-                    }
 
                     decimal? outputPrice = null;
                     if (outputPriceIndex >= 0 && outputPriceIndex < fields.Length)
-                    {
-                        if (decimal.TryParse(fields[outputPriceIndex], NumberStyles.Any, CultureInfo.InvariantCulture, out var op))
+                        if (decimal.TryParse(fields[outputPriceIndex], NumberStyles.Any, CultureInfo.InvariantCulture,
+                                out var op))
                             outputPrice = Math.Round(op, 3);
-                    }
 
-                    bool isChatModel = true;
-                    bool isEmbeddingModel = false;
+                    var isChatModel = true;
+                    var isEmbeddingModel = false;
                     if (typeIndex >= 0 && typeIndex < fields.Length)
                     {
                         var typeValue = fields[typeIndex].Trim();
@@ -991,7 +986,8 @@ public partial class ProviderSettingsViewModel : ObservableObject
                     }
 
                     // Upsert logic: check if model exists in Provider.Models
-                    var existingModel = Provider.Models.FirstOrDefault(m => m.Id.Equals(modelId, StringComparison.OrdinalIgnoreCase));
+                    var existingModel =
+                        Provider.Models.FirstOrDefault(m => m.Id.Equals(modelId, StringComparison.OrdinalIgnoreCase));
                     if (existingModel != null)
                     {
                         // Update existing model
@@ -1023,7 +1019,6 @@ public partial class ProviderSettingsViewModel : ObservableObject
                 {
                     skipCount++;
                 }
-            }
 
             // Save all changes at once
             _providerService.UpdateProvider(Provider);
@@ -1119,6 +1114,14 @@ public partial class KeyWrapper : ObservableObject
 
 public partial class ModelWrapper : ObservableObject
 {
+    public ModelWrapper()
+    {
+        WeakReferenceMessenger.Default.Register<ThemeChangedMessage>(this, (r, m) =>
+        {
+            OnPropertyChanged(nameof(ModelIconUri));
+            OnPropertyChanged(nameof(HasModelIcon));
+        });
+    }
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ProviderSymbol))]
     [NotifyPropertyChangedFor(nameof(InputPriceDisplay))]
@@ -1154,6 +1157,24 @@ public partial class ModelWrapper : ObservableObject
     private double _outputPriceValue;
 
     public string Id { get; set; } = string.Empty;
+
+    public Uri? ModelIconUri
+    {
+        get
+        {
+            // Use Name if Id lookup fails? Or just Id? ModelItemViewModel uses Id then DisplayName.
+            // ModelWrapper has Name property for DisplayName.
+            // Use Id first, then Name.
+            var iconName = ProviderIconHelper.GetIconForModel(Id) ?? ProviderIconHelper.GetIconForModel(Name);
+            if (!string.IsNullOrEmpty(iconName))
+            {
+                return ProviderIconHelper.GetPresetIconUri(iconName, ThemeHelper.IsDarkTheme());
+            }
+            return null;
+        }
+    }
+
+    public bool HasModelIcon => ModelIconUri != null;
 
     public bool IsReadOnly => !IsEditing;
 

@@ -28,11 +28,11 @@ public sealed partial class ProviderSettingsPage : Page, INotifyPropertyChanged
     private double _generalTop;
     private double _modelsTop;
     private Border? _stickyApiKeys;
+    private InfoBadge? _stickyApiKeysBadge;
 
     // Sticky Headers fields
     private Border? _stickyGeneral;
     private Border? _stickyModels;
-    private InfoBadge? _stickyApiKeysBadge;
     private InfoBadge? _stickyModelsBadge;
     private ProviderSettingsViewModel? _viewModel;
 
@@ -44,10 +44,25 @@ public sealed partial class ProviderSettingsPage : Page, INotifyPropertyChanged
         InitializeComponent();
         Loaded += OnPageLoaded;
         Unloaded += OnPageUnloaded;
-        
+
         // Register message receiver for CSV import results
         WeakReferenceMessenger.Default.Register<CsvImportResultMessage>(this, OnCsvImportResult);
     }
+
+    public ProviderSettingsViewModel? ViewModel
+    {
+        get => _viewModel;
+        private set
+        {
+            if (_viewModel != value)
+            {
+                _viewModel = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ViewModel)));
+            }
+        }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     private void OnPageUnloaded(object sender, RoutedEventArgs e)
     {
@@ -92,21 +107,6 @@ public sealed partial class ProviderSettingsPage : Page, INotifyPropertyChanged
         CsvImportInfoBar.Message = messageText;
         CsvImportInfoBar.IsOpen = true;
     }
-
-    public ProviderSettingsViewModel? ViewModel
-    {
-        get => _viewModel;
-        private set
-        {
-            if (_viewModel != value)
-            {
-                _viewModel = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ViewModel)));
-            }
-        }
-    }
-
-    public event PropertyChangedEventHandler? PropertyChanged;
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
@@ -422,10 +422,10 @@ public sealed partial class ProviderSettingsPage : Page, INotifyPropertyChanged
         var stackPanel = new StackPanel { Spacing = 4 };
 
         // Title row with badge
-        var titleRow = new StackPanel 
-        { 
-            Orientation = Orientation.Horizontal, 
-            Spacing = 8 
+        var titleRow = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 8
         };
 
         var titleBlock = new TextBlock

@@ -1,8 +1,9 @@
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 using KeyPocket.Core.Services;
+using KeyPocket.UI.Messages;
 
 namespace KeyPocket.UI.ViewModels;
 
@@ -12,7 +13,7 @@ public partial class ModelsViewModel : ObservableObject
     private readonly ProviderService _providerService;
 
     [ObservableProperty] private ObservableCollection<ModelItemViewModel> _filteredModels = new();
-    
+
     [ObservableProperty] private ObservableCollection<ProviderGroupViewModel> _groupedModels = new();
 
     [ObservableProperty] private string _searchText = string.Empty;
@@ -27,6 +28,12 @@ public partial class ModelsViewModel : ObservableObject
     {
         _providerService = providerService;
         LoadData();
+
+        // Register for theme changes to update icons
+        WeakReferenceMessenger.Default.Register<ThemeChangedMessage>(this, (r, m) =>
+        {
+            App.MainWindow.DispatcherQueue.TryEnqueue(ApplyFilters);
+        });
     }
 
     public ObservableCollection<string> Capabilities { get; } = new()
@@ -113,7 +120,7 @@ public partial class ModelsViewModel : ObservableObject
         };
 
         FilteredModels = new ObservableCollection<ModelItemViewModel>(query);
-        
+
         // 5. Generate Grouped Data for Tree View
         // Define explicit provider order based on _providerService.GetAllProviders()
         // We can re-fetch or cache. LoadData already fetches, let's rely on _sortedProviders from there if we add it, 
@@ -135,7 +142,7 @@ public partial class ModelsViewModel : ObservableObject
                 Models = g.OrderBy(m => m.DisplayName).ToList()
             })
             .ToList();
-            
+
         GroupedModels = new ObservableCollection<ProviderGroupViewModel>(grouped);
     }
 }

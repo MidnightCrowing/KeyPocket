@@ -1,3 +1,5 @@
+using System.ComponentModel;
+using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
 using KeyPocket.UI.Controls;
 using KeyPocket.UI.ViewModels;
@@ -39,12 +41,9 @@ public sealed partial class ModelsPage : Page
         base.OnNavigatedFrom(e);
     }
 
-    private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(ModelsViewModel.GroupedModels))
-        {
-            UpdateTreeView();
-        }
+        if (e.PropertyName == nameof(ModelsViewModel.GroupedModels)) UpdateTreeView();
     }
 
     private void UpdateTreeView()
@@ -56,7 +55,7 @@ public sealed partial class ModelsPage : Page
         foreach (var group in ViewModel.GroupedModels)
         {
             var groupNode = new TreeViewNode { Content = group, IsExpanded = true };
-            
+
             foreach (var model in group.Models)
             {
                 var modelNode = new TreeViewNode { Content = model };
@@ -69,11 +68,67 @@ public sealed partial class ModelsPage : Page
 
     private void CopyButton_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is CopyButton button && button.Tag is string text)
+        // Copy logic is handled by command or direct clipboard
+        if (sender is Button button && button.Tag is string text)
         {
             var package = new DataPackage();
             package.SetText(text);
             Clipboard.SetContent(package);
+        }
+    }
+
+    private void ModelItem_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        if (sender is Grid grid)
+        {
+            var children = grid.Children;
+            Button? copyBtn = null;
+            Button? favBtn = null;
+
+            foreach (var child in children)
+            {
+                if (child is Button btn)
+                {
+                    int col = Grid.GetColumn(btn);
+                    if (col == 2) copyBtn = btn;
+                    else if (col == 4) favBtn = btn;
+                }
+            }
+
+            if (favBtn != null) favBtn.Opacity = 1;
+            if (copyBtn != null) copyBtn.Opacity = 1;
+        }
+    }
+
+    private void ModelItem_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        if (sender is Grid grid)
+        {
+            var children = grid.Children;
+            Button? copyBtn = null;
+            Button? favBtn = null;
+
+            foreach (var child in children)
+            {
+                if (child is Button btn)
+                {
+                    int col = Grid.GetColumn(btn);
+                    if (col == 2) copyBtn = btn;
+                    else if (col == 4) favBtn = btn;
+                }
+            }
+
+            if (copyBtn != null) copyBtn.Opacity = 0;
+
+            if (favBtn != null)
+            {
+                bool isFavorite = false;
+                if (grid.DataContext is TreeViewNode node && node.Content is ModelItemViewModel vm)
+                {
+                    isFavorite = vm.IsFavorite;
+                }
+                favBtn.Opacity = isFavorite ? 1 : 0;
+            }
         }
     }
 }

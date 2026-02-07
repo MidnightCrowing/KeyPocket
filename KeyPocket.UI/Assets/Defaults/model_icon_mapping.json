@@ -1,0 +1,66 @@
+{
+  "openai": [
+    "openai",
+    "gpt",
+    "o1",
+    "o3",
+    "o4"
+  ],
+  "anthropic": [
+    "claude"
+  ],
+  "gemini": [
+    "gemini"
+  ],
+  "gork": [
+    "gork"
+  ],
+  "cohere": [
+    "command"
+  ],
+  "meta": [
+    "llama",
+    "meta"
+  ],
+  "amazon": [
+    "nova"
+  ],
+  "qwen": [
+    "qwen"
+  ],
+  "yi": [
+    "yi"
+  ],
+  "deepseek": [
+    "deepseek"
+  ],
+  "mistral": [
+    "mistral",
+    "mixtral"
+  ],
+  "z.ai": [
+    "glm"
+  ],
+  "doubao": [
+    "doubao"
+  ],
+  "minimax": [
+    "minimax"
+  ],
+  "huggingface": [
+    "huggingface"
+  ],
+  "arcee": [
+    "arcee"
+  ],
+  "microsoft": [
+    "azure",
+    "microsoft"
+  ],
+  "nvidia": [
+    "nvidia"
+  ],
+  "openrouter": [
+    "router"
+  ]
+}

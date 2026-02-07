@@ -1,6 +1,5 @@
 using System;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using KeyPocket.Core.Models;
@@ -118,45 +117,23 @@ public partial class ProviderViewModel : ObservableObject
     public void UpdateIcon(string type, string? iconPath = null)
     {
         // 1. Try resolving Icon
-        if (!string.IsNullOrEmpty(iconPath))
+        if (ProviderIconHelper.HasCustomIcon(iconPath))
         {
-            // 判断是否为预设名称
-            if (ProviderIconHelper.IsPresetName(iconPath))
+            var isDark = ThemeHelper.IsDarkTheme();
+            var uri = ProviderIconHelper.GetIconUri(iconPath, isDark);
+
+            if (uri != null)
             {
-                // 预设名称（如 "openai"）
-                var isDark = ThemeHelper.IsDarkTheme();
-                var uri = ProviderIconHelper.GetPresetIconUri(iconPath, isDark);
                 CustomIconSource = new BitmapImage(uri);
                 IsCustomIcon = true;
                 return;
             }
-
-            // 自定义文件路径
-            try
-            {
-                // Direct absolute path check
-                if (File.Exists(iconPath))
-                {
-                    CustomIconSource = new BitmapImage(new Uri(iconPath));
-                    IsCustomIcon = true;
-                    return;
-                }
-
-                // Try as URI (e.g., web URL or appx URI not covered by File.Exists)
-                CustomIconSource = new BitmapImage(new Uri(iconPath));
-                IsCustomIcon = true;
-                return;
-            }
-            catch
-            {
-                // Fall through to default
-            }
         }
 
-        // 2. Fallback to default icon based on type
+        // 2. Fallback to default icon
         IsCustomIcon = false;
         CustomIconSource = null;
-        Icon = "\uE99A"; // Default icon for all types
+        Icon = ProviderIconHelper.DefaultIconGlyph;
     }
 
     public void RefreshIcon()

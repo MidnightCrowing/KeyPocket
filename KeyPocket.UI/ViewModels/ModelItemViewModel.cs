@@ -1,7 +1,9 @@
 using System;
 using Windows.ApplicationModel.DataTransfer;
+using KeyPocket.UI.Messages;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using KeyPocket.Core.Models;
 using KeyPocket.Core.Services;
 using KeyPocket.UI.Helpers;
@@ -27,7 +29,29 @@ public partial class ModelItemViewModel : ObservableObject
         _providerIcon = providerIcon;
         _providerCurrency = providerCurrency ?? "USD";
         _providerService = providerService;
+
+        // Listen for theme changes to update icon
+        WeakReferenceMessenger.Default.Register<ThemeChangedMessage>(this, (r, m) =>
+        {
+            OnPropertyChanged(nameof(ModelIconUri));
+            OnPropertyChanged(nameof(HasModelIcon));
+        });
     }
+
+    public Uri? ModelIconUri
+    {
+        get
+        {
+            var iconName = ProviderIconHelper.GetIconForModel(Id) ?? ProviderIconHelper.GetIconForModel(DisplayName);
+            if (!string.IsNullOrEmpty(iconName))
+            {
+                return ProviderIconHelper.GetPresetIconUri(iconName, ThemeHelper.IsDarkTheme());
+            }
+            return null; // Or fallback to ProviderIcon? Let's keep it null for now to only show special ones.
+        }
+    }
+
+    public bool HasModelIcon => ModelIconUri != null;
 
     public string Id => _model.Id;
     public string DisplayName => _model.DisplayName;

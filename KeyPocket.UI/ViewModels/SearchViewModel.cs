@@ -4,6 +4,8 @@ using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using KeyPocket.Core.Services;
 using KeyPocket.UI.Helpers;
+using System.IO;
+using Windows.Storage;
 using KeyPocket.UI.Models;
 
 namespace KeyPocket.UI.ViewModels;
@@ -43,30 +45,25 @@ public partial class SearchViewModel : ObservableObject
                 };
 
                 // 设置图标
-                if (!string.IsNullOrEmpty(p.IconPath))
+                if (ProviderIconHelper.HasCustomIcon(p.IconPath))
                 {
-                    // 有自定义图标路径
-                    if (ProviderIconHelper.IsPresetName(p.IconPath))
+                    var uri = ProviderIconHelper.GetIconUri(p.IconPath, isDark);
+                    if (uri != null)
                     {
-                        // 预设名称（如 "openai"）
                         item.IconKind = IconType.ImagePath;
-                        item.IconPath = ProviderIconHelper.GetPresetIconUri(p.IconPath, isDark);
+                        item.IconPath = uri;
                     }
                     else
                     {
-                        // 自定义文件路径
-                        item.IconKind = IconType.ImagePath;
-                        var iconUri = p.IconPath.StartsWith("ms-appx://") || p.IconPath.StartsWith("http")
-                            ? p.IconPath
-                            : $"ms-appx:///{p.IconPath.TrimStart('/')}";
-                        item.IconPath = new Uri(iconUri);
+                        item.IconKind = IconType.Glyph;
+                        item.Icon = ProviderIconHelper.DefaultIconGlyph;
                     }
                 }
                 else
                 {
                     // 使用默认图标
                     item.IconKind = IconType.Glyph;
-                    item.Icon = "\uE99A"; // Provider icon
+                    item.Icon = ProviderIconHelper.DefaultIconGlyph;
                 }
 
                 return item;
@@ -79,20 +76,40 @@ public partial class SearchViewModel : ObservableObject
             .SelectMany(p => p.Models.Select(m => new { Model = m, ProviderName = p.Name }))
             .Where(x => x.Model.Id.Contains(query, StringComparison.OrdinalIgnoreCase) ||
                         (x.Model.DisplayName?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false))
-            .Take(5)
-            .Select(x => new SearchResultItem
+            .Take(5);
+
+        foreach (var x in models)
+        {
+            var item = new SearchResultItem
             {
                 Title = x.Model.DisplayName ?? x.Model.Id,
                 Description = $"Model · {x.ProviderName}",
                 Type = SearchResultType.Model,
                 Data = x.Model.Id,
-                Icon = "\uF158" // AI icon
-            });
+                Icon = "\uF158", // Fallback AI icon
+                IconKind = IconType.Glyph
+            };
 
-        foreach (var model in models) SearchResults.Add(model);
+            // Try to resolve model icon
+            var iconName = ProviderIconHelper.GetIconForModel(x.Model.Id) ??
+                           ProviderIconHelper.GetIconForModel(x.Model.DisplayName);
+
+            if (!string.IsNullOrEmpty(iconName))
+            {
+                var uri = ProviderIconHelper.GetPresetIconUri(iconName, isDark);
+                if (uri != null)
+                {
+                    item.IconPath = uri;
+                    item.IconKind = IconType.ImagePath;
+                }
+            }
+            
+            SearchResults.Add(item);
+        }
 
         // 3. 特殊关键词：crash.log
         if (lowerQuery.Contains("crash") || lowerQuery.Contains("log"))
+        {
             SearchResults.Add(new SearchResultItem
             {
                 Title = "crash.log",
@@ -101,5 +118,26 @@ public partial class SearchViewModel : ObservableObject
                 Data = CrashLogHelper.GetCrashLogPath(),
                 Icon = "\uE7C3" // Page icon
             });
+        }
+
+        // 4. 特殊关键词：model_icon_mapping.json
+        if (lowerQuery.Contains("icon") || lowerQuery.Contains("mapping") || lowerQuery.Contains("json"))
+        {
+            var localFolder = ApplicationData.Current.LocalFolder;
+            var mappingFile = Path.Combine(localFolder.Path, "model_icon_mapping.json");
+            
+            // Ensure file exists (ProviderIconHelper handles copying if needed, but let's be safe)
+            if (File.Exists(mappingFile))
+            {
+                SearchResults.Add(new SearchResultItem
+                {
+                    Title = "model_icon_mapping.json",
+                    Description = "Model Icon Mapping Configuration",
+                    Type = SearchResultType.SystemFile,
+                    Data = mappingFile,
+                    Icon = "\uE7C3" // Page icon
+                });
+            }
+        }
     }
 }

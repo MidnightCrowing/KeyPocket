@@ -12,7 +12,6 @@ using KeyPocket.UI.ViewModels;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 
 namespace KeyPocket.UI;
@@ -79,6 +78,8 @@ public sealed partial class MainWindow
 
     private void UpdateAllSidebarIcons()
     {
+        var isDark = ThemeHelper.IsDarkTheme();
+
         // 1. Update Sidebar items
         // Recursively or iterate menu items
         foreach (var item in NavView.MenuItems)
@@ -90,7 +91,7 @@ public sealed partial class MainWindow
                     {
                         var provider = ViewModel.Providers.FirstOrDefault(p => p.Id == pid);
                         if (provider != null)
-                            navItem.Icon = ResolveIconElement(provider.IconPath, provider.DefaultIconGlyph);
+                            navItem.Icon = ProviderIconHelper.ResolveIconElement(provider.IconPath, isDark);
                     }
                 }
                 catch
@@ -98,8 +99,6 @@ public sealed partial class MainWindow
                 }
 
         // 2. Notify other components (like HomeViewModel)
-        var isDark = true;
-        if (Content is FrameworkElement root) isDark = root.ActualTheme == ElementTheme.Dark;
         WeakReferenceMessenger.Default.Send(new ThemeChangedMessage(isDark));
     }
 
@@ -135,7 +134,8 @@ public sealed partial class MainWindow
         if (insertIndex == -1) return;
 
         // Create Icon using helper
-        var icon = ResolveIconElement(provider.IconPath, provider.DefaultIconGlyph);
+        var isDark = ThemeHelper.IsDarkTheme();
+        var icon = ProviderIconHelper.ResolveIconElement(provider.IconPath, isDark);
 
         var navItem = new NavigationViewItem
         {
@@ -153,38 +153,13 @@ public sealed partial class MainWindow
                     navItem.Content = p.Name;
                 else if (e.PropertyName == nameof(SidebarProviderItem.IconPath) ||
                          e.PropertyName == nameof(SidebarProviderItem.Type))
-                    navItem.Icon = ResolveIconElement(p.IconPath, p.DefaultIconGlyph);
+                    navItem.Icon = ProviderIconHelper.ResolveIconElement(p.IconPath, isDark);
             }
         };
 
         NavView.MenuItems.Insert(insertIndex, navItem);
     }
 
-    private IconElement ResolveIconElement(string? iconPath, string defaultGlyph)
-    {
-        if (string.IsNullOrEmpty(iconPath)) return new FontIcon { Glyph = defaultGlyph };
-
-        // 判断是否为预设名称
-        if (ProviderIconHelper.IsPresetName(iconPath))
-        {
-            // 预设名称（如 "openai"）
-            var isDark = true;
-            if (Content is FrameworkElement root) isDark = root.ActualTheme == ElementTheme.Dark;
-
-            var uri = ProviderIconHelper.GetPresetIconUri(iconPath, isDark);
-            return new ImageIcon { Source = new BitmapImage(uri) };
-        }
-
-        // 自定义文件路径
-        try
-        {
-            return new ImageIcon { Source = new BitmapImage(new Uri(iconPath)) };
-        }
-        catch
-        {
-            return new FontIcon { Glyph = defaultGlyph };
-        }
-    }
 
     private void RemoveProviderFromSidebar(Guid providerId)
     {

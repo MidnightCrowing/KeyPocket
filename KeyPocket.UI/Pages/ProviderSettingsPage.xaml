@@ -224,7 +224,7 @@
                                 Text="API Keys"
                                 VerticalAlignment="Center"
                                 x:Uid="ProviderSettings_ApiKeys" />
-                            <InfoBadge Value="{x:Bind ViewModel.ApiKeys.Count, Mode=OneWay}" />  
+                            <InfoBadge Value="{x:Bind ViewModel.ApiKeys.Count, Mode=OneWay}" />
                         </StackPanel>
                         <TextBlock
                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
@@ -467,11 +467,16 @@
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
 
-                                            <TextBlock
-                                                Grid.Column="0"
-                                                Style="{StaticResource BodyStrongTextBlockStyle}"
-                                                Text="{x:Bind Name, Mode=OneWay}"
-                                                VerticalAlignment="Center" />
+                                            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                <BitmapIcon UriSource="{x:Bind ModelIconUri, Mode=OneWay}"
+                                                            ShowAsMonochrome="False"
+                                                            Width="14" Height="14"
+                                                            Visibility="{x:Bind HasModelIcon, Converter={StaticResource BoolToVisConverter}, Mode=OneWay}"/>
+                                                <TextBlock
+                                                    Style="{StaticResource BodyStrongTextBlockStyle}"
+                                                    Text="{x:Bind Name, Mode=OneWay}"
+                                                    VerticalAlignment="Center" />
+                                            </StackPanel>
 
                                             <!--  Price Info  -->
                                             <Grid
@@ -721,23 +726,19 @@
                             <Button x:Uid="ProviderSettings_Import">
                                 <Button.Flyout>
                                     <MenuFlyout Placement="Bottom">
-                                        <MenuFlyoutItem
-                                            Command="{x:Bind ViewModel.ImportCsvCommand, Mode=OneWay}"
-                                            x:Uid="ProviderSettings_ImportFromCsv" />
-                                        <MenuFlyoutItem
-                                            Command="{x:Bind ViewModel.GenerateCsvTemplateCommand, Mode=OneWay}"
-                                            x:Uid="ProviderSettings_CreateCsvTemplate" />
+                                        <MenuFlyoutItem Command="{x:Bind ViewModel.ImportCsvCommand, Mode=OneWay}" x:Uid="ProviderSettings_ImportFromCsv" />
+                                        <MenuFlyoutItem Command="{x:Bind ViewModel.GenerateCsvTemplateCommand, Mode=OneWay}" x:Uid="ProviderSettings_CreateCsvTemplate" />
                                     </MenuFlyout>
                                 </Button.Flyout>
                             </Button>
                         </StackPanel>
-                        
-                        <!-- CSV Import Result InfoBar -->
+
+                        <!--  CSV Import Result InfoBar  -->
                         <InfoBar
-                            x:Name="CsvImportInfoBar"
+                            IsClosable="True"
                             IsOpen="False"
                             Margin="0,8,0,0"
-                            IsClosable="True" />
+                            x:Name="CsvImportInfoBar" />
                     </StackPanel>
                 </Grid>
 

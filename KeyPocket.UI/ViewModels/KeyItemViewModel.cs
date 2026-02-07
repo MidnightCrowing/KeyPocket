@@ -28,21 +28,6 @@ public partial class KeyItemViewModel : ObservableObject
         Initialize();
     }
 
-    private void Initialize()
-    {
-        // Decrypt to generate mask
-        var rawKey = _providerService.GetDecryptedApiKey(_apiKey.ProviderId, _apiKey.Id);
-        if (string.IsNullOrEmpty(rawKey))
-        {
-            MaskedKey = "Error: Cannot Decrypt";
-            DisplayKey = MaskedKey; // Ensure DisplayKey is set
-            return;
-        }
-
-        MaskedKey = GenerateMask(rawKey);
-        DisplayKey = MaskedKey;
-    }
-
     public Guid Id => _apiKey.Id;
     public Guid ProviderId => _apiKey.ProviderId;
     public string ProviderName { get; }
@@ -92,6 +77,21 @@ public partial class KeyItemViewModel : ObservableObject
                 OnPropertyChanged();
             }
         }
+    }
+
+    private void Initialize()
+    {
+        // Decrypt to generate mask
+        var rawKey = _providerService.GetDecryptedApiKey(_apiKey.ProviderId, _apiKey.Id);
+        if (string.IsNullOrEmpty(rawKey))
+        {
+            MaskedKey = "Error: Cannot Decrypt";
+            DisplayKey = MaskedKey; // Ensure DisplayKey is set
+            return;
+        }
+
+        MaskedKey = GenerateMask(rawKey);
+        DisplayKey = MaskedKey;
     }
 
     private string GenerateMask(string key)
