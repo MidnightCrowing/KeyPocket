@@ -155,7 +155,7 @@
     <value>KeyPocket</value>
   </data>
   <data name="Settings_AboutExpander.Description" xml:space="preserve">
-    <value>© 2026 MidnightCrowing.</value>
+    <value>© 2026 KeyPocket Community.</value>
   </data>
   <data name="Settings_GitHub.Header" xml:space="preserve">
     <value>GitHub</value>
@@ -223,6 +223,12 @@
   </data>
   <data name="Home_AddFirstProvider.Content" xml:space="preserve">
     <value>新增你的第一個服務商</value>
+  </data>
+  <data name="Home_Disclaimer.Title" xml:space="preserve">
+    <value>免責聲明</value>
+  </data>
+  <data name="Home_Disclaimer.Message" xml:space="preserve">
+    <value>本軟體並非專業的金鑰管理解決方案。如果您有專業的安全需求,請使用專業的密碼管理器或企業級金鑰管理系統。</value>
   </data>
   <data name="ProviderSettings_Title.Text" xml:space="preserve">
     <value>服務商設定</value>
@@ -298,6 +304,15 @@
   </data>
   <data name="ProviderSettings_ModelsDesc.Text" xml:space="preserve">
     <value>設定可用模型。</value>
+  </data>
+  <data name="ProviderSettings_Import.Content" xml:space="preserve">
+    <value>匯入</value>
+  </data>
+  <data name="ProviderSettings_ImportFromCsv.Text" xml:space="preserve">
+    <value>從 CSV 匯入</value>
+  </data>
+  <data name="ProviderSettings_CreateCsvTemplate.Text" xml:space="preserve">
+    <value>建立 CSV 範本</value>
   </data>
   <data name="ProviderSettings_AddModel.Content" xml:space="preserve">
     <value>新增模型</value>

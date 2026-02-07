@@ -134,32 +134,39 @@
                             </StackPanel>
                         </StackPanel>
 
-                        <StackPanel Spacing="8">
-                            <TextBlock
-                                Style="{StaticResource BodyStrongTextBlockStyle}"
-                                Text="Base URL"
-                                x:Uid="ProviderSettings_BaseUrl" />
-                            <TextBox
-                                PlaceholderText="https://api.openai.com/v1"
-                                Text="{x:Bind ViewModel.BaseUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                x:Uid="ProviderSettings_BaseUrlPlaceholder" />
-                            <TextBlock
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                Style="{StaticResource CaptionTextBlockStyle}"
-                                Text="The base URL of the API provider."
-                                x:Uid="ProviderSettings_BaseUrlDesc" />
-                        </StackPanel>
+                        <Grid ColumnSpacing="24">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3*" />
+                                <ColumnDefinition Width="7*" />
+                            </Grid.ColumnDefinitions>
 
-                        <StackPanel Spacing="8">
-                            <TextBlock
-                                Style="{StaticResource BodyStrongTextBlockStyle}"
-                                Text="API Mode"
-                                x:Uid="ProviderSettings_ApiMode" />
-                            <ComboBox
-                                HorizontalAlignment="Stretch"
-                                ItemsSource="{x:Bind ViewModel.ProviderTypes, Mode=OneWay}"
-                                SelectedIndex="{x:Bind ViewModel.TypeIndex, Mode=TwoWay}" />
-                        </StackPanel>
+                            <StackPanel Grid.Column="0" Spacing="8">
+                                <TextBlock
+                                    Style="{StaticResource BodyStrongTextBlockStyle}"
+                                    Text="API Mode"
+                                    x:Uid="ProviderSettings_ApiMode" />
+                                <ComboBox
+                                    HorizontalAlignment="Stretch"
+                                    ItemsSource="{x:Bind ViewModel.ProviderTypes, Mode=OneWay}"
+                                    SelectedIndex="{x:Bind ViewModel.TypeIndex, Mode=TwoWay}" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Spacing="8">
+                                <TextBlock
+                                    Style="{StaticResource BodyStrongTextBlockStyle}"
+                                    Text="Base URL"
+                                    x:Uid="ProviderSettings_BaseUrl" />
+                                <TextBox
+                                    PlaceholderText="https://api.openai.com/v1"
+                                    Text="{x:Bind ViewModel.BaseUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    x:Uid="ProviderSettings_BaseUrlPlaceholder" />
+                                <TextBlock
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Style="{StaticResource CaptionTextBlockStyle}"
+                                    Text="The base URL of the API provider."
+                                    x:Uid="ProviderSettings_BaseUrlDesc" />
+                            </StackPanel>
+                        </Grid>
 
                         <StackPanel Spacing="8">
                             <TextBlock
@@ -211,10 +218,14 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel Spacing="4" x:Name="ApiKeysHeader">
-                        <TextBlock
-                            Style="{StaticResource SubtitleTextBlockStyle}"
-                            Text="API Keys"
-                            x:Uid="ProviderSettings_ApiKeys" />
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock
+                                Style="{StaticResource SubtitleTextBlockStyle}"
+                                Text="API Keys"
+                                VerticalAlignment="Center"
+                                x:Uid="ProviderSettings_ApiKeys" />
+                            <InfoBadge Value="{x:Bind ViewModel.ApiKeys.Count, Mode=OneWay}" />  
+                        </StackPanel>
                         <TextBlock
                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                             Style="{StaticResource CaptionTextBlockStyle}"
@@ -402,10 +413,14 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel Spacing="4" x:Name="ModelsHeader">
-                        <TextBlock
-                            Style="{StaticResource SubtitleTextBlockStyle}"
-                            Text="Models"
-                            x:Uid="ProviderSettings_Models" />
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock
+                                Style="{StaticResource SubtitleTextBlockStyle}"
+                                Text="Models"
+                                VerticalAlignment="Center"
+                                x:Uid="ProviderSettings_Models" />
+                            <InfoBadge Value="{x:Bind ViewModel.Models.Count, Mode=OneWay}" />
+                        </StackPanel>
                         <TextBlock
                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                             Style="{StaticResource CaptionTextBlockStyle}"
@@ -703,11 +718,26 @@
                                 Command="{x:Bind ViewModel.AddModelCommand, Mode=OneWay}"
                                 Content="Add Model"
                                 x:Uid="ProviderSettings_AddModel" />
-                            <Button
-                                Content="Fetch Models"
-                                ToolTipService.ToolTip="Fetch available models from provider"
-                                x:Uid="ProviderSettings_FetchModels" />
+                            <Button x:Uid="ProviderSettings_Import">
+                                <Button.Flyout>
+                                    <MenuFlyout Placement="Bottom">
+                                        <MenuFlyoutItem
+                                            Command="{x:Bind ViewModel.ImportCsvCommand, Mode=OneWay}"
+                                            x:Uid="ProviderSettings_ImportFromCsv" />
+                                        <MenuFlyoutItem
+                                            Command="{x:Bind ViewModel.GenerateCsvTemplateCommand, Mode=OneWay}"
+                                            x:Uid="ProviderSettings_CreateCsvTemplate" />
+                                    </MenuFlyout>
+                                </Button.Flyout>
+                            </Button>
                         </StackPanel>
+                        
+                        <!-- CSV Import Result InfoBar -->
+                        <InfoBar
+                            x:Name="CsvImportInfoBar"
+                            IsOpen="False"
+                            Margin="0,8,0,0"
+                            IsClosable="True" />
                     </StackPanel>
                 </Grid>
 

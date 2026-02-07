@@ -43,7 +43,9 @@ public sealed partial class HomePage : Page
 
     private void UpdateVisualState()
     {
-        EmptyStatePanel.Visibility = ViewModel.IsEmpty ? Visibility.Visible : Visibility.Collapsed;
+        var isEmpty = ViewModel.IsEmpty;
+        EmptyStatePanel.Visibility = isEmpty ? Visibility.Visible : Visibility.Collapsed;
+        DisclaimerInfoBar.Visibility = isEmpty ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void OnAddProviderClicked(object sender, RoutedEventArgs e)

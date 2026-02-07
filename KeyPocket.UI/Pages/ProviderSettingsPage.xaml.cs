@@ -7,7 +7,9 @@ using Windows.Foundation;
 using Windows.Storage.Pickers;
 using Windows.System;
 using Windows.UI;
+using CommunityToolkit.Mvvm.Messaging;
 using KeyPocket.UI.Helpers;
+using KeyPocket.UI.Messages;
 using KeyPocket.UI.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -30,6 +32,8 @@ public sealed partial class ProviderSettingsPage : Page, INotifyPropertyChanged
     // Sticky Headers fields
     private Border? _stickyGeneral;
     private Border? _stickyModels;
+    private InfoBadge? _stickyApiKeysBadge;
+    private InfoBadge? _stickyModelsBadge;
     private ProviderSettingsViewModel? _viewModel;
 
     public ProviderSettingsPage()
@@ -39,6 +43,54 @@ public sealed partial class ProviderSettingsPage : Page, INotifyPropertyChanged
 
         InitializeComponent();
         Loaded += OnPageLoaded;
+        Unloaded += OnPageUnloaded;
+        
+        // Register message receiver for CSV import results
+        WeakReferenceMessenger.Default.Register<CsvImportResultMessage>(this, OnCsvImportResult);
+    }
+
+    private void OnPageUnloaded(object sender, RoutedEventArgs e)
+    {
+        // Unregister message receiver
+        WeakReferenceMessenger.Default.Unregister<CsvImportResultMessage>(this);
+    }
+
+    private void OnCsvImportResult(object recipient, CsvImportResultMessage message)
+    {
+        // Determine InfoBar severity based on results
+        var severity = InfoBarSeverity.Success;
+        string title;
+        string messageText;
+
+        if (message.SuccessCount == 0 && message.SkipCount == 0)
+        {
+            severity = InfoBarSeverity.Warning;
+            title = "No Data";
+            messageText = "The CSV file is empty or has no valid data.";
+        }
+        else if (message.SuccessCount == 0)
+        {
+            severity = InfoBarSeverity.Error;
+            title = "Import Failed";
+            messageText = $"All {message.SkipCount} rows were skipped due to errors.";
+        }
+        else if (message.SkipCount > 0)
+        {
+            severity = InfoBarSeverity.Informational;
+            title = "Import Completed";
+            messageText = $"Successfully imported {message.SuccessCount} models, skipped {message.SkipCount} rows.";
+        }
+        else
+        {
+            severity = InfoBarSeverity.Success;
+            title = "Import Successful";
+            messageText = $"Successfully imported {message.SuccessCount} models.";
+        }
+
+        CsvImportInfoBar.Severity = severity;
+        CsvImportInfoBar.Title = title;
+        CsvImportInfoBar.Message = messageText;
+        CsvImportInfoBar.IsOpen = true;
     }
 
     public ProviderSettingsViewModel? ViewModel
@@ -246,28 +298,37 @@ public sealed partial class ProviderSettingsPage : Page, INotifyPropertyChanged
     {
         var resourceLoader = ResourceLoader.GetForViewIndependentUse();
 
-        // Create sticky header for General
+        // Create sticky header for General (no badge)
         _stickyGeneral = CreateStickyHeaderBorder(
             resourceLoader.GetString("ProviderSettings_General/Text"),
             resourceLoader.GetString("ProviderSettings_GeneralDesc/Text"));
         StickyHeadersCanvas.Children.Add(_stickyGeneral);
 
-        // Create sticky header for API Keys
-        _stickyApiKeys = CreateStickyHeaderBorder(
+        // Create sticky header for API Keys (with badge)
+        (_stickyApiKeys, _stickyApiKeysBadge) = CreateStickyHeaderBorderWithBadge(
             resourceLoader.GetString("ProviderSettings_ApiKeys/Text"),
-            resourceLoader.GetString("ProviderSettings_ApiKeysDesc/Text"));
+            resourceLoader.GetString("ProviderSettings_ApiKeysDesc/Text"),
+            ViewModel?.ApiKeys.Count ?? 0);
         StickyHeadersCanvas.Children.Add(_stickyApiKeys);
 
-        // Create sticky header for Models
-        _stickyModels = CreateStickyHeaderBorder(
+        // Create sticky header for Models (with badge)
+        (_stickyModels, _stickyModelsBadge) = CreateStickyHeaderBorderWithBadge(
             resourceLoader.GetString("ProviderSettings_Models/Text"),
-            resourceLoader.GetString("ProviderSettings_ModelsDesc/Text"));
+            resourceLoader.GetString("ProviderSettings_ModelsDesc/Text"),
+            ViewModel?.Models.Count ?? 0);
         StickyHeadersCanvas.Children.Add(_stickyModels);
 
         // Initially hide all sticky headers
         _stickyGeneral.Visibility = Visibility.Collapsed;
         _stickyApiKeys.Visibility = Visibility.Collapsed;
         _stickyModels.Visibility = Visibility.Collapsed;
+
+        // Subscribe to collection changes to update badge counts
+        if (ViewModel != null)
+        {
+            ViewModel.ApiKeys.CollectionChanged += (s, e) => UpdateStickyBadgeCounts();
+            ViewModel.Models.CollectionChanged += (s, e) => UpdateStickyBadgeCounts();
+        }
     }
 
     private Border CreateStickyHeaderBorder(string title, string subtitle)
@@ -334,6 +395,91 @@ public sealed partial class ProviderSettingsPage : Page, INotifyPropertyChanged
         Canvas.SetZIndex(border, 100);
 
         return border;
+    }
+
+    private (Border, InfoBadge) CreateStickyHeaderBorderWithBadge(string title, string subtitle, int count)
+    {
+        // Determine the current theme
+        var currentTheme = ThemeHelper.Theme == ElementTheme.Default
+            ? Application.Current.RequestedTheme == ApplicationTheme.Dark ? ElementTheme.Dark : ElementTheme.Light
+            : ThemeHelper.Theme;
+
+        var border = new Border
+        {
+            BorderThickness = new Thickness(0, 0, 0, 1),
+            Padding = new Thickness(0, 12, 0, 12),
+            Width = 270, // Match the left column width
+            Height = 70, // Increased height to prevent text clipping
+            RequestedTheme = currentTheme
+        };
+
+        // Manually set colors based on theme
+        if (currentTheme == ElementTheme.Dark)
+            border.Background = new SolidColorBrush(Color.FromArgb(255, 32, 32, 32)); // #202020
+        else
+            border.Background = new SolidColorBrush(Color.FromArgb(255, 243, 243, 243)); // #F3F3F3
+
+        var stackPanel = new StackPanel { Spacing = 4 };
+
+        // Title row with badge
+        var titleRow = new StackPanel 
+        { 
+            Orientation = Orientation.Horizontal, 
+            Spacing = 8 
+        };
+
+        var titleBlock = new TextBlock
+        {
+            Text = title,
+            VerticalAlignment = VerticalAlignment.Center,
+            Style = (Style)Application.Current.Resources["SubtitleTextBlockStyle"]
+        };
+
+        var infoBadge = new InfoBadge
+        {
+            Value = count,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+
+        titleRow.Children.Add(titleBlock);
+        titleRow.Children.Add(infoBadge);
+
+        var subtitleBlock = new TextBlock
+        {
+            Text = subtitle,
+            Style = (Style)Application.Current.Resources["CaptionTextBlockStyle"]
+        };
+
+        // Manually set text colors based on theme
+        if (currentTheme == ElementTheme.Dark)
+        {
+            titleBlock.Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255));
+            subtitleBlock.Foreground = new SolidColorBrush(Color.FromArgb(255, 161, 161, 161));
+        }
+        else
+        {
+            titleBlock.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
+            subtitleBlock.Foreground = new SolidColorBrush(Color.FromArgb(255, 96, 96, 96));
+        }
+
+        stackPanel.Children.Add(titleRow);
+        stackPanel.Children.Add(subtitleBlock);
+        border.Child = stackPanel;
+
+        Canvas.SetLeft(border, 40);
+        Canvas.SetTop(border, 0);
+        Canvas.SetZIndex(border, 100);
+
+        return (border, infoBadge);
+    }
+
+    private void UpdateStickyBadgeCounts()
+    {
+        if (_stickyApiKeysBadge != null && ViewModel != null)
+            _stickyApiKeysBadge.Value = ViewModel.ApiKeys.Count;
+
+        if (_stickyModelsBadge != null && ViewModel != null)
+            _stickyModelsBadge.Value = ViewModel.Models.Count;
     }
 
     private void CalculateSectionPositions()

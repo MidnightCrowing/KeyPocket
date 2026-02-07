@@ -71,17 +71,32 @@
     </Page.Resources>
 
     <Grid Padding="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--  Disclaimer InfoBar (only visible when empty)  -->
+        <InfoBar
+            Grid.Row="0"
+            IsClosable="True"
+            IsOpen="True"
+            Margin="0,0,0,12"
+            Message="This is not a professional key management solution. If you have professional security requirements, please use dedicated password managers or enterprise key management systems."
+            Severity="Warning"
+            Title="Disclaimer"
+            Visibility="Collapsed"
+            x:Name="DisclaimerInfoBar"
+            x:Uid="Home_Disclaimer" />
+
         <!--  Empty State  -->
         <StackPanel
+            Grid.Row="1"
             HorizontalAlignment="Center"
             Spacing="20"
             VerticalAlignment="Center"
             Visibility="Collapsed"
             x:Name="EmptyStatePanel">
-            <FontIcon
-                FontSize="64"
-                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                Glyph="&#xE78B;" />
             <TextBlock
                 HorizontalAlignment="Center"
                 Style="{StaticResource SubtitleTextBlockStyle}"
@@ -97,6 +112,7 @@
 
         <!--  Content Grid  -->
         <ScrollViewer
+            Grid.Row="1"
             IsHitTestVisible="{x:Bind ViewModel.IsNotEmpty, Mode=OneWay}"
             Padding="0,0,12,0"
             Visibility="{x:Bind ViewModel.IsNotEmpty, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}">

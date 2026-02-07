@@ -17,8 +17,8 @@
     <LangVersion>12.0</LangVersion>
     <ApplicationIcon>Assets\KeyPocket.ico</ApplicationIcon>
     <Title>KeyPocket</Title>
-    <Authors>MidnightCrowing</Authors>
-    <Copyright>© 2026 MidnightCrowing</Copyright>
+    <Authors>KeyPocket Community</Authors>
+    <Copyright>© 2026 KeyPocket Community</Copyright>
     <PackageProjectUrl>https://github.com/MidnightCrowing/KeyPocket</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/MidnightCrowing/KeyPocket/blob/main/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/MidnightCrowing/KeyPocket</RepositoryUrl>
@@ -32,6 +32,7 @@
     <Content Include="Assets\Square44x44Logo.scale-200.png" />
     <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+    <Content Include="Assets\ProviderIcons\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -50,6 +51,7 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="CommunityToolkit.WinUI.Controls.Primitives" Version="8.2.251219" />
     <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.251219" />
+    <PackageReference Include="CommunityToolkit.WinUI.UI.Controls.DataGrid" Version="7.1.2" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7463" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260101001" />
   </ItemGroup>

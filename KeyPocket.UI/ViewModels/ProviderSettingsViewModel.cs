@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.ApplicationModel.Resources;
 using Windows.Storage;
+using Windows.Storage.Pickers;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -16,6 +21,8 @@ using KeyPocket.Core.Services;
 using KeyPocket.UI.Helpers;
 using KeyPocket.UI.Messages;
 using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml.Controls;
+using WinRT.Interop;
 
 namespace KeyPocket.UI.ViewModels;
 
@@ -416,6 +423,80 @@ public partial class ProviderSettingsViewModel : ObservableObject
 
     // --- Models ---
 
+    /// <summary>
+    /// Refreshes the Models collection incrementally, preserving editing state.
+    /// Only updates/adds changed models, does not clear the entire list.
+    /// </summary>
+    /// <param name="current">Optional provider to load from, otherwise reloads from service</param>
+    private void RefreshModels(Provider? current = null)
+    {
+        if (current == null) current = GetProviderFromService(Provider.Id);
+        if (current == null) return;
+        Provider = current;
+
+        _isSyncingOrder = true;
+        try
+        {
+            var existingWrapperIds = Models.Select(w => w.Id).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            
+            // Add new models that don't exist in UI
+            foreach (var model in Provider.Models)
+            {
+                if (!existingWrapperIds.Contains(model.Id))
+                {
+                    var wrapper = new ModelWrapper
+                    {
+                        Id = model.Id,
+                        Name = model.DisplayName,
+                        InputPriceValue = (double)(model.InputPricePerMTokens ?? 0),
+                        OutputPriceValue = (double)(model.OutputPricePerMTokens ?? 0),
+                        InputCurrency = Provider.Currency ?? "USD",
+                        IsFavorite = model.IsFavorite,
+                        IsEditing = false
+                    };
+                    
+                    wrapper.InputPrice = wrapper.InputPriceValue.ToString();
+                    wrapper.OutputPrice = wrapper.OutputPriceValue.ToString();
+                    
+                    InjectModelCommands(wrapper);
+                    Models.Add(wrapper);
+                }
+            }
+            
+            // Update existing wrappers that were modified (only if not editing)
+            foreach (var wrapper in Models.ToList())
+            {
+                var model = Provider.Models.FirstOrDefault(m => m.Id.Equals(wrapper.Id, StringComparison.OrdinalIgnoreCase));
+                if (model != null && !wrapper.IsEditing)
+                {
+                    // Update wrapper properties from reloaded model
+                    wrapper.Name = model.DisplayName;
+                    wrapper.InputPriceValue = (double)(model.InputPricePerMTokens ?? 0);
+                    wrapper.OutputPriceValue = (double)(model.OutputPricePerMTokens ?? 0);
+                    wrapper.InputCurrency = Provider.Currency ?? "USD";
+                    wrapper.IsFavorite = model.IsFavorite;
+                    
+                    wrapper.InputPrice = wrapper.InputPriceValue.ToString();
+                    wrapper.OutputPrice = wrapper.OutputPriceValue.ToString();
+                }
+                else if (model == null)
+                {
+                    // Model was deleted, remove wrapper
+                    Models.Remove(wrapper);
+                }
+            }
+        }
+        finally
+        {
+            _isSyncingOrder = false;
+        }
+    }
+
+    /// <summary>
+    /// Loads models from scratch, clearing the entire list. 
+    /// Use RefreshModels() instead to preserve editing state.
+    /// </summary>
+    [Obsolete("Use RefreshModels() instead to preserve editing state")]
     private void LoadModels(Provider? current = null)
     {
         if (current == null) current = GetProviderFromService(Provider.Id);
@@ -785,6 +866,200 @@ public partial class ProviderSettingsViewModel : ObservableObject
         // Convert to Title Case (e.g. "gpt-4" -> "Gpt-4", "deepseek" -> "Deepseek")
         // ToLower() first to ensure ToTitleCase processes it correctly even if input is ALLCAPS or mixed.
         return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(id.ToLower());
+    }
+
+    [RelayCommand]
+    public async Task GenerateCsvTemplate()
+    {
+        try
+        {
+            var savePicker = new FileSavePicker();
+            var hwnd = WindowNative.GetWindowHandle(App.MainWindow);
+            InitializeWithWindow.Initialize(savePicker, hwnd);
+
+            savePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+            savePicker.FileTypeChoices.Add("CSV File", new List<string> { ".csv" });
+            savePicker.SuggestedFileName = $"{Provider.Name}_models_template";
+
+            var file = await savePicker.PickSaveFileAsync();
+            if (file == null) return;
+
+            var csvContent = new StringBuilder();
+            csvContent.AppendLine("ModelId,Name,InputPrice,OutputPrice,Type");
+            csvContent.AppendLine("eg:gpt-4-turbo,GPT-4 Turbo,0.010,0.030,Chat");
+            csvContent.AppendLine("eg:gpt-3.5-turbo,GPT-3.5 Turbo,0.001,0.002,Chat");
+            csvContent.AppendLine("eg:text-embedding-3-small,Text Embedding Small,0.000,,Embedding");
+
+            await FileIO.WriteTextAsync(file, csvContent.ToString(), Windows.Storage.Streams.UnicodeEncoding.Utf8);
+        }
+        catch (Exception)
+        {
+            // Silently fail or show error dialog
+        }
+    }
+
+    [RelayCommand]
+    public async Task ImportCsv()
+    {
+        try
+        {
+            var openPicker = new FileOpenPicker();
+            var hwnd = WindowNative.GetWindowHandle(App.MainWindow);
+            InitializeWithWindow.Initialize(openPicker, hwnd);
+
+            openPicker.ViewMode = PickerViewMode.List;
+            openPicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+            openPicker.FileTypeFilter.Add(".csv");
+
+            var file = await openPicker.PickSingleFileAsync();
+            if (file == null) return;
+
+            var csvText = await FileIO.ReadTextAsync(file, Windows.Storage.Streams.UnicodeEncoding.Utf8);
+            var lines = csvText.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (lines.Length < 2)
+            {
+                ShowImportResult(0, 0);
+                return;
+            }
+
+            // Parse header
+            var header = ParseCsvLine(lines[0]);
+            var modelIdIndex = Array.FindIndex(header, h => h.Equals("ModelId", StringComparison.OrdinalIgnoreCase));
+            var nameIndex = Array.FindIndex(header, h => h.Equals("Name", StringComparison.OrdinalIgnoreCase));
+            var inputPriceIndex = Array.FindIndex(header, h => h.Equals("InputPrice", StringComparison.OrdinalIgnoreCase));
+            var outputPriceIndex = Array.FindIndex(header, h => h.Equals("OutputPrice", StringComparison.OrdinalIgnoreCase));
+            var typeIndex = Array.FindIndex(header, h => h.Equals("Type", StringComparison.OrdinalIgnoreCase));
+
+            if (modelIdIndex == -1)
+            {
+                ShowImportResult(0, 0);
+                return;
+            }
+
+            int successCount = 0;
+            int skipCount = 0;
+
+            for (int i = 1; i < lines.Length; i++)
+            {
+                try
+                {
+                    var fields = ParseCsvLine(lines[i]);
+                    if (fields.Length <= modelIdIndex || string.IsNullOrWhiteSpace(fields[modelIdIndex]))
+                    {
+                        skipCount++;
+                        continue;
+                    }
+
+                    var modelId = fields[modelIdIndex].Trim();
+                    
+                    // Skip example data with eg: prefix
+                    if (modelId.StartsWith("eg:", StringComparison.OrdinalIgnoreCase))
+                    {
+                        skipCount++;
+                        continue;
+                    }
+
+                    var displayName = nameIndex >= 0 && nameIndex < fields.Length && !string.IsNullOrWhiteSpace(fields[nameIndex])
+                        ? fields[nameIndex].Trim()
+                        : FormatDefaultModelName(modelId);
+
+                    decimal? inputPrice = null;
+                    if (inputPriceIndex >= 0 && inputPriceIndex < fields.Length)
+                    {
+                        if (decimal.TryParse(fields[inputPriceIndex], NumberStyles.Any, CultureInfo.InvariantCulture, out var ip))
+                            inputPrice = Math.Round(ip, 3);
+                    }
+
+                    decimal? outputPrice = null;
+                    if (outputPriceIndex >= 0 && outputPriceIndex < fields.Length)
+                    {
+                        if (decimal.TryParse(fields[outputPriceIndex], NumberStyles.Any, CultureInfo.InvariantCulture, out var op))
+                            outputPrice = Math.Round(op, 3);
+                    }
+
+                    bool isChatModel = true;
+                    bool isEmbeddingModel = false;
+                    if (typeIndex >= 0 && typeIndex < fields.Length)
+                    {
+                        var typeValue = fields[typeIndex].Trim();
+                        if (typeValue.Equals("Embedding", StringComparison.OrdinalIgnoreCase))
+                        {
+                            isEmbeddingModel = true;
+                            isChatModel = false;
+                        }
+                    }
+
+                    // Upsert logic: check if model exists in Provider.Models
+                    var existingModel = Provider.Models.FirstOrDefault(m => m.Id.Equals(modelId, StringComparison.OrdinalIgnoreCase));
+                    if (existingModel != null)
+                    {
+                        // Update existing model
+                        existingModel.DisplayName = displayName;
+                        existingModel.InputPricePerMTokens = inputPrice;
+                        existingModel.OutputPricePerMTokens = outputPrice;
+                        existingModel.IsChatModel = isChatModel;
+                        existingModel.IsEmbeddingModel = isEmbeddingModel;
+                    }
+                    else
+                    {
+                        // Add new model to Provider.Models
+                        var newModel = new ModelInfo
+                        {
+                            Id = modelId,
+                            DisplayName = displayName,
+                            ProviderId = Provider.Id,
+                            InputPricePerMTokens = inputPrice,
+                            OutputPricePerMTokens = outputPrice,
+                            IsChatModel = isChatModel,
+                            IsEmbeddingModel = isEmbeddingModel
+                        };
+                        Provider.Models.Add(newModel);
+                    }
+
+                    successCount++;
+                }
+                catch
+                {
+                    skipCount++;
+                }
+            }
+
+            // Save all changes at once
+            _providerService.UpdateProvider(Provider);
+
+            // Reload and refresh UI using incremental update
+            RefreshModels();
+
+            ShowImportResult(successCount, skipCount);
+        }
+        catch (Exception)
+        {
+            // Silently fail or show error dialog
+        }
+    }
+
+    private string[] ParseCsvLine(string line)
+    {
+        var result = new List<string>();
+        var regex = new Regex(@"(?:^|,)(""(?:[^""]+|"""")*""|[^,]*)");
+        var matches = regex.Matches(line);
+
+        foreach (Match match in matches)
+        {
+            var value = match.Groups[1].Value;
+            if (value.StartsWith("\"") && value.EndsWith("\""))
+                value = value.Substring(1, value.Length - 2).Replace("\"\"", "\"");
+            result.Add(value);
+        }
+
+        return result.ToArray();
+    }
+
+    private void ShowImportResult(int successCount, int skipCount)
+    {
+        // Send message to show InfoBar in the page
+        WeakReferenceMessenger.Default.Send(new CsvImportResultMessage(successCount, skipCount));
     }
 }
 

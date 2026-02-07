@@ -293,7 +293,7 @@
                     Text="About"
                     x:Uid="Settings_About" />
                 <toolkit:SettingsExpander
-                    Description="© 2026 MidnightCrowing."
+                    Description="© 2026 KeyPocket Community."
                     Header="{StaticResource AppTitleName}"
                     Margin="0,0,0,36"
                     x:Uid="Settings_AboutExpander">
