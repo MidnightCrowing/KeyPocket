@@ -81,20 +81,11 @@ public sealed partial class ModelsPage : Page
     {
         if (sender is Grid grid)
         {
-            var children = grid.Children;
-            Button? copyBtn = null;
-            Button? favBtn = null;
+            var copyBtn = FindDescendant<Button>(grid, "ListCopyBtn");
+            var favBtn = FindDescendant<Button>(grid, "ListFavoriteBtn");
 
-            foreach (var child in children)
-                if (child is Button btn)
-                {
-                    var col = Grid.GetColumn(btn);
-                    if (col == 2) copyBtn = btn;
-                    else if (col == 4) favBtn = btn;
-                }
-
-            if (favBtn != null) favBtn.SetValue(OpacityProperty, 1d);
-            if (copyBtn != null) copyBtn.SetValue(OpacityProperty, 1d);
+            if (favBtn != null) favBtn.Opacity = 1;
+            if (copyBtn != null) copyBtn.Opacity = 1;
         }
     }
 
@@ -102,72 +93,49 @@ public sealed partial class ModelsPage : Page
     {
         if (sender is Grid grid)
         {
-            var children = grid.Children;
-            Button? copyBtn = null;
-            Button? favBtn = null;
+            var copyBtn = FindDescendant<Button>(grid, "ListCopyBtn");
+            var favBtn = FindDescendant<Button>(grid, "ListFavoriteBtn");
 
-            foreach (var child in children)
-                if (child is Button btn)
-                {
-                    var col = Grid.GetColumn(btn);
-                    if (col == 2) copyBtn = btn;
-                    else if (col == 4) favBtn = btn;
-                }
-
-            if (copyBtn != null) copyBtn.SetValue(OpacityProperty, 0d);
-            if (favBtn != null)
-            {
-                var isFavorite = false;
-                if (grid.DataContext is TreeViewNode node && node.Content is ModelItemViewModel vm)
-                    isFavorite = vm.IsFavorite;
-                favBtn.SetValue(OpacityProperty, isFavorite ? 1d : 0d);
-            }
+            if (copyBtn != null) copyBtn.Opacity = 0;
+            if (favBtn != null) favBtn.ClearValue(OpacityProperty);
         }
     }
 
     private void ModelCard_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
-        if (sender is Grid grid)
+        if (sender is Border border)
         {
-            Button? copyBtn = null;
-            Button? favBtn = null;
+            var favBtn = FindDescendant<Button>(border, "CardFavoriteBtn");
+            var copyBtn = FindDescendant<Button>(border, "CardCopyBtn");
 
-            foreach (var child in grid.Children)
-                if (child is Button btn)
-                {
-                    var col = Grid.GetColumn(btn);
-                    if (col == 2) favBtn = btn;
-                    else if (col == 3) copyBtn = btn;
-                }
-
-            if (favBtn != null) favBtn.SetValue(OpacityProperty, 1d);
-            if (copyBtn != null) copyBtn.SetValue(OpacityProperty, 1d);
+            if (favBtn != null) favBtn.Opacity = 1;
+            if (copyBtn != null) copyBtn.Opacity = 1;
         }
     }
 
     private void ModelCard_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
-        if (sender is Grid grid)
+        if (sender is Border border)
         {
-            Button? copyBtn = null;
-            Button? favBtn = null;
+            var favBtn = FindDescendant<Button>(border, "CardFavoriteBtn");
+            var copyBtn = FindDescendant<Button>(border, "CardCopyBtn");
 
-            foreach (var child in grid.Children)
-                if (child is Button btn)
-                {
-                    var col = Grid.GetColumn(btn);
-                    if (col == 2) favBtn = btn;
-                    else if (col == 3) copyBtn = btn;
-                }
-
-            if (copyBtn != null) copyBtn.SetValue(OpacityProperty, 0d);
-            if (favBtn != null)
-            {
-                var isFavorite = false;
-                if (grid.DataContext is ModelItemViewModel vm) isFavorite = vm.IsFavorite;
-                favBtn.SetValue(OpacityProperty, isFavorite ? 1d : 0d);
-            }
+            if (copyBtn != null) copyBtn.Opacity = 0;
+            if (favBtn != null) favBtn.ClearValue(OpacityProperty);
         }
+    }
+
+    private T? FindDescendant<T>(DependencyObject element, string name) where T : FrameworkElement
+    {
+        int count = Microsoft.UI.Xaml.Media.VisualTreeHelper.GetChildrenCount(element);
+        for (int i = 0; i < count; i++)
+        {
+            var child = Microsoft.UI.Xaml.Media.VisualTreeHelper.GetChild(element, i);
+            if (child is T t && t.Name == name) return t;
+            var result = FindDescendant<T>(child, name);
+            if (result != null) return result;
+        }
+        return null;
     }
 
     private void SortOption_Click(object sender, RoutedEventArgs e)

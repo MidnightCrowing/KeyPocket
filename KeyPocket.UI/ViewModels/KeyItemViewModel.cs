@@ -13,10 +13,10 @@ public partial class KeyItemViewModel : ObservableObject
     private readonly ProviderService _providerService;
 
     [ObservableProperty] private string _displayKey = string.Empty;
-
     [ObservableProperty] private string _maskedKey = "Loading...";
-
     [ObservableProperty] private string? _providerIcon;
+    [ObservableProperty] private bool _isEditingTag;
+    private string? _originalTag;
 
     public KeyItemViewModel(ApiKey apiKey, string providerName, string? providerIcon, ProviderService providerService)
     {
@@ -33,6 +33,8 @@ public partial class KeyItemViewModel : ObservableObject
     public string ProviderName { get; }
 
     public DateTime CreatedAt => _apiKey.CreatedAt;
+    
+    public string FormattedCreatedAt => CreatedAt.ToString("yyyy-MM-dd");
 
     public string? Tag
     {
@@ -45,9 +47,12 @@ public partial class KeyItemViewModel : ObservableObject
                 _providerService.UpdateApiKeyTag(ProviderId, Id, value);
                 _apiKey.Tag = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(HasTag));
             }
         }
     }
+
+    public bool HasTag => !string.IsNullOrEmpty(Tag);
 
     public bool IsFavorite
     {
@@ -99,11 +104,57 @@ public partial class KeyItemViewModel : ObservableObject
         if (string.IsNullOrEmpty(key)) return "";
         if (key.Length <= 8) return new string('*', key.Length);
 
-        // Standard format often: sk-.......1234
-        // Keep first 3 letters (if they exist) and last 4.
-        var prefix = key.Substring(0, Math.Min(3, key.Length));
-        var suffix = key.Substring(key.Length - 4);
-        return $"{prefix}••••••••{suffix}";
+        string prefix;
+        string suffix;
+        const string mask = "............"; // 12 dots
+
+        if (key.StartsWith("sk-"))
+        {
+            // First 7 chars (sk- + 4 chars)
+            var take = Math.Min(7, key.Length);
+            prefix = key.Substring(0, take);
+        }
+        else
+        {
+            // First 4 chars
+            var take = Math.Min(4, key.Length);
+            prefix = key.Substring(0, take);
+        }
+
+        // Last 4 chars
+        suffix = key.Substring(key.Length - 4);
+        
+        return $"{prefix}{mask}{suffix}";
+    }
+
+    [RelayCommand]
+    private void StartEditTag()
+    {
+        _originalTag = Tag;
+        IsEditingTag = true;
+    }
+
+    [RelayCommand]
+    private void CommitEditTag()
+    {
+        IsEditingTag = false;
+        _originalTag = null;
+    }
+
+    [RelayCommand]
+    private void CancelEditTag()
+    {
+        Tag = _originalTag;
+        IsEditingTag = false;
+        _originalTag = null;
+    }
+
+    [RelayCommand]
+    private void UpdateTag(string newTag)
+    {
+        Tag = newTag;
+        OnPropertyChanged(nameof(Tag));
+        OnPropertyChanged(nameof(HasTag));
     }
 
     private void ToggleDisableServiceCall()
@@ -132,6 +183,10 @@ public partial class KeyItemViewModel : ObservableObject
             var package = new DataPackage();
             package.SetText(rawKey);
             Clipboard.SetContent(package);
+            
+            // Explicitly clear local var if possible (though string is immutable, GC handles it)
+            // The requirement was to not keep it in memory as a field. 
+            // We are using a local var 'rawKey' which will be collected.
         }
     }
 }

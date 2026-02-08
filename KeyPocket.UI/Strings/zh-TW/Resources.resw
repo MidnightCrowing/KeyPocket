@@ -204,12 +204,12 @@
     <value>複製 ID</value>
   </data>
   <data name="Keys_SearchBox.PlaceholderText" xml:space="preserve">
-    <value>搜尋金鑰 (服務商, 標籤)...</value>
+    <value>搜尋標籤...</value>
   </data>
   <data name="Keys_SortBy.Text" xml:space="preserve">
     <value>排序:</value>
   </data>
-  <data name="Keys_Favorites.Text" xml:space="preserve">
+  <data name="Keys_Favorites.ToolTipService.ToolTip" xml:space="preserve">
     <value>收藏</value>
   </data>
   <data name="Keys_MaskedKey.ToolTipService.ToolTip" xml:space="preserve">

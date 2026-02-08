@@ -203,12 +203,12 @@
     <value>Copy ID</value>
   </data>
   <data name="Keys_SearchBox.PlaceholderText" xml:space="preserve">
-    <value>Search keys (provider, tag)...</value>
+    <value>Search tags...</value>
   </data>
   <data name="Keys_SortBy.Text" xml:space="preserve">
     <value>Sort by:</value>
   </data>
-  <data name="Keys_Favorites.Text" xml:space="preserve">
+  <data name="Keys_Favorites.ToolTipService.ToolTip" xml:space="preserve">
     <value>Favorites</value>
   </data>
   <data name="Keys_MaskedKey.ToolTipService.ToolTip" xml:space="preserve">

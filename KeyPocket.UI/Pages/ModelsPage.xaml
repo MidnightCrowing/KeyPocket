@@ -105,7 +105,7 @@
                             ToolTipService.ToolTip="Copy ID"
                             VerticalAlignment="Center"
                             Width="28"
-                            x:Name="CopyBtn"
+                            x:Name="ListCopyBtn"
                             x:Uid="Models_CopyID">
                             <!--  Interaction handled in code-behind  -->
                             <FontIcon FontSize="14" Glyph="&#xE8C8;" />
@@ -123,7 +123,7 @@
                             ToolTipService.ToolTip="Favorite"
                             VerticalAlignment="Center"
                             Width="28"
-                            x:Name="FavoriteBtn"
+                            x:Name="ListFavoriteBtn"
                             x:Uid="Models_Favorites">
                             <FontIcon
                                 FontSize="14"
@@ -214,13 +214,13 @@
                     BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
                     BorderThickness="1"
                     CornerRadius="12"
-                    Padding="16">
+                    Padding="16"
+                    PointerEntered="ModelCard_PointerEntered"
+                    PointerExited="ModelCard_PointerExited">
                     <StackPanel Spacing="12">
                         <!--  Header  -->
                         <Grid
-                            ColumnSpacing="8"
-                            PointerEntered="ModelCard_PointerEntered"
-                            PointerExited="ModelCard_PointerExited">
+                            ColumnSpacing="8">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
@@ -369,6 +369,7 @@
             <!--  Model Count  -->
             <TextBlock
                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Margin="15,15,0,0"
                 Style="{StaticResource CaptionTextBlockStyle}"
                 Text="{x:Bind ViewModel.ModelsCountText, Mode=OneWay}"
                 VerticalAlignment="Center" />
