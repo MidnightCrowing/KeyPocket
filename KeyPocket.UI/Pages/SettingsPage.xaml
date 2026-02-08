@@ -1,13 +1,13 @@
 ﻿<Page
     mc:Ignorable="d"
     x:Class="KeyPocket.UI.Pages.SettingsPage"
-    x:Name="RootPage"
+    x:Name="Root"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:converters="using:KeyPocket.UI.Converters"
+    xmlns:ctk="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:global="using:Windows.Globalization.NumberFormatting"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
     xmlns:vm="using:KeyPocket.UI.ViewModels"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
@@ -34,8 +34,8 @@
         </Style>
 
         <DataTemplate x:DataType="vm:ExchangeRateItem" x:Key="RateTemplate">
-            <toolkit:SettingsCard IsClickEnabled="False">
-                <toolkit:SettingsCard.Header>
+            <ctk:SettingsCard IsClickEnabled="False">
+                <ctk:SettingsCard.Header>
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <TextBlock FontWeight="SemiBold" Text="{x:Bind Source}" />
                         <FontIcon
@@ -44,7 +44,7 @@
                             Opacity="0.6" />
                         <TextBlock FontWeight="SemiBold" Text="{x:Bind Target}" />
                     </StackPanel>
-                </toolkit:SettingsCard.Header>
+                </ctk:SettingsCard.Header>
 
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <NumberBox
@@ -57,7 +57,7 @@
                     <Button
                         Background="Transparent"
                         BorderThickness="0"
-                        Command="{Binding ElementName=RootPage, Path=ViewModel.DeleteRateCommand}"
+                        Command="{Binding ElementName=Root, Path=ViewModel.DeleteRateCommand}"
                         CommandParameter="{x:Bind}"
                         Height="32"
                         Padding="0"
@@ -69,26 +69,26 @@
                             Glyph="&#xE74D;" />
                     </Button>
                 </StackPanel>
-            </toolkit:SettingsCard>
+            </ctk:SettingsCard>
         </DataTemplate>
 
         <DataTemplate x:Key="AddFooterTemplate">
             <!--  DataContext is AddRatePlaceholder, so we must bind to ElementName=RootPage ViewModel  -->
-            <toolkit:SettingsCard
-                Command="{Binding ElementName=RootPage, Path=ViewModel.StartAddRateCommand}"
+            <ctk:SettingsCard
+                Command="{Binding ElementName=Root, Path=ViewModel.StartAddRateCommand}"
                 HorizontalContentAlignment="Left"
                 IsActionIconVisible="False"
-                IsClickEnabled="{Binding ElementName=RootPage, Path=ViewModel.IsAddingRate, Converter={StaticResource BoolNegation}, Mode=OneWay}">
-                <toolkit:SettingsCard.Resources>
+                IsClickEnabled="{Binding ElementName=Root, Path=ViewModel.IsAddingRate, Converter={StaticResource BoolNegation}, Mode=OneWay}">
+                <ctk:SettingsCard.Resources>
                     <x:Double x:Key="SettingsCardWrapThreshold">10000</x:Double>
-                </toolkit:SettingsCard.Resources>
+                </ctk:SettingsCard.Resources>
                 <Grid>
                     <!--  View Mode: "Add Exchange Rate" Label (Replaces Header)  -->
                     <StackPanel
                         Orientation="Horizontal"
                         Padding="0,10"
                         Spacing="8"
-                        Visibility="{Binding ElementName=RootPage, Path=ViewModel.IsAddingRate, Converter={StaticResource NegBoolToVis}, Mode=OneWay}">
+                        Visibility="{Binding ElementName=Root, Path=ViewModel.IsAddingRate, Converter={StaticResource NegBoolToVis}, Mode=OneWay}">
                         <FontIcon FontSize="14" Glyph="&#xE710;" />
                         <TextBlock
                             FontWeight="SemiBold"
@@ -102,11 +102,11 @@
                         HorizontalAlignment="Left"
                         Orientation="Horizontal"
                         Spacing="12"
-                        Visibility="{Binding ElementName=RootPage, Path=ViewModel.IsAddingRate, Converter={StaticResource BoolToVis}, Mode=OneWay}">
+                        Visibility="{Binding ElementName=Root, Path=ViewModel.IsAddingRate, Converter={StaticResource BoolToVis}, Mode=OneWay}">
                         <ComboBox
-                            ItemsSource="{Binding ElementName=RootPage, Path=ViewModel.AvailableCurrencies}"
+                            ItemsSource="{Binding ElementName=Root, Path=ViewModel.AvailableCurrencies}"
                             PlaceholderText="From"
-                            SelectedItem="{Binding ElementName=RootPage, Path=ViewModel.NewRateSource, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            SelectedItem="{Binding ElementName=Root, Path=ViewModel.NewRateSource, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             Width="100"
                             x:Uid="Settings_AddRate_From" />
                         <FontIcon
@@ -115,9 +115,9 @@
                             Opacity="0.5"
                             VerticalAlignment="Center" />
                         <ComboBox
-                            ItemsSource="{Binding ElementName=RootPage, Path=ViewModel.AvailableCurrencies}"
+                            ItemsSource="{Binding ElementName=Root, Path=ViewModel.AvailableCurrencies}"
                             PlaceholderText="To"
-                            SelectedItem="{Binding ElementName=RootPage, Path=ViewModel.NewRateTarget, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            SelectedItem="{Binding ElementName=Root, Path=ViewModel.NewRateTarget, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             Width="100"
                             x:Uid="Settings_AddRate_To" />
                         <TextBlock
@@ -129,22 +129,22 @@
                             PlaceholderText="Rate"
                             SmallChange="0.01"
                             SpinButtonPlacementMode="Inline"
-                            Value="{Binding ElementName=RootPage, Path=ViewModel.NewRateValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Value="{Binding ElementName=Root, Path=ViewModel.NewRateValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             Width="160"
                             x:Uid="Settings_AddRate_Rate" />
 
                         <Button
-                            Command="{Binding ElementName=RootPage, Path=ViewModel.AddCustomRateCommand}"
+                            Command="{Binding ElementName=Root, Path=ViewModel.AddCustomRateCommand}"
                             Padding="8"
                             Style="{StaticResource AccentButtonStyle}">
                             <FontIcon FontSize="14" Glyph="&#xE73E;" />
                         </Button>
-                        <Button Command="{Binding ElementName=RootPage, Path=ViewModel.CancelAddRateCommand}" Padding="8">
+                        <Button Command="{Binding ElementName=Root, Path=ViewModel.CancelAddRateCommand}" Padding="8">
                             <FontIcon FontSize="14" Glyph="&#xE711;" />
                         </Button>
                     </StackPanel>
                 </Grid>
-            </toolkit:SettingsCard>
+            </ctk:SettingsCard>
         </DataTemplate>
 
     </Page.Resources>
@@ -173,27 +173,27 @@
                     Text="Appearance"
                     x:Uid="Settings_Appearance" />
 
-                <toolkit:SettingsCard
+                <ctk:SettingsCard
                     Description="Select which app theme to display"
                     Header="App theme"
                     x:Uid="Settings_Theme">
-                    <toolkit:SettingsCard.HeaderIcon>
+                    <ctk:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE790;" />
-                    </toolkit:SettingsCard.HeaderIcon>
+                    </ctk:SettingsCard.HeaderIcon>
                     <ComboBox AutomationProperties.AutomationId="themeModeComboBox" SelectedIndex="{x:Bind ViewModel.ThemeIndex, Mode=TwoWay}">
                         <ComboBoxItem Content="Light" x:Uid="Settings_Theme_Light" />
                         <ComboBoxItem Content="Dark" x:Uid="Settings_Theme_Dark" />
                         <ComboBoxItem Content="Use system setting" x:Uid="Settings_Theme_System" />
                     </ComboBox>
-                </toolkit:SettingsCard>
+                </ctk:SettingsCard>
 
-                <toolkit:SettingsCard
+                <ctk:SettingsCard
                     Description="Select application language"
                     Header="Language"
                     x:Uid="Settings_Language">
-                    <toolkit:SettingsCard.HeaderIcon>
+                    <ctk:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE775;" />
-                    </toolkit:SettingsCard.HeaderIcon>
+                    </ctk:SettingsCard.HeaderIcon>
                     <StackPanel Orientation="Horizontal" Spacing="12">
                         <TextBlock
                             Foreground="{ThemeResource SystemFillColorCriticalBrush}"
@@ -207,7 +207,7 @@
                             <ComboBoxItem Content="Traditional Chinese" x:Uid="Settings_Language_ZhTw" />
                         </ComboBox>
                     </StackPanel>
-                </toolkit:SettingsCard>
+                </ctk:SettingsCard>
 
                 <!--  Currency Exchange Section  -->
                 <TextBlock
@@ -216,13 +216,13 @@
                     x:Uid="Settings_ExchangeRates" />
 
                 <!--  1. Display Currency Selection  -->
-                <toolkit:SettingsCard
+                <ctk:SettingsCard
                     Description="Set default display currency"
                     Header="Display Currency"
                     x:Uid="Settings_DisplayCurrency">
-                    <toolkit:SettingsCard.HeaderIcon>
+                    <ctk:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE1D0;" />
-                    </toolkit:SettingsCard.HeaderIcon>
+                    </ctk:SettingsCard.HeaderIcon>
 
                     <Grid>
                         <!--  ... (same currency selection logic) ...  -->
@@ -273,62 +273,62 @@
                             </Button>
                         </StackPanel>
                     </Grid>
-                </toolkit:SettingsCard>
+                </ctk:SettingsCard>
 
                 <!--  2. Exchange Rates Expander  -->
-                <toolkit:SettingsExpander
+                <ctk:SettingsExpander
                     Description="Configure exchange rates between currencies"
                     Header="Exchange Rate Details"
                     IsExpanded="False"
                     x:Name="RatesExpander"
                     x:Uid="Settings_ExchangeRateDetails">
-                    <toolkit:SettingsExpander.HeaderIcon>
+                    <ctk:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE825;" />
-                    </toolkit:SettingsExpander.HeaderIcon>
-                </toolkit:SettingsExpander>
+                    </ctk:SettingsExpander.HeaderIcon>
+                </ctk:SettingsExpander>
 
                 <!--  About  -->
                 <TextBlock
                     Style="{StaticResource SettingsSectionHeaderTextBlockStyle}"
                     Text="About"
                     x:Uid="Settings_About" />
-                <toolkit:SettingsExpander
+                <ctk:SettingsExpander
                     Description="© 2026 KeyPocket Community."
                     Header="{StaticResource AppTitleName}"
                     Margin="0,0,0,36"
                     x:Uid="Settings_AboutExpander">
-                    <toolkit:SettingsExpander.HeaderIcon>
+                    <ctk:SettingsExpander.HeaderIcon>
                         <BitmapIcon ShowAsMonochrome="False" UriSource="/Assets/KeyPocket.png" />
-                    </toolkit:SettingsExpander.HeaderIcon>
+                    </ctk:SettingsExpander.HeaderIcon>
                     <TextBlock
                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                         IsTextSelectionEnabled="True"
                         Text="{x:Bind ViewModel.Version}" />
-                    <toolkit:SettingsExpander.Items>
+                    <ctk:SettingsExpander.Items>
                         <!--  GitHub  -->
-                        <toolkit:SettingsCard
+                        <ctk:SettingsCard
                             Command="{x:Bind ViewModel.OpenGitHubCommand}"
                             Header="GitHub"
                             IsClickEnabled="True"
                             x:Uid="Settings_GitHub">
-                            <toolkit:SettingsCard.ActionIcon>
+                            <ctk:SettingsCard.ActionIcon>
                                 <FontIcon Glyph="&#xE8A7;" />
-                            </toolkit:SettingsCard.ActionIcon>
-                        </toolkit:SettingsCard>
+                            </ctk:SettingsCard.ActionIcon>
+                        </ctk:SettingsCard>
 
                         <!--  Open an issue or pull request  -->
-                        <toolkit:SettingsCard
+                        <ctk:SettingsCard
                             Command="{x:Bind ViewModel.OpenFeedbackCommand}"
                             Header="Open an issue or pull request"
                             IsClickEnabled="True"
                             x:Uid="Settings_Issue">
-                            <toolkit:SettingsCard.ActionIcon>
+                            <ctk:SettingsCard.ActionIcon>
                                 <FontIcon Glyph="&#xE8A7;" />
-                            </toolkit:SettingsCard.ActionIcon>
-                        </toolkit:SettingsCard>
+                            </ctk:SettingsCard.ActionIcon>
+                        </ctk:SettingsCard>
 
                         <!--  Resources & Sources  -->
-                        <toolkit:SettingsCard
+                        <ctk:SettingsCard
                             ContentAlignment="Vertical"
                             Header="Resources &amp; Sources"
                             HorizontalContentAlignment="Left"
@@ -339,10 +339,10 @@
                                     NavigateUri="https://lobehub.com/icons"
                                     x:Uid="Settings_IconLink" />
                             </StackPanel>
-                        </toolkit:SettingsCard>
+                        </ctk:SettingsCard>
 
                         <!--  License  -->
-                        <toolkit:SettingsCard
+                        <ctk:SettingsCard
                             ContentAlignment="Vertical"
                             Header="License"
                             HorizontalContentAlignment="Left"
@@ -350,9 +350,9 @@
                             <StackPanel Margin="-12,0,0,0" Orientation="Vertical">
                                 <HyperlinkButton Content="MIT License" NavigateUri="https://github.com/MidnightCrowing/KeyPocket/blob/main/LICENSE" />
                             </StackPanel>
-                        </toolkit:SettingsCard>
-                    </toolkit:SettingsExpander.Items>
-                </toolkit:SettingsExpander>
+                        </ctk:SettingsCard>
+                    </ctk:SettingsExpander.Items>
+                </ctk:SettingsExpander>
 
             </StackPanel>
         </Border>

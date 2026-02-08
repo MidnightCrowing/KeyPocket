@@ -105,7 +105,8 @@
                             ToolTipService.ToolTip="Copy ID"
                             VerticalAlignment="Center"
                             Width="28"
-                            x:Name="CopyBtn">
+                            x:Name="CopyBtn"
+                            x:Uid="Models_CopyID">
                             <!--  Interaction handled in code-behind  -->
                             <FontIcon FontSize="14" Glyph="&#xE8C8;" />
                         </controls:CopyButton>
@@ -122,7 +123,8 @@
                             ToolTipService.ToolTip="Favorite"
                             VerticalAlignment="Center"
                             Width="28"
-                            x:Name="FavoriteBtn">
+                            x:Name="FavoriteBtn"
+                            x:Uid="Models_Favorites">
                             <FontIcon
                                 FontSize="14"
                                 Foreground="{x:Bind ((vm:ModelItemViewModel)Content).IsFavorite, Mode=OneWay, Converter={StaticResource BoolToBrushConverter}}"
@@ -175,7 +177,8 @@
                         Orientation="Horizontal"
                         Spacing="8"
                         ToolTipService.ToolTip="Double click to edit provider settings"
-                        VerticalAlignment="Center">
+                        VerticalAlignment="Center"
+                        x:Uid="Models_Provider_EditTooltip">
                         <!--  Icon  -->
                         <Grid
                             AllowDrop="False"
@@ -267,7 +270,8 @@
                                 ToolTipService.ToolTip="Copy ID"
                                 VerticalAlignment="Center"
                                 Width="28"
-                                x:Name="CardCopyBtn">
+                                x:Name="CardCopyBtn"
+                                x:Uid="Models_CopyID">
                                 <FontIcon FontSize="14" Glyph="&#xE8C8;" />
                             </controls:CopyButton>
 
@@ -283,7 +287,8 @@
                                 ToolTipService.ToolTip="Favorite"
                                 VerticalAlignment="Center"
                                 Width="28"
-                                x:Name="CardFavoriteBtn">
+                                x:Name="CardFavoriteBtn"
+                                x:Uid="Models_Favorites">
                                 <FontIcon
                                     FontSize="14"
                                     Foreground="{x:Bind IsFavorite, Mode=OneWay, Converter={StaticResource BoolToBrushConverter}}"
@@ -304,14 +309,14 @@
                                         Background="{ThemeResource LayerFillColorDefaultBrush}"
                                         BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
                                         BorderThickness="1"
-                                        CornerRadius="999"
+                                        CornerRadius="9"
                                         Padding="8,2">
                                         <StackPanel Orientation="Horizontal" Spacing="6">
                                             <Ellipse
                                                 Fill="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                                Height="4"
+                                                Height="6"
                                                 VerticalAlignment="Center"
-                                                Width="4" />
+                                                Width="6" />
                                             <TextBlock
                                                 FontSize="12"
                                                 Text="{Binding}"
@@ -327,14 +332,14 @@
                             FontSize="12"
                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                             TextTrimming="CharacterEllipsis">
-                            <Run Text="by " />
+                            <Run Text="by " x:Uid="Models_Card_By" />
                             <Run Text="{x:Bind ProviderName}" />
                             <Run Text=" | " />
-                            <Run Text="In:" />
+                            <Run Text="In:" x:Uid="Models_Card_In" />
                             <Run Text="{x:Bind InputPriceFormatted}" />
                             <Run Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind InputPriceOriginal}" />
                             <Run Text=" | " />
-                            <Run Text="Out:" />
+                            <Run Text="Out:" x:Uid="Models_Card_Out" />
                             <Run Text="{x:Bind OutputPriceFormatted}" />
                             <Run Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind OutputPriceOriginal}" />
                         </TextBlock>
@@ -361,6 +366,13 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
+            <!--  Model Count  -->
+            <TextBlock
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Style="{StaticResource CaptionTextBlockStyle}"
+                Text="{x:Bind ViewModel.ModelsCountText, Mode=OneWay}"
+                VerticalAlignment="Center" />
+
             <!--  Search Box  -->
             <TextBox
                 Grid.Column="1"
@@ -383,17 +395,22 @@
                                 <TextBlock
                                     FontWeight="SemiBold"
                                     Text="Filters"
-                                    VerticalAlignment="Center" />
+                                    VerticalAlignment="Center"
+                                    x:Uid="Models_Filter_Title" />
                                 <Button
                                     Click="ResetFilters_Click"
                                     Content="Reset"
                                     HorizontalAlignment="Right"
-                                    Style="{StaticResource TextBlockButtonStyle}" />
+                                    Style="{StaticResource TextBlockButtonStyle}"
+                                    x:Uid="Models_Filter_Reset" />
                             </Grid>
 
                             <!--  Capability Section  -->
                             <StackPanel Spacing="8">
-                                <TextBlock FontWeight="SemiBold" Text="Capability" />
+                                <TextBlock
+                                    FontWeight="SemiBold"
+                                    Text="Capability"
+                                    x:Uid="Models_Filter_Capability" />
                                 <ctk:Segmented
                                     ItemContainerStyle="{StaticResource CustomSegmentedItemStyle}"
                                     SelectionMode="Multiple"
@@ -401,33 +418,42 @@
                                     <ctk:SegmentedItem
                                         Content="Text"
                                         IsSelected="{x:Bind ViewModel.IsTextSelected, Mode=TwoWay}"
-                                        ToolTipService.ToolTip="Text/Chat models" />
+                                        ToolTipService.ToolTip="Text/Chat models"
+                                        x:Uid="Models_Segment_Text" />
                                     <ctk:SegmentedItem
                                         Content="File"
                                         IsSelected="{x:Bind ViewModel.IsFileSelected, Mode=TwoWay}"
-                                        ToolTipService.ToolTip="File processing models" />
+                                        ToolTipService.ToolTip="File processing models"
+                                        x:Uid="Models_Segment_File" />
                                     <ctk:SegmentedItem
                                         Content="Image"
                                         IsSelected="{x:Bind ViewModel.IsImageSelected, Mode=TwoWay}"
-                                        ToolTipService.ToolTip="Image models" />
+                                        ToolTipService.ToolTip="Image models"
+                                        x:Uid="Models_Segment_Image" />
                                     <ctk:SegmentedItem
                                         Content="Audio"
                                         IsSelected="{x:Bind ViewModel.IsAudioSelected, Mode=TwoWay}"
-                                        ToolTipService.ToolTip="Audio models" />
+                                        ToolTipService.ToolTip="Audio models"
+                                        x:Uid="Models_Segment_Audio" />
                                     <ctk:SegmentedItem
                                         Content="Video"
                                         IsSelected="{x:Bind ViewModel.IsVideoSelected, Mode=TwoWay}"
-                                        ToolTipService.ToolTip="Video models" />
+                                        ToolTipService.ToolTip="Video models"
+                                        x:Uid="Models_Segment_Video" />
                                     <ctk:SegmentedItem
                                         Content="Embeddings"
                                         IsSelected="{x:Bind ViewModel.IsEmbeddingsSelected, Mode=TwoWay}"
-                                        ToolTipService.ToolTip="Embedding models" />
+                                        ToolTipService.ToolTip="Embedding models"
+                                        x:Uid="Models_Segment_Embeddings" />
                                 </ctk:Segmented>
                             </StackPanel>
 
                             <!--  Price Range Section  -->
                             <StackPanel Spacing="4">
-                                <TextBlock FontWeight="SemiBold" Text="Prompt Pricing" />
+                                <TextBlock
+                                    FontWeight="SemiBold"
+                                    Text="Prompt Pricing"
+                                    x:Uid="Models_Filter_Pricing" />
 
                                 <ctk:RangeSelector
                                     Maximum="6"
@@ -514,7 +540,8 @@
                                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                         Grid.Column="0"
                                         HorizontalAlignment="Left"
-                                        Text="Free" />
+                                        Text="Free"
+                                        x:Uid="Models_Filter_Price_Free" />
 
                                     <!--  1: 0.1  -->
                                     <TextBlock
@@ -579,8 +606,14 @@
 
                             <!--  Favorites Filter  -->
                             <StackPanel Spacing="8">
-                                <TextBlock FontWeight="SemiBold" Text="Status" />
-                                <CheckBox Content="Show favorites only" IsChecked="{x:Bind ViewModel.ShowFavoritesOnly, Mode=TwoWay}" />
+                                <TextBlock
+                                    FontWeight="SemiBold"
+                                    Text="Status"
+                                    x:Uid="Models_Filter_Status" />
+                                <CheckBox
+                                    Content="Show favorites only"
+                                    IsChecked="{x:Bind ViewModel.ShowFavoritesOnly, Mode=TwoWay}"
+                                    x:Uid="Models_Filter_FavoritesOnly" />
                             </StackPanel>
                         </StackPanel>
                     </Flyout>
@@ -599,26 +632,30 @@
                             GroupName="Sort"
                             IsChecked="{x:Bind ViewModel.SortOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=NameAsc, Mode=OneWay}"
                             Tag="NameAsc"
-                            Text="Name (A-Z)" />
+                            Text="Name (A-Z)"
+                            x:Uid="Models_Sort_NameAsc" />
                         <RadioMenuFlyoutItem
                             Click="SortOption_Click"
                             GroupName="Sort"
                             IsChecked="{x:Bind ViewModel.SortOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=NameDesc, Mode=OneWay}"
                             Tag="NameDesc"
-                            Text="Name (Z-A)" />
+                            Text="Name (Z-A)"
+                            x:Uid="Models_Sort_NameDesc" />
                         <MenuFlyoutSeparator />
                         <RadioMenuFlyoutItem
                             Click="SortOption_Click"
                             GroupName="Sort"
                             IsChecked="{x:Bind ViewModel.SortOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=PriceLowHigh, Mode=OneWay}"
                             Tag="PriceLowHigh"
-                            Text="Pricing: Low to High" />
+                            Text="Pricing: Low to High"
+                            x:Uid="Models_Sort_PriceLow" />
                         <RadioMenuFlyoutItem
                             Click="SortOption_Click"
                             GroupName="Sort"
                             IsChecked="{x:Bind ViewModel.SortOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=PriceHighLow, Mode=OneWay}"
                             Tag="PriceHighLow"
-                            Text="Pricing: High to Low" />
+                            Text="Pricing: High to Low"
+                            x:Uid="Models_Sort_PriceHigh" />
 
                     </MenuFlyout>
                 </DropDownButton.Flyout>
@@ -651,9 +688,15 @@
                     <ctk:HeaderedTreeView.Header>
                         <ctk:DataTable ColumnSpacing="16" Margin="16,0">
                             <!--  Provider Name Column (Auto width handles indentation)  -->
-                            <ctk:DataColumn Content="Provider" DesiredWidth="Auto" />
+                            <ctk:DataColumn
+                                Content="Provider"
+                                DesiredWidth="Auto"
+                                x:Uid="Models_List_Provider" />
                             <!--  Model Name Column  -->
-                            <ctk:DataColumn Content="Model Name" DesiredWidth="*" />
+                            <ctk:DataColumn
+                                Content="Model Name"
+                                DesiredWidth="*"
+                                x:Uid="Models_List_ModelName" />
                             <!--  Input Price Column  -->
                             <ctk:DataColumn Content="{x:Bind ViewModel.InputPriceHeader, Mode=OneWay}" DesiredWidth="160" />
                             <!--  Output Price Column  -->

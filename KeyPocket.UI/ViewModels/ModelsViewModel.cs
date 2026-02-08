@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using KeyPocket.Core.Services;
 using KeyPocket.UI.Messages;
+using Windows.ApplicationModel.Resources;
 
 namespace KeyPocket.UI.ViewModels;
 
@@ -20,10 +21,14 @@ public partial class ModelsViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(OutputPriceHeader))]
     private string _currencySymbol = "$";
 
-    public string InputPriceHeader => $"Input ({CurrencySymbol}/1M)";
-    public string OutputPriceHeader => $"Output ({CurrencySymbol}/1M)";
+    public string InputPriceHeader => string.Format(ResourceLoader.GetForViewIndependentUse().GetString("Models_InputPriceFormat"), CurrencySymbol);
+    public string OutputPriceHeader => string.Format(ResourceLoader.GetForViewIndependentUse().GetString("Models_OutputPriceFormat"), CurrencySymbol);
 
-    [ObservableProperty] private ObservableCollection<ModelItemViewModel> _filteredModels = new();
+    [ObservableProperty] 
+    [NotifyPropertyChangedFor(nameof(ModelsCountText))]
+    private ObservableCollection<ModelItemViewModel> _filteredModels = new();
+
+    public string ModelsCountText => string.Format(ResourceLoader.GetForViewIndependentUse().GetString("Models_CountFormat"), FilteredModels.Count);
 
     [ObservableProperty] private ObservableCollection<ProviderGroupViewModel> _groupedModels = new();
 

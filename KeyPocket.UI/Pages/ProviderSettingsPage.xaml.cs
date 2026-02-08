@@ -8,6 +8,7 @@ using Windows.Storage.Pickers;
 using Windows.System;
 using Windows.UI;
 using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.WinUI.Controls;
 using KeyPocket.UI.Helpers;
 using KeyPocket.UI.Messages;
 using KeyPocket.UI.ViewModels;
@@ -229,6 +230,35 @@ public sealed partial class ProviderSettingsPage : Page, INotifyPropertyChanged
         {
             wrapper.CancelAddCommand?.Execute(null);
             e.Handled = true;
+        }
+    }
+
+    private void OnTokenItemAdding(TokenizingTextBox sender, TokenItemAddingEventArgs e)
+    {
+        if (ViewModel == null) return;
+
+        // Restriction: Only allow tags that exist in AvailableTags
+        // Case-insensitive check to be user-friendly, but store the canonical case
+        var match = ModelWrapper.AvailableTagsList.FirstOrDefault(t => t.Equals(e.TokenText, StringComparison.OrdinalIgnoreCase));
+
+        if (match != null)
+        {
+            // Found a valid tag, use the canonical string from the list
+            e.Item = match;
+        }
+        else
+        {
+            // Not a valid tag, reject input
+            e.Cancel = true;
+        }
+    }
+
+    private void OnTokenTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+    {
+        if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput && 
+            sender.DataContext is ModelWrapper wrapper)
+        {
+             wrapper.UpdateSuggestions(sender.Text);
         }
     }
 

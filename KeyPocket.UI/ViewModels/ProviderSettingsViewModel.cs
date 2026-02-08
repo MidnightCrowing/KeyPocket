@@ -78,7 +78,6 @@ public partial class ProviderSettingsViewModel : ObservableObject
         Models.CollectionChanged += OnModelsCollectionChanged;
 
         // Subscribe to global usage changes to update currency symbol if needed
-        // (Logic simplified intentionally)
     }
 
     // Default for designer
@@ -448,14 +447,23 @@ public partial class ProviderSettingsViewModel : ObservableObject
                         InputPriceValue = (double)(model.InputPricePerMTokens ?? 0),
                         OutputPriceValue = (double)(model.OutputPricePerMTokens ?? 0),
                         InputCurrency = Provider.Currency ?? "USD",
-                        IsFavorite = model.Tags.Contains(ModelTags.Favorite),
+                        IsFavorite = model.Tags?.Contains(ModelTags.Favorite) ?? false,
                         IsEditing = false
                     };
 
                     wrapper.InputPrice = wrapper.InputPriceValue.ToString();
                     wrapper.OutputPrice = wrapper.OutputPriceValue.ToString();
 
+                    if (model.Tags != null)
+                    {
+                        foreach (var tag in model.Tags)
+                        {
+                            wrapper.Tags.Add(tag);
+                        }
+                    }
+
                     InjectModelCommands(wrapper);
+                    wrapper.InitializeTags(); // Hook up events and initial suggestions
                     Models.Add(wrapper);
                 }
 
@@ -475,6 +483,17 @@ public partial class ProviderSettingsViewModel : ObservableObject
 
                     wrapper.InputPrice = wrapper.InputPriceValue.ToString();
                     wrapper.OutputPrice = wrapper.OutputPriceValue.ToString();
+
+                    wrapper.Tags.Clear();
+                    if (model.Tags != null)
+                    {
+                        foreach (var tag in model.Tags)
+                        {
+                            wrapper.Tags.Add(tag);
+                        }
+                    }
+
+                    wrapper.InitializeTags();
                 }
                 else if (model == null)
                 {
@@ -488,7 +507,6 @@ public partial class ProviderSettingsViewModel : ObservableObject
             _isSyncingOrder = false;
         }
     }
-
 
     private void InjectModelCommands(ModelWrapper w)
     {
@@ -515,7 +533,9 @@ public partial class ProviderSettingsViewModel : ObservableObject
             OutputPriceValue = 0,
             InputCurrency = ProviderCurrency ?? "USD" // Use current selection
         };
+        w.Tags.Add(ModelTags.Text); // Default tag for new models
         InjectModelCommands(w);
+        w.InitializeTags(); // Hook up events and initial suggestions
         Models.Add(w);
     }
 
@@ -545,7 +565,8 @@ public partial class ProviderSettingsViewModel : ObservableObject
                     : item.NewName,
                 ProviderId = Provider.Id,
                 InputPricePerMTokens = inputPrice,
-                OutputPricePerMTokens = outputPrice
+                OutputPricePerMTokens = outputPrice,
+                Tags = new HashSet<string>(item.Tags)
             };
 
             _providerService.AddModel(Provider.Id, model);
@@ -577,6 +598,7 @@ public partial class ProviderSettingsViewModel : ObservableObject
                 model.DisplayName = string.IsNullOrWhiteSpace(item.NewName) ? item.NewId : item.NewName;
                 model.InputPricePerMTokens = inputPrice;
                 model.OutputPricePerMTokens = outputPrice;
+                model.Tags = new HashSet<string>(item.Tags);
 
                 // Save changes
                 _providerService.UpdateProvider(Provider);
@@ -620,6 +642,17 @@ public partial class ProviderSettingsViewModel : ObservableObject
 
             item.InputPriceValue = (double)(model.InputPricePerMTokens ?? 0);
             item.OutputPriceValue = (double)(model.OutputPricePerMTokens ?? 0);
+
+            item.Tags.Clear();
+            if (model.Tags != null)
+            {
+                foreach (var tag in model.Tags)
+                {
+                    item.Tags.Add(tag);
+                }
+            }
+
+            item.InitializeTags(); // Hook up events and initial suggestions AFTER loading tags to avoid early sync triggers
         }
 
         item.IsEditing = true;
@@ -643,6 +676,7 @@ public partial class ProviderSettingsViewModel : ObservableObject
             model.DisplayName = string.IsNullOrWhiteSpace(item.NewName) ? item.NewId : item.NewName;
             model.InputPricePerMTokens = inputPrice;
             model.OutputPricePerMTokens = outputPrice;
+            model.Tags = new HashSet<string>(item.Tags);
             _providerService.UpdateProvider(Provider);
         }
 
@@ -679,7 +713,15 @@ public partial class ProviderSettingsViewModel : ObservableObject
 
         // Refresh local state without full reload
         item.IsFavorite = !item.IsFavorite;
-        // Or full reload if we trust service source of truth
+
+        // Ensure the underlying model in memory is also updated 
+        // otherwise StartEditModel might reload stale data
+        var model = Provider.Models.FirstOrDefault(m => m.Id == item.Id);
+        if (model != null)
+        {
+            if (item.IsFavorite) model.Tags.Add(ModelTags.Favorite);
+            else model.Tags.Remove(ModelTags.Favorite);
+        }
     }
 
     private void OnApiKeysCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -930,7 +972,8 @@ public partial class ProviderSettingsViewModel : ObservableObject
                     var tags = new HashSet<string>();
                     if (tagsIndex >= 0 && tagsIndex < fields.Length && !string.IsNullOrWhiteSpace(fields[tagsIndex]))
                     {
-                        var tagValues = fields[tagsIndex].Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
+                        var tagValues = fields[tagsIndex]
+                            .Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
                         foreach (var tag in tagValues)
                         {
                             var trimmedTag = tag.Trim();
@@ -944,6 +987,7 @@ public partial class ProviderSettingsViewModel : ObservableObject
                             }
                         }
                     }
+
                     // 如果没有标签,默认添加 Text 标签
                     if (tags.Count == 0)
                     {
@@ -1077,6 +1121,19 @@ public partial class KeyWrapper : ObservableObject
 
 public partial class ModelWrapper : ObservableObject
 {
+    // Shared list of available tags for binding (Static backing)
+    public static List<string> AvailableTagsList { get; } = new()
+    {
+        ModelTags.Text,
+        ModelTags.File,
+        ModelTags.Image,
+        ModelTags.Audio,
+        ModelTags.Video,
+        ModelTags.Embeddings,
+        ModelTags.Favorite,
+        ModelTags.Deprecated
+    };
+
     public ModelWrapper()
     {
         WeakReferenceMessenger.Default.Register<ThemeChangedMessage>(this, (r, m) =>
@@ -1085,11 +1142,165 @@ public partial class ModelWrapper : ObservableObject
             OnPropertyChanged(nameof(HasModelIcon));
         });
     }
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ProviderSymbol))]
     [NotifyPropertyChangedFor(nameof(InputPriceDisplay))]
     [NotifyPropertyChangedFor(nameof(OutputPriceDisplay))]
     private string _inputCurrency = "USD";
+
+    // Dynamic suggestions based on input and available tags
+    public ObservableCollection<string> SuggestedTags { get; } = new();
+
+    public ObservableCollection<string> Tags { get; } = new();
+
+    private bool _isSyncingFavorite;
+
+    partial void OnIsFavoriteChanged(bool value)
+    {
+        if (_isSyncingFavorite) return;
+
+        try
+        {
+            _isSyncingFavorite = true;
+            if (value)
+            {
+                if (!Tags.Contains(ModelTags.Favorite))
+                {
+                    Tags.Add(ModelTags.Favorite);
+                }
+            }
+            else
+            {
+                if (Tags.Contains(ModelTags.Favorite))
+                {
+                    Tags.Remove(ModelTags.Favorite);
+                }
+            }
+
+            // Update suggestions after tag change
+            UpdateSuggestions("");
+        }
+        finally
+        {
+            _isSyncingFavorite = false;
+        }
+
+        OnPropertyChanged(nameof(FavoriteIcon));
+    }
+
+    public void InitializeTags()
+    {
+        Tags.CollectionChanged -= OnTagsCollectionChanged;
+
+        // One-time sync: ensure IsFavorite and Tags are in sync before attaching listener
+        bool hasFavoriteTag = Tags.Contains(ModelTags.Favorite);
+        if (IsFavorite && !hasFavoriteTag)
+        {
+            Tags.Add(ModelTags.Favorite);
+        }
+        else if (!IsFavorite && hasFavoriteTag)
+        {
+            Tags.Remove(ModelTags.Favorite);
+        }
+
+        Tags.CollectionChanged += OnTagsCollectionChanged;
+        // Initial populate of suggestions
+        UpdateSuggestions("");
+    }
+
+    private void OnTagsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (_isSyncingFavorite)
+        {
+            UpdateSuggestions("");
+            return;
+        }
+
+        try
+        {
+            _isSyncingFavorite = true;
+            bool hasFavorite = Tags.Contains(ModelTags.Favorite);
+            if (IsFavorite != hasFavorite)
+            {
+                IsFavorite = hasFavorite;
+            }
+        }
+        finally
+        {
+            _isSyncingFavorite = false;
+        }
+
+        UpdateSuggestions("");
+    }
+
+    public void UpdateSuggestions(string input)
+    {
+        var currentInput = input?.Trim() ?? "";
+
+        var unselected = AvailableTagsList.Where(t => !Tags.Contains(t)).ToList();
+
+        List<string> filtered;
+
+        if (currentInput.Length < 2)
+        {
+            // Show all unselected candidates if input is short
+            filtered = unselected;
+        }
+        else
+        {
+            // Filter by Contains (case-insensitive)
+            filtered = unselected.Where(t => t.Contains(currentInput, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            // If no matches, find best match using Levenshtein distance
+            if (filtered.Count == 0 && unselected.Count > 0)
+            {
+                var bestMatch = unselected
+                    .Select(t => new { Tag = t, Distance = LevenshteinDistance(t, currentInput) })
+                    .OrderBy(x => x.Distance)
+                    .First();
+
+                filtered = new List<string> { bestMatch.Tag };
+            }
+        }
+
+        SuggestedTags.Clear();
+        foreach (var tag in filtered)
+        {
+            SuggestedTags.Add(tag);
+        }
+    }
+
+    private int LevenshteinDistance(string s, string t)
+    {
+        if (string.IsNullOrEmpty(s)) return string.IsNullOrEmpty(t) ? 0 : t.Length;
+        if (string.IsNullOrEmpty(t)) return s.Length;
+
+        int n = s.Length;
+        int m = t.Length;
+        int[,] d = new int[n + 1, m + 1];
+
+        for (int i = 0; i <= n; d[i, 0] = i++)
+        {
+        }
+
+        for (int j = 0; j <= m; d[0, j] = j++)
+        {
+        }
+
+        for (int i = 1; i <= n; i++)
+        {
+            for (int j = 1; j <= m; j++)
+            {
+                int cost = (t[j - 1] == s[i - 1]) ? 0 : 1;
+                d[i, j] = Math.Min(
+                    Math.Min(d[i - 1, j] + 1, d[i, j - 1] + 1),
+                    d[i - 1, j - 1] + cost);
+            }
+        }
+
+        return d[n, m];
+    }
 
     // Display strings
     [ObservableProperty] private string _inputPrice = "0";
@@ -1105,7 +1316,7 @@ public partial class ModelWrapper : ObservableObject
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(FavoriteIcon))]
     private bool _isFavorite;
 
-    [ObservableProperty] 
+    [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ModelIconUri))]
     [NotifyPropertyChangedFor(nameof(HasModelIcon))]
     private string _name = string.Empty;
@@ -1136,6 +1347,7 @@ public partial class ModelWrapper : ObservableObject
             {
                 return ProviderIconHelper.GetPresetIconUri(iconName, ThemeHelper.IsDarkTheme());
             }
+
             return null;
         }
     }

@@ -173,6 +173,9 @@
   <data name="Settings_IconLink.Content" xml:space="preserve">
     <value>AI / LLM 模型圖示</value>
   </data>
+  <data name="Models_Provider_EditTooltip.ToolTipService.ToolTip" xml:space="preserve">
+    <value>雙擊編輯服務商設定</value>
+  </data>
   <data name="Models_SearchBox.PlaceholderText" xml:space="preserve">
     <value>搜尋模型...</value>
   </data>
@@ -182,7 +185,7 @@
   <data name="Models_SortBy.Text" xml:space="preserve">
     <value>排序:</value>
   </data>
-  <data name="Models_Favorites.Text" xml:space="preserve">
+  <data name="Models_Favorites.ToolTipService.ToolTip" xml:space="preserve">
     <value>收藏</value>
   </data>
   <data name="Models_Tag_Chat.Text" xml:space="preserve">
@@ -397,5 +400,104 @@
   </data>
   <data name="ProviderSettings_ModelOutputPriceLabel.Text" xml:space="preserve">
     <value>輸出:</value>
+  </data>
+      <data name="Models_Filter_Title.Text" xml:space="preserve">
+    <value>篩選</value>
+  </data>
+  <data name="Models_Filter_Reset.Content" xml:space="preserve">
+    <value>重置</value>
+  </data>
+  <data name="Models_Filter_Capability.Text" xml:space="preserve">
+    <value>能力</value>
+  </data>
+  <data name="Models_Filter_Pricing.Text" xml:space="preserve">
+    <value>提示詞價格</value>
+  </data>
+  <data name="Models_Filter_Price_Free.Text" xml:space="preserve">
+    <value>免費</value>
+  </data>
+  <data name="Models_Filter_Status.Text" xml:space="preserve">
+    <value>狀態</value>
+  </data>
+  <data name="Models_Filter_FavoritesOnly.Content" xml:space="preserve">
+    <value>僅顯示收藏</value>
+  </data>
+  <data name="Models_Sort_NameAsc.Text" xml:space="preserve">
+    <value>名稱 (A-Z)</value>
+  </data>
+  <data name="Models_Sort_NameDesc.Text" xml:space="preserve">
+    <value>名稱 (Z-A)</value>
+  </data>
+  <data name="Models_Sort_PriceLow.Text" xml:space="preserve">
+    <value>價格: 從低到高</value>
+  </data>
+  <data name="Models_Sort_PriceHigh.Text" xml:space="preserve">
+    <value>價格: 從高到低</value>
+  </data>
+  <data name="Models_Segment_Text.Content" xml:space="preserve">
+    <value>Text</value>
+  </data>
+  <data name="Models_Segment_Text.ToolTipService.ToolTip" xml:space="preserve">
+    <value>文本/對話模型</value>
+  </data>
+  <data name="Models_Segment_File.Content" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="Models_Segment_File.ToolTipService.ToolTip" xml:space="preserve">
+    <value>檔案處理模型</value>
+  </data>
+  <data name="Models_Segment_Image.Content" xml:space="preserve">
+    <value>Image</value>
+  </data>
+  <data name="Models_Segment_Image.ToolTipService.ToolTip" xml:space="preserve">
+    <value>圖像模型</value>
+  </data>
+  <data name="Models_Segment_Audio.Content" xml:space="preserve">
+    <value>Audio</value>
+  </data>
+  <data name="Models_Segment_Audio.ToolTipService.ToolTip" xml:space="preserve">
+    <value>音訊模型</value>
+  </data>
+  <data name="Models_Segment_Video.Content" xml:space="preserve">
+    <value>Video</value>
+  </data>
+  <data name="Models_Segment_Video.ToolTipService.ToolTip" xml:space="preserve">
+    <value>影片模型</value>
+  </data>
+  <data name="Models_Segment_Embeddings.Content" xml:space="preserve">
+    <value>Embeddings</value>
+  </data>
+  <data name="Models_Segment_Embeddings.ToolTipService.ToolTip" xml:space="preserve">
+    <value>嵌入模型</value>
+  </data>
+  <data name="Models_List_Provider.Content" xml:space="preserve">
+    <value>服務商</value>
+  </data>
+  <data name="Models_List_ModelName.Content" xml:space="preserve">
+    <value>模型名稱</value>
+  </data>
+  <data name="Models_Card_By.Text" xml:space="preserve">
+    <value>來自 </value>
+  </data>
+  <data name="Models_Card_In.Text" xml:space="preserve">
+    <value>輸入:</value>
+  </data>
+  <data name="Models_Card_Out.Text" xml:space="preserve">
+    <value>輸出:</value>
+  </data>
+  <data name="Models_InputPriceFormat" xml:space="preserve">
+    <value>輸入 ({0}/1M)</value>
+  </data>
+  <data name="Models_OutputPriceFormat" xml:space="preserve">
+    <value>輸出 ({0}/1M)</value>
+  </data>
+  <data name="ProviderSettings_Tags.Text" xml:space="preserve">
+    <value>標籤</value>
+  </data>
+  <data name="ProviderSettings_TagsPlaceholder.PlaceholderText" xml:space="preserve">
+    <value>選擇標籤...</value>
+  </data>
+  <data name="Models_CountFormat" xml:space="preserve">
+    <value>{0} 個模型</value>
   </data>
 </root>
