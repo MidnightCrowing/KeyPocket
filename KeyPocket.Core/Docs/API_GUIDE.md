@@ -306,8 +306,7 @@ var model = new ModelInfo
     DisplayName = "GPT-4 Omni",
     InputPricePerMTokens = 5.0m,
     OutputPricePerMTokens = 15.0m,
-    IsChatModel = true,
-    IsEmbeddingModel = false
+    Tags = new HashSet<string> { ModelTags.Text }
 };
 
 // 添加模型
@@ -380,7 +379,7 @@ var gpt4 = new ModelInfo
     DisplayName = "GPT-4",
     InputPricePerMTokens = 30.0m,
     OutputPricePerMTokens = 60.0m,
-    IsChatModel = true
+    Tags = new HashSet<string> { ModelTags.Text }
 };
 providerService.AddModel(openai.Id, gpt4);
 

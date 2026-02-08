@@ -27,16 +27,19 @@ public class ModelFilterService
 
         // 2. 收藏过滤
         if (criteria.ShowFavoritesOnly)
-            query = query.Where(m => m.IsFavorite);
+            query = query.Where(m => m.Tags.Contains(ModelTags.Favorite));
 
         // 3. Capability 过滤
         // 如果所有 Capability 都选中或都未选中,则不应用过滤
         if (criteria.SelectedCapabilities.Count > 0 && criteria.SelectedCapabilities.Count < 6)
         {
             query = query.Where(m =>
-                (criteria.SelectedCapabilities.Contains("Text") && m.IsChatModel) ||
-                (criteria.SelectedCapabilities.Contains("Embeddings") && m.IsEmbeddingModel)
-                // 其他 Capability (File, Image, Audio, Video) 暂未实现,需要模型数据支持
+                (criteria.SelectedCapabilities.Contains("Text") && m.Tags.Contains(ModelTags.Text)) ||
+                (criteria.SelectedCapabilities.Contains("File") && m.Tags.Contains(ModelTags.File)) ||
+                (criteria.SelectedCapabilities.Contains("Image") && m.Tags.Contains(ModelTags.Image)) ||
+                (criteria.SelectedCapabilities.Contains("Audio") && m.Tags.Contains(ModelTags.Audio)) ||
+                (criteria.SelectedCapabilities.Contains("Video") && m.Tags.Contains(ModelTags.Video)) ||
+                (criteria.SelectedCapabilities.Contains("Embeddings") && m.Tags.Contains(ModelTags.Embeddings))
             );
         }
 

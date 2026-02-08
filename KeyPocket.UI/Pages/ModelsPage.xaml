@@ -204,6 +204,144 @@
                 </ctk:DataRow>
             </DataTemplate>
 
+            <!--  Model Card Template  -->
+            <DataTemplate x:DataType="vm:ModelItemViewModel" x:Key="ModelCardTemplate">
+                <Border
+                    Background="{ThemeResource LayerFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    CornerRadius="12"
+                    Padding="16">
+                    <StackPanel Spacing="12">
+                        <!--  Header  -->
+                        <Grid
+                            ColumnSpacing="8"
+                            PointerEntered="ModelCard_PointerEntered"
+                            PointerExited="ModelCard_PointerExited">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <!--  Model Icon  -->
+                            <Grid
+                                Height="20"
+                                VerticalAlignment="Center"
+                                Width="20">
+                                <Border
+                                    Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                    BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
+                                    BorderThickness="1.5"
+                                    CornerRadius="10"
+                                    Visibility="{x:Bind HasModelIcon, Converter={StaticResource BoolToVis}, Mode=OneWay}">
+                                    <BitmapIcon
+                                        Height="12"
+                                        HorizontalAlignment="Center"
+                                        ShowAsMonochrome="False"
+                                        UriSource="{x:Bind ModelIconUri, Mode=OneWay}"
+                                        VerticalAlignment="Center"
+                                        Width="12" />
+                                </Border>
+                            </Grid>
+
+                            <!--  Model Name  -->
+                            <TextBlock
+                                FontWeight="SemiBold"
+                                Grid.Column="1"
+                                Text="{x:Bind DisplayName}"
+                                TextTrimming="CharacterEllipsis"
+                                VerticalAlignment="Center" />
+
+                            <!--  Copy  -->
+                            <controls:CopyButton
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Click="CopyButton_Click"
+                                Grid.Column="3"
+                                Height="28"
+                                Opacity="0"
+                                Padding="4"
+                                Tag="{x:Bind Id, Mode=OneWay}"
+                                ToolTipService.ToolTip="Copy ID"
+                                VerticalAlignment="Center"
+                                Width="28"
+                                x:Name="CardCopyBtn">
+                                <FontIcon FontSize="14" Glyph="&#xE8C8;" />
+                            </controls:CopyButton>
+
+                            <!--  Favorite  -->
+                            <Button
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Command="{x:Bind ToggleFavoriteCommand}"
+                                Grid.Column="2"
+                                Height="28"
+                                Opacity="{x:Bind IsFavorite, Converter={StaticResource BoolToOpacity}, Mode=OneWay}"
+                                Padding="4"
+                                ToolTipService.ToolTip="Favorite"
+                                VerticalAlignment="Center"
+                                Width="28"
+                                x:Name="CardFavoriteBtn">
+                                <FontIcon
+                                    FontSize="14"
+                                    Foreground="{x:Bind IsFavorite, Mode=OneWay, Converter={StaticResource BoolToBrushConverter}}"
+                                    Glyph="{x:Bind IsFavorite, Mode=OneWay, Converter={StaticResource BoolToGlyphConverter}, ConverterParameter='Fill'}" />
+                            </Button>
+                        </Grid>
+
+                        <!--  Tags  -->
+                        <ItemsControl ItemsSource="{x:Bind CapabilityTags, Mode=OneWay}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="6" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border
+                                        Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                        BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="999"
+                                        Padding="8,2">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <Ellipse
+                                                Fill="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                                Height="4"
+                                                VerticalAlignment="Center"
+                                                Width="4" />
+                                            <TextBlock
+                                                FontSize="12"
+                                                Text="{Binding}"
+                                                VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!--  Footer  -->
+                        <TextBlock
+                            FontSize="12"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            TextTrimming="CharacterEllipsis">
+                            <Run Text="by " />
+                            <Run Text="{x:Bind ProviderName}" />
+                            <Run Text=" | " />
+                            <Run Text="In:" />
+                            <Run Text="{x:Bind InputPriceFormatted}" />
+                            <Run Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind InputPriceOriginal}" />
+                            <Run Text=" | " />
+                            <Run Text="Out:" />
+                            <Run Text="{x:Bind OutputPriceFormatted}" />
+                            <Run Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind OutputPriceOriginal}" />
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+            </DataTemplate>
+
         </ResourceDictionary>
     </Page.Resources>
 
@@ -220,6 +358,7 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
             <!--  Search Box  -->
@@ -228,7 +367,7 @@
                 HorizontalAlignment="Right"
                 PlaceholderText="Search models..."
                 Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                Width="300"
+                Width="200"
                 x:Uid="Models_SearchBox" />
 
             <!--  Filter Button  -->
@@ -295,8 +434,7 @@
                                     Minimum="0"
                                     RangeEnd="{x:Bind ViewModel.MaxPriceIndex, Mode=TwoWay}"
                                     RangeStart="{x:Bind ViewModel.MinPriceIndex, Mode=TwoWay}"
-                                    StepFrequency="1"
-                                    x:Name="PriceRangeSelector" />
+                                    StepFrequency="1" />
 
                                 <!--  Ticks  -->
                                 <Grid Margin="0,-8,0,0" Padding="8,0,8,0">
@@ -486,25 +624,59 @@
                 </DropDownButton.Flyout>
             </DropDownButton>
 
+            <!--  View Toggle  -->
+            <ctk:Segmented
+                Grid.Column="4"
+                ItemContainerStyle="{StaticResource CustomSegmentedItemStyle}"
+                SelectedIndex="{x:Bind ViewModel.ViewModeIndex, Mode=TwoWay}">
+                <ctk:SegmentedItem Height="28.8" ToolTipService.ToolTip="List view">
+                    <ctk:SegmentedItem.Content>
+                        <FontIcon FontSize="16" Glyph="&#xE8FD;" />
+                    </ctk:SegmentedItem.Content>
+                </ctk:SegmentedItem>
+                <ctk:SegmentedItem Height="28.8" ToolTipService.ToolTip="Card view">
+                    <ctk:SegmentedItem.Content>
+                        <FontIcon FontSize="16" Glyph="&#xECA5;" />
+                    </ctk:SegmentedItem.Content>
+                </ctk:SegmentedItem>
+            </ctk:Segmented>
+
         </Grid>
 
-        <!--  HeaderedTreeView with DataTable  -->
-        <ctk:HeaderedTreeView
-            Grid.Row="1"
-            ItemTemplateSelector="{StaticResource ModelsItemTemplateSelector}"
-            x:Name="ModelsTreeView">
-            <ctk:HeaderedTreeView.Header>
-                <ctk:DataTable ColumnSpacing="16" Margin="16,0">
-                    <!--  Provider Name Column (Auto width handles indentation)  -->
-                    <ctk:DataColumn Content="Provider" DesiredWidth="Auto" />
-                    <!--  Model Name Column  -->
-                    <ctk:DataColumn Content="Model Name" DesiredWidth="*" />
-                    <!--  Input Price Column  -->
-                    <ctk:DataColumn Content="Input ($/1M)" DesiredWidth="160" />
-                    <!--  Output Price Column  -->
-                    <ctk:DataColumn Content="Output ($/1M)" DesiredWidth="160" />
-                </ctk:DataTable>
-            </ctk:HeaderedTreeView.Header>
-        </ctk:HeaderedTreeView>
+        <!--  List / Card Switcher  -->
+        <ctk:SwitchPresenter Grid.Row="1" Value="{x:Bind ViewModel.ViewMode, Mode=OneWay}">
+            <ctk:Case Value="{x:Bind vm:ModelsViewMode.List}">
+                <!--  HeaderedTreeView with DataTable  -->
+                <ctk:HeaderedTreeView ItemTemplateSelector="{StaticResource ModelsItemTemplateSelector}" x:Name="ModelsTreeView">
+                    <ctk:HeaderedTreeView.Header>
+                        <ctk:DataTable ColumnSpacing="16" Margin="16,0">
+                            <!--  Provider Name Column (Auto width handles indentation)  -->
+                            <ctk:DataColumn Content="Provider" DesiredWidth="Auto" />
+                            <!--  Model Name Column  -->
+                            <ctk:DataColumn Content="Model Name" DesiredWidth="*" />
+                            <!--  Input Price Column  -->
+                            <ctk:DataColumn Content="{x:Bind ViewModel.InputPriceHeader, Mode=OneWay}" DesiredWidth="160" />
+                            <!--  Output Price Column  -->
+                            <ctk:DataColumn Content="{x:Bind ViewModel.OutputPriceHeader, Mode=OneWay}" DesiredWidth="160" />
+                        </ctk:DataTable>
+                    </ctk:HeaderedTreeView.Header>
+                </ctk:HeaderedTreeView>
+            </ctk:Case>
+            <ctk:Case Value="{x:Bind vm:ModelsViewMode.Card}">
+                <!--  Card View  -->
+                <ScrollViewer>
+                    <muxc:ItemsRepeater ItemTemplate="{StaticResource ModelCardTemplate}" ItemsSource="{x:Bind ViewModel.FilteredModels, Mode=OneWay}">
+                        <muxc:ItemsRepeater.Layout>
+                            <muxc:UniformGridLayout
+                                ItemsStretch="Fill"
+                                MinColumnSpacing="12"
+                                MinItemWidth="300"
+                                MinRowSpacing="12"
+                                Orientation="Horizontal" />
+                        </muxc:ItemsRepeater.Layout>
+                    </muxc:ItemsRepeater>
+                </ScrollViewer>
+            </ctk:Case>
+        </ctk:SwitchPresenter>
     </Grid>
 </Page>

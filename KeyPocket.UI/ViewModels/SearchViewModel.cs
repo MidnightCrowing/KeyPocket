@@ -91,8 +91,11 @@ public partial class SearchViewModel : ObservableObject
             };
 
             // Try to resolve model icon
-            var iconName = ProviderIconHelper.GetIconForModel(x.Model.Id) ??
-                           ProviderIconHelper.GetIconForModel(x.Model.DisplayName);
+            var iconName = ProviderIconHelper.GetIconForModel(x.Model.Id);
+            if (iconName == null && !string.IsNullOrEmpty(x.Model.DisplayName))
+            {
+                iconName = ProviderIconHelper.GetIconForModel(x.Model.DisplayName);
+            }
 
             if (!string.IsNullOrEmpty(iconName))
             {

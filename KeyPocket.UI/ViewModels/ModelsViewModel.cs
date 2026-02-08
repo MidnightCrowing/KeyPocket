@@ -15,7 +15,13 @@ public partial class ModelsViewModel : ObservableObject
     private readonly ProviderService _providerService;
     private readonly ModelFilterService _filterService;
 
-    [ObservableProperty] private string _currencySymbol = "$";
+    [ObservableProperty] 
+    [NotifyPropertyChangedFor(nameof(InputPriceHeader))]
+    [NotifyPropertyChangedFor(nameof(OutputPriceHeader))]
+    private string _currencySymbol = "$";
+
+    public string InputPriceHeader => $"Input ({CurrencySymbol}/1M)";
+    public string OutputPriceHeader => $"Output ({CurrencySymbol}/1M)";
 
     [ObservableProperty] private ObservableCollection<ModelItemViewModel> _filteredModels = new();
 
@@ -40,6 +46,10 @@ public partial class ModelsViewModel : ObservableObject
 
     [ObservableProperty] private bool _showFavoritesOnly;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ViewModeIndex))]
+    private ModelsViewMode _viewMode = ModelsViewMode.List;
+
     public ModelsViewModel(ProviderService providerService, ModelFilterService filterService)
     {
         _providerService = providerService;
@@ -52,7 +62,30 @@ public partial class ModelsViewModel : ObservableObject
             App.MainWindow.DispatcherQueue.TryEnqueue(ApplyFilters);
         });
 
+        // Register for provider updates (e.g. icon change)
+        WeakReferenceMessenger.Default.Register<ProviderUpdatedMessage>(this, (r, m) =>
+        {
+             App.MainWindow.DispatcherQueue.TryEnqueue(() =>
+             {
+                 var group = GroupedModels.FirstOrDefault(g => g.ProviderId == m.ProviderId);
+                 if (group != null)
+                 {
+                     var provider = _providerService.GetAllProviders().FirstOrDefault(p => p.Id == m.ProviderId);
+                     if (provider != null)
+                     {
+                         group.ProviderIcon = provider.IconPath;
+                     }
+                 }
+             });
+        });
+
         UpdateCurrencySymbol();
+    }
+
+    public int ViewModeIndex
+    {
+        get => ViewMode == ModelsViewMode.List ? 0 : 1;
+        set => ViewMode = value == 1 ? ModelsViewMode.Card : ModelsViewMode.List;
     }
 
     private void UpdateCurrencySymbol()
@@ -108,6 +141,7 @@ public partial class ModelsViewModel : ObservableObject
     partial void OnMinPriceIndexChanged(int value) => ApplyFilters();
     partial void OnMaxPriceIndexChanged(int value) => ApplyFilters();
     partial void OnSortOptionChanged(ModelSortOption value) => ApplyFilters();
+    partial void OnViewModeChanged(ModelsViewMode value) => OnPropertyChanged(nameof(ViewModeIndex));
 
     private void ApplyFilters()
     {
@@ -127,9 +161,7 @@ public partial class ModelsViewModel : ObservableObject
         {
             Id = vm.Id,
             DisplayName = vm.DisplayName,
-            IsFavorite = vm.IsFavorite,
-            IsChatModel = vm.IsChatModel,
-            IsEmbeddingModel = vm.IsEmbeddingModel,
+            Tags = new HashSet<string>(vm._model.Tags),
             InputPricePerMTokens = vm.InputPrice
         }).ToList();
 
@@ -218,4 +250,10 @@ public partial class ModelsViewModel : ObservableObject
         MaxPriceIndex = 6;
         SortOption = ModelSortOption.NameAsc;
     }
+}
+
+public enum ModelsViewMode
+{
+    List,
+    Card
 }

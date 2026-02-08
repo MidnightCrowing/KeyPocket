@@ -8,7 +8,7 @@
     xmlns:converters="using:KeyPocket.UI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:viewModels="using:KeyPocket.UI.ViewModels"
+    xmlns:vm="using:KeyPocket.UI.ViewModels"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Page.Resources>
         <ResourceDictionary>
@@ -96,7 +96,7 @@
                                                     </Style>
                                                 </GridView.ItemContainerStyle>
                                                 <GridView.ItemTemplate>
-                                                    <DataTemplate x:DataType="viewModels:DefaultIconItem">
+                                                    <DataTemplate x:DataType="vm:DefaultIconItem">
                                                         <StackPanel
                                                             Spacing="4"
                                                             ToolTipService.ToolTip="{x:Bind Name}"
@@ -255,7 +255,7 @@
                                 </Style>
                             </ListView.ItemContainerStyle>
                             <ListView.ItemTemplate>
-                                <DataTemplate x:DataType="viewModels:KeyWrapper">
+                                <DataTemplate x:DataType="vm:KeyWrapper">
                                     <Grid
                                         Background="{ThemeResource LayerFillColorDefaultBrush}"
                                         BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
@@ -451,7 +451,7 @@
                                 </Style>
                             </ListView.ItemContainerStyle>
                             <ListView.ItemTemplate>
-                                <DataTemplate x:DataType="viewModels:ModelWrapper">
+                                <DataTemplate x:DataType="vm:ModelWrapper">
                                     <Grid
                                         Background="{ThemeResource LayerFillColorDefaultBrush}"
                                         BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
@@ -467,11 +467,17 @@
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
 
-                                            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                                                <BitmapIcon UriSource="{x:Bind ModelIconUri, Mode=OneWay}"
-                                                            ShowAsMonochrome="False"
-                                                            Width="14" Height="14"
-                                                            Visibility="{x:Bind HasModelIcon, Converter={StaticResource BoolToVisConverter}, Mode=OneWay}"/>
+                                            <StackPanel
+                                                Grid.Column="0"
+                                                Orientation="Horizontal"
+                                                Spacing="8"
+                                                VerticalAlignment="Center">
+                                                <BitmapIcon
+                                                    Height="14"
+                                                    ShowAsMonochrome="False"
+                                                    UriSource="{x:Bind ModelIconUri, Mode=OneWay}"
+                                                    Visibility="{x:Bind HasModelIcon, Converter={StaticResource BoolToVisConverter}, Mode=OneWay}"
+                                                    Width="14" />
                                                 <TextBlock
                                                     Style="{StaticResource BodyStrongTextBlockStyle}"
                                                     Text="{x:Bind Name, Mode=OneWay}"

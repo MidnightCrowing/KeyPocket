@@ -7,7 +7,7 @@
     xmlns:custom="using:KeyPocket.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:viewModels="using:KeyPocket.UI.ViewModels"
+    xmlns:vm="using:KeyPocket.UI.ViewModels"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Page.Resources>
@@ -127,7 +127,7 @@
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="viewModels:ProviderViewModel">
+                    <DataTemplate x:DataType="vm:ProviderViewModel">
                         <Grid
                             AllowDrop="True"
                             Background="{ThemeResource LayerOnMicaBaseAltFillColorDefaultBrush}"
@@ -246,7 +246,7 @@
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
-                                    <DataTemplate x:DataType="viewModels:ModelItem">
+                                    <DataTemplate x:DataType="vm:ModelItem">
                                         <Button
                                             Click="OnCopyModelIdClicked"
                                             Content="{x:Bind Name}"
@@ -266,7 +266,7 @@
                                 Margin="0,12,0,0">
                                 <ItemsControl.ItemTemplate>
 
-                                    <DataTemplate x:DataType="viewModels:KeyItem">
+                                    <DataTemplate x:DataType="vm:KeyItem">
                                         <Button
                                             Background="{ThemeResource LayerFillColorDefaultBrush}"
                                             BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"

@@ -69,7 +69,7 @@ public partial class ProviderSettingsViewModel : ObservableObject
         _description = provider.Description;
         _providerCurrency = provider.Currency;
         LoadKeys(Provider);
-        LoadModels(Provider);
+        RefreshModels(Provider);
         HasCustomIcon = ProviderIconHelper.HasCustomIcon(provider.IconPath);
 
         LoadDefaultIcons();
@@ -448,7 +448,7 @@ public partial class ProviderSettingsViewModel : ObservableObject
                         InputPriceValue = (double)(model.InputPricePerMTokens ?? 0),
                         OutputPriceValue = (double)(model.OutputPricePerMTokens ?? 0),
                         InputCurrency = Provider.Currency ?? "USD",
-                        IsFavorite = model.IsFavorite,
+                        IsFavorite = model.Tags.Contains(ModelTags.Favorite),
                         IsEditing = false
                     };
 
@@ -471,7 +471,7 @@ public partial class ProviderSettingsViewModel : ObservableObject
                     wrapper.InputPriceValue = (double)(model.InputPricePerMTokens ?? 0);
                     wrapper.OutputPriceValue = (double)(model.OutputPricePerMTokens ?? 0);
                     wrapper.InputCurrency = Provider.Currency ?? "USD";
-                    wrapper.IsFavorite = model.IsFavorite;
+                    wrapper.IsFavorite = model.Tags.Contains(ModelTags.Favorite);
 
                     wrapper.InputPrice = wrapper.InputPriceValue.ToString();
                     wrapper.OutputPrice = wrapper.OutputPriceValue.ToString();
@@ -489,52 +489,6 @@ public partial class ProviderSettingsViewModel : ObservableObject
         }
     }
 
-    /// <summary>
-    ///     Loads models from scratch, clearing the entire list.
-    ///     Use RefreshModels() instead to preserve editing state.
-    /// </summary>
-    [Obsolete("Use RefreshModels() instead to preserve editing state")]
-    private void LoadModels(Provider? current = null)
-    {
-        if (current == null) current = GetProviderFromService(Provider.Id);
-        if (current == null) return;
-        Provider = current;
-
-        Models.Clear();
-
-        _isSyncingOrder = true;
-        try
-        {
-            foreach (var m in Provider.Models)
-            {
-                var w = new ModelWrapper
-                {
-                    Id = m.Id,
-                    Name = m.DisplayName,
-                    IsFavorite = m.IsFavorite,
-                    IsEditing = false
-                };
-
-                // Initialize editing currency to Provider's currency
-                w.InputCurrency = Provider.Currency ?? "USD";
-
-                // Load stored values (which are in Provider.Currency)
-                w.InputPriceValue = (double)(m.InputPricePerMTokens ?? 0);
-                w.OutputPriceValue = (double)(m.OutputPricePerMTokens ?? 0);
-
-
-                w.InputPrice = w.InputPriceValue.ToString();
-                w.OutputPrice = w.OutputPriceValue.ToString();
-
-                InjectModelCommands(w);
-                Models.Add(w);
-            }
-        }
-        finally
-        {
-            _isSyncingOrder = false;
-        }
-    }
 
     private void InjectModelCommands(ModelWrapper w)
     {
@@ -637,8 +591,6 @@ public partial class ProviderSettingsViewModel : ObservableObject
                 item.IsEditing = false;
             }
         }
-
-        // No global LoadModels() call here to preserve other new cards
     }
 
     private void CancelAddModel(ModelWrapper? item)
@@ -880,10 +832,11 @@ public partial class ProviderSettingsViewModel : ObservableObject
             if (file == null) return;
 
             var csvContent = new StringBuilder();
-            csvContent.AppendLine("ModelId,Name,InputPrice,OutputPrice,Type");
-            csvContent.AppendLine("eg:gpt-4-turbo,GPT-4 Turbo,0.010,0.030,Chat");
-            csvContent.AppendLine("eg:gpt-3.5-turbo,GPT-3.5 Turbo,0.001,0.002,Chat");
-            csvContent.AppendLine("eg:text-embedding-3-small,Text Embedding Small,0.000,,Embedding");
+            csvContent.AppendLine("ModelId,Name,InputPrice,OutputPrice,Tags");
+            csvContent.AppendLine("eg:gpt-4-turbo,GPT-4 Turbo,0.010,0.030,Text");
+            csvContent.AppendLine("eg:gpt-3.5-turbo,GPT-3.5 Turbo,0.001,0.002,Text");
+            csvContent.AppendLine("eg:text-embedding-3-small,Text Embedding Small,0.000,,Embeddings");
+            csvContent.AppendLine("eg:gpt-4-vision,GPT-4 Vision,0.010,0.030,\"Text,Image\"");
 
             await FileIO.WriteTextAsync(file, csvContent.ToString(), UnicodeEncoding.Utf8);
         }
@@ -926,7 +879,7 @@ public partial class ProviderSettingsViewModel : ObservableObject
                 Array.FindIndex(header, h => h.Equals("InputPrice", StringComparison.OrdinalIgnoreCase));
             var outputPriceIndex =
                 Array.FindIndex(header, h => h.Equals("OutputPrice", StringComparison.OrdinalIgnoreCase));
-            var typeIndex = Array.FindIndex(header, h => h.Equals("Type", StringComparison.OrdinalIgnoreCase));
+            var tagsIndex = Array.FindIndex(header, h => h.Equals("Tags", StringComparison.OrdinalIgnoreCase));
 
             if (modelIdIndex == -1)
             {
@@ -973,16 +926,28 @@ public partial class ProviderSettingsViewModel : ObservableObject
                                 out var op))
                             outputPrice = Math.Round(op, 3);
 
-                    var isChatModel = true;
-                    var isEmbeddingModel = false;
-                    if (typeIndex >= 0 && typeIndex < fields.Length)
+                    // 解析标签
+                    var tags = new HashSet<string>();
+                    if (tagsIndex >= 0 && tagsIndex < fields.Length && !string.IsNullOrWhiteSpace(fields[tagsIndex]))
                     {
-                        var typeValue = fields[typeIndex].Trim();
-                        if (typeValue.Equals("Embedding", StringComparison.OrdinalIgnoreCase))
+                        var tagValues = fields[tagsIndex].Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
+                        foreach (var tag in tagValues)
                         {
-                            isEmbeddingModel = true;
-                            isChatModel = false;
+                            var trimmedTag = tag.Trim();
+                            // 验证标签是否为预定义标签
+                            if (trimmedTag == ModelTags.Text || trimmedTag == ModelTags.File ||
+                                trimmedTag == ModelTags.Image || trimmedTag == ModelTags.Audio ||
+                                trimmedTag == ModelTags.Video || trimmedTag == ModelTags.Embeddings ||
+                                trimmedTag == ModelTags.Deprecated)
+                            {
+                                tags.Add(trimmedTag);
+                            }
                         }
+                    }
+                    // 如果没有标签,默认添加 Text 标签
+                    if (tags.Count == 0)
+                    {
+                        tags.Add(ModelTags.Text);
                     }
 
                     // Upsert logic: check if model exists in Provider.Models
@@ -994,8 +959,7 @@ public partial class ProviderSettingsViewModel : ObservableObject
                         existingModel.DisplayName = displayName;
                         existingModel.InputPricePerMTokens = inputPrice;
                         existingModel.OutputPricePerMTokens = outputPrice;
-                        existingModel.IsChatModel = isChatModel;
-                        existingModel.IsEmbeddingModel = isEmbeddingModel;
+                        existingModel.Tags = tags;
                     }
                     else
                     {
@@ -1007,8 +971,7 @@ public partial class ProviderSettingsViewModel : ObservableObject
                             ProviderId = Provider.Id,
                             InputPricePerMTokens = inputPrice,
                             OutputPricePerMTokens = outputPrice,
-                            IsChatModel = isChatModel,
-                            IsEmbeddingModel = isEmbeddingModel
+                            Tags = tags
                         };
                         Provider.Models.Add(newModel);
                     }
@@ -1142,7 +1105,10 @@ public partial class ModelWrapper : ObservableObject
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(FavoriteIcon))]
     private bool _isFavorite;
 
-    [ObservableProperty] private string _name = string.Empty;
+    [ObservableProperty] 
+    [NotifyPropertyChangedFor(nameof(ModelIconUri))]
+    [NotifyPropertyChangedFor(nameof(HasModelIcon))]
+    private string _name = string.Empty;
 
     // For new model entry
     [ObservableProperty] private string _newId = "";
@@ -1156,13 +1122,16 @@ public partial class ModelWrapper : ObservableObject
     [NotifyPropertyChangedFor(nameof(HasOutputPrice))]
     private double _outputPriceValue;
 
-    public string Id { get; set; } = string.Empty;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ModelIconUri))]
+    [NotifyPropertyChangedFor(nameof(HasModelIcon))]
+    private string _id = string.Empty;
 
     public Uri? ModelIconUri
     {
         get
         {
-            var iconName = ProviderIconHelper.GetIconForModel(Id) ?? ProviderIconHelper.GetIconForModel(Name);
+            var iconName = ProviderIconHelper.GetIconForModel(Name) ?? ProviderIconHelper.GetIconForModel(Id);
             if (!string.IsNullOrEmpty(iconName))
             {
                 return ProviderIconHelper.GetPresetIconUri(iconName, ThemeHelper.IsDarkTheme());

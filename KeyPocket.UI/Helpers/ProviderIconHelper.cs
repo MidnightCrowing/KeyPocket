@@ -78,14 +78,14 @@ public static class ProviderIconHelper
         // 判断是否为预设名称
         if (IsPresetName(iconPath))
         {
-            var uri = GetPresetIconUri(iconPath, isDarkTheme);
+            var uri = GetPresetIconUri(iconPath!, isDarkTheme);
             return new ImageIcon { Source = new BitmapImage(uri) };
         }
 
         // 自定义文件路径
         try
         {
-            return new ImageIcon { Source = new BitmapImage(new Uri(iconPath)) };
+            return new ImageIcon { Source = new BitmapImage(new Uri(iconPath!)) };
         }
         catch
         {
@@ -111,8 +111,22 @@ public static class ProviderIconHelper
             var assetsPath = Path.Combine(appInstalledPath, "Assets", "ProviderIcons");
             var themeSpecificPath = Path.Combine(assetsPath, $"{baseName}{suffix}.png");
 
+            // Check direct file (with dots) first - but try to sanitize if not found OR always sanitize?
+            // Since we know . in filename is problematic for PRI, we should prefer sanitized names
+            // But to avoid breaking existing valid names (that don't use qualifiers), we can check both?
+            // Actually, the warning is because the *file exists* with that name.
+            // So renaming the file fixes the warning.
+            // Now we need Code to find the renamed file.
+            
             if (File.Exists(themeSpecificPath))
                 return new Uri($"ms-appx:///Assets/ProviderIcons/{baseName}{suffix}.png");
+                
+            // Fallback: Check for underscore replacement (e.g. z.ai-dark -> z_ai-dark)
+            var sanitizedBaseName = baseName.Replace('.', '_');
+            var sanitizedPath = Path.Combine(assetsPath, $"{sanitizedBaseName}{suffix}.png");
+            
+             if (File.Exists(sanitizedPath))
+                return new Uri($"ms-appx:///Assets/ProviderIcons/{sanitizedBaseName}{suffix}.png");
         }
         catch
         {
@@ -163,7 +177,7 @@ public static class ProviderIconHelper
     /// </summary>
     /// <param name="iconPath">图标路径</param>
     /// <returns>是否为预设名称</returns>
-    public static bool IsPresetName(string iconPath)
+    public static bool IsPresetName(string? iconPath)
     {
         if (string.IsNullOrEmpty(iconPath)) return false;
 
@@ -191,7 +205,7 @@ public static class ProviderIconHelper
 
         try
         {
-            string jsonContent = null;
+            string? jsonContent = null;
             var localFolder = ApplicationData.Current.LocalFolder;
             var mappingFile = Path.Combine(localFolder.Path, "model_icon_mapping.json");
 

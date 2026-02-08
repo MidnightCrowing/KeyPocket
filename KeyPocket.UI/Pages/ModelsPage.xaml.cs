@@ -1,13 +1,10 @@
 using System;
 using System.ComponentModel;
-using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
 using KeyPocket.Core.Services;
-using KeyPocket.UI.Controls;
 using KeyPocket.UI.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Navigation;
 
 namespace KeyPocket.UI.Pages;
@@ -89,17 +86,15 @@ public sealed partial class ModelsPage : Page
             Button? favBtn = null;
 
             foreach (var child in children)
-            {
                 if (child is Button btn)
                 {
-                    int col = Grid.GetColumn(btn);
+                    var col = Grid.GetColumn(btn);
                     if (col == 2) copyBtn = btn;
                     else if (col == 4) favBtn = btn;
                 }
-            }
 
-            if (favBtn != null) favBtn.Opacity = 1;
-            if (copyBtn != null) copyBtn.Opacity = 1;
+            if (favBtn != null) favBtn.SetValue(OpacityProperty, 1d);
+            if (copyBtn != null) copyBtn.SetValue(OpacityProperty, 1d);
         }
     }
 
@@ -112,25 +107,65 @@ public sealed partial class ModelsPage : Page
             Button? favBtn = null;
 
             foreach (var child in children)
-            {
                 if (child is Button btn)
                 {
-                    int col = Grid.GetColumn(btn);
+                    var col = Grid.GetColumn(btn);
                     if (col == 2) copyBtn = btn;
                     else if (col == 4) favBtn = btn;
                 }
-            }
 
-            if (copyBtn != null) copyBtn.Opacity = 0;
-
+            if (copyBtn != null) copyBtn.SetValue(OpacityProperty, 0d);
             if (favBtn != null)
             {
-                bool isFavorite = false;
+                var isFavorite = false;
                 if (grid.DataContext is TreeViewNode node && node.Content is ModelItemViewModel vm)
-                {
                     isFavorite = vm.IsFavorite;
+                favBtn.SetValue(OpacityProperty, isFavorite ? 1d : 0d);
+            }
+        }
+    }
+
+    private void ModelCard_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        if (sender is Grid grid)
+        {
+            Button? copyBtn = null;
+            Button? favBtn = null;
+
+            foreach (var child in grid.Children)
+                if (child is Button btn)
+                {
+                    var col = Grid.GetColumn(btn);
+                    if (col == 2) favBtn = btn;
+                    else if (col == 3) copyBtn = btn;
                 }
-                favBtn.Opacity = isFavorite ? 1 : 0;
+
+            if (favBtn != null) favBtn.SetValue(OpacityProperty, 1d);
+            if (copyBtn != null) copyBtn.SetValue(OpacityProperty, 1d);
+        }
+    }
+
+    private void ModelCard_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        if (sender is Grid grid)
+        {
+            Button? copyBtn = null;
+            Button? favBtn = null;
+
+            foreach (var child in grid.Children)
+                if (child is Button btn)
+                {
+                    var col = Grid.GetColumn(btn);
+                    if (col == 2) favBtn = btn;
+                    else if (col == 3) copyBtn = btn;
+                }
+
+            if (copyBtn != null) copyBtn.SetValue(OpacityProperty, 0d);
+            if (favBtn != null)
+            {
+                var isFavorite = false;
+                if (grid.DataContext is ModelItemViewModel vm) isFavorite = vm.IsFavorite;
+                favBtn.SetValue(OpacityProperty, isFavorite ? 1d : 0d);
             }
         }
     }
@@ -138,9 +173,7 @@ public sealed partial class ModelsPage : Page
     private void SortOption_Click(object sender, RoutedEventArgs e)
     {
         if (sender is MenuFlyoutItem item && item.Tag is string tag)
-        {
             ViewModel.SortOption = Enum.Parse<ModelSortOption>(tag);
-        }
     }
 
     private void ResetFilters_Click(object sender, RoutedEventArgs e)
@@ -152,9 +185,6 @@ public sealed partial class ModelsPage : Page
     {
         if (sender is FrameworkElement element && element.DataContext is TreeViewNode node &&
             node.Content is ProviderGroupViewModel group && group.ProviderId != Guid.Empty)
-        {
             Frame.Navigate(typeof(ProviderSettingsPage), group.ProviderId.ToString());
-        }
     }
-
 }

@@ -46,7 +46,7 @@ public partial class ProviderViewModel : ObservableObject
         UpdateIcon(provider.Type, provider.IconPath);
 
         // Populate favorite models
-        var favoriteModels = provider.Models.Where(m => m.IsFavorite).ToList();
+        var favoriteModels = provider.Models.Where(m => m.Tags.Contains(ModelTags.Favorite)).ToList();
         foreach (var model in favoriteModels)
             Models.Add(new ModelItem
             {

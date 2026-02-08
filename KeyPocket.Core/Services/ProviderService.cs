@@ -271,13 +271,18 @@ public class ProviderService
             var model = provider.Models.FirstOrDefault(m => m.Id == modelId);
             if (model != null)
             {
-                model.IsFavorite = !model.IsFavorite;
-
-                // Sync list
-                if (model.IsFavorite && !provider.FavoriteModelIds.Contains(modelId))
-                    provider.FavoriteModelIds.Add(modelId);
-                else if (!model.IsFavorite && provider.FavoriteModelIds.Contains(modelId))
+                // 切换收藏标签
+                if (model.Tags.Contains(ModelTags.Favorite))
+                {
+                    model.Tags.Remove(ModelTags.Favorite);
                     provider.FavoriteModelIds.Remove(modelId);
+                }
+                else
+                {
+                    model.Tags.Add(ModelTags.Favorite);
+                    if (!provider.FavoriteModelIds.Contains(modelId))
+                        provider.FavoriteModelIds.Add(modelId);
+                }
 
                 _storage.Save(config);
             }

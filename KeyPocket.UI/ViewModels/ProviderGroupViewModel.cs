@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+
+using CommunityToolkit.Mvvm.ComponentModel;
 using KeyPocket.UI.Helpers;
 
 namespace KeyPocket.UI.ViewModels;
@@ -7,11 +9,17 @@ namespace KeyPocket.UI.ViewModels;
 /// <summary>
 ///     服务商分组,用于 HeaderedTreeView 的分组展示
 /// </summary>
-public class ProviderGroupViewModel
+public partial class ProviderGroupViewModel : ObservableObject
 {
     public Guid ProviderId { get; set; }
     public string ProviderName { get; set; } = string.Empty;
-    public string? ProviderIcon { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsCustomIcon))]
+    [NotifyPropertyChangedFor(nameof(DefaultGlyph))]
+    [NotifyPropertyChangedFor(nameof(IconUri))]
+    private string? _providerIcon;
+
     public List<ModelItemViewModel> Models { get; set; } = new();
 
     public bool IsCustomIcon => ProviderIconHelper.HasCustomIcon(ProviderIcon);

@@ -13,9 +13,9 @@ public class ModelsItemTemplateSelector : DataTemplateSelector
     {
         if (item is TreeViewNode node) item = node.Content;
 
-        if (item is ProviderGroupViewModel) return ProviderTemplate;
+        if (item is ProviderGroupViewModel && ProviderTemplate != null) return ProviderTemplate;
 
-        if (item is ModelItemViewModel) return ModelTemplate;
+        if (item is ModelItemViewModel && ModelTemplate != null) return ModelTemplate;
 
         return base.SelectTemplateCore(item, container);
     }
