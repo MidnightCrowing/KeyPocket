@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.Input;
 using Windows.System;
+using CommunityToolkit.Mvvm.Input;
 
 namespace KeyPocket.UI.ViewModels;
 

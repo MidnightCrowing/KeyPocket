@@ -21,7 +21,6 @@ public sealed partial class ProviderSettingsPage : Page, INotifyPropertyChanged
 
         InitializeComponent();
         Loaded += OnPageLoaded;
-
     }
 
     public ProviderSettingsViewModel? ViewModel

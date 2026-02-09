@@ -9,16 +9,13 @@ public partial class SettingsViewModel
 {
     [ObservableProperty] private bool _isAddingCurrency;
 
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(ConfirmAddCurrencyCommand))]
+    [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(ConfirmAddCurrencyCommand))]
     private string _newCurrencyCode = string.Empty;
 
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(ConfirmAddCurrencyCommand))]
+    [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(ConfirmAddCurrencyCommand))]
     private string _newCurrencySymbol = string.Empty;
 
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(DeleteSelectedCurrencyCommand))]
+    [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(DeleteSelectedCurrencyCommand))]
     private string _selectedCurrency;
 
     [RelayCommand]

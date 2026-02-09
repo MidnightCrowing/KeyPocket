@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-
 using CommunityToolkit.Mvvm.ComponentModel;
 using KeyPocket.UI.Helpers;
 
@@ -11,14 +10,14 @@ namespace KeyPocket.UI.ViewModels;
 /// </summary>
 public partial class ProviderGroupViewModel : ObservableObject
 {
-    public Guid ProviderId { get; set; }
-    public string ProviderName { get; set; } = string.Empty;
-
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsCustomIcon))]
     [NotifyPropertyChangedFor(nameof(DefaultGlyph))]
     [NotifyPropertyChangedFor(nameof(IconUri))]
     private string? _providerIcon;
+
+    public Guid ProviderId { get; set; }
+    public string ProviderName { get; set; } = string.Empty;
 
     public List<ModelItemViewModel> Models { get; set; } = new();
 

@@ -10,16 +10,13 @@ public partial class SettingsViewModel
 {
     [ObservableProperty] private bool _isAddingRate;
 
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(AddCustomRateCommand))]
+    [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(AddCustomRateCommand))]
     private string _newRateSource = string.Empty;
 
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(AddCustomRateCommand))]
+    [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(AddCustomRateCommand))]
     private string _newRateTarget = string.Empty;
 
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(AddCustomRateCommand))]
+    [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(AddCustomRateCommand))]
     private double _newRateValue = double.NaN;
 
     partial void OnNewRateValueChanged(double value)

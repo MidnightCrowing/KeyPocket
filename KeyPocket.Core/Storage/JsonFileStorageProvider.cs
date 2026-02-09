@@ -53,27 +53,25 @@ public class JsonFileStorageProvider : IStorageProvider
             File.WriteAllText(tempPath, json);
 
             // 2. 如果目标存在，先移到备份
-            if (File.Exists(_filePath))
-            {
-                File.Move(_filePath, backupPath, true);
-            }
+            if (File.Exists(_filePath)) File.Move(_filePath, backupPath, true);
 
             // 3. 将临时文件移正
             File.Move(tempPath, _filePath);
 
             // 4. 成功后删除备份
-            if (File.Exists(backupPath))
-            {
-                File.Delete(backupPath);
-            }
+            if (File.Exists(backupPath)) File.Delete(backupPath);
         }
         catch (Exception)
         {
             // 如果出错了（比如第3步失败），尝试用备份恢复
             if (!File.Exists(_filePath) && File.Exists(backupPath))
-            {
-                try { File.Move(backupPath, _filePath); } catch { }
-            }
+                try
+                {
+                    File.Move(backupPath, _filePath);
+                }
+                catch
+                {
+                }
 
             if (File.Exists(tempPath)) File.Delete(tempPath);
             throw;

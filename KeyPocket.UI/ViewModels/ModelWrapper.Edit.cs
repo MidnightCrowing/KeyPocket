@@ -6,20 +6,14 @@ namespace KeyPocket.UI.ViewModels;
 
 public partial class ModelWrapper
 {
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsReadOnly))]
+    [ObservableProperty] private string _inputPrice = string.Empty;
+
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsReadOnly))]
     private bool _isEditing;
 
     [ObservableProperty] private string _newId = string.Empty;
 
-    partial void OnNewIdChanged(string value)
-    {
-        (ConfirmAddCommand as IRelayCommand)?.NotifyCanExecuteChanged();
-    }
-
     [ObservableProperty] private string _newName = string.Empty;
-
-    [ObservableProperty] private string _inputPrice = string.Empty;
 
     [ObservableProperty] private string _outputPrice = string.Empty;
 
@@ -54,4 +48,9 @@ public partial class ModelWrapper
     public ICommand? ConfirmEditCommand { get; set; }
 
     public ICommand? CancelEditCommand { get; set; }
+
+    partial void OnNewIdChanged(string value)
+    {
+        (ConfirmAddCommand as IRelayCommand)?.NotifyCanExecuteChanged();
+    }
 }

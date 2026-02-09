@@ -10,14 +10,14 @@ namespace KeyPocket.UI.ViewModels;
 /// </summary>
 public partial class KeyProviderGroupViewModel : ObservableObject
 {
-    public Guid ProviderId { get; set; }
-    public string ProviderName { get; set; } = string.Empty;
-
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsCustomIcon))]
     [NotifyPropertyChangedFor(nameof(DefaultGlyph))]
     [NotifyPropertyChangedFor(nameof(IconUri))]
     private string? _providerIcon;
+
+    public Guid ProviderId { get; set; }
+    public string ProviderName { get; set; } = string.Empty;
 
     public List<KeyItemViewModel> Keys { get; set; } = new();
 

@@ -13,10 +13,10 @@ public partial class KeyItemViewModel : ObservableObject
     private readonly ProviderService _providerService;
 
     [ObservableProperty] private string _displayKey = string.Empty;
-    [ObservableProperty] private string _maskedKey = "Loading...";
-    [ObservableProperty] private string? _providerIcon;
     [ObservableProperty] private bool _isEditingTag;
+    [ObservableProperty] private string _maskedKey = "Loading...";
     private string? _originalTag;
+    [ObservableProperty] private string? _providerIcon;
 
     public KeyItemViewModel(ApiKey apiKey, string providerName, string? providerIcon, ProviderService providerService)
     {
@@ -33,7 +33,7 @@ public partial class KeyItemViewModel : ObservableObject
     public string ProviderName { get; }
 
     public DateTime CreatedAt => _apiKey.CreatedAt;
-    
+
     public string FormattedCreatedAt => CreatedAt.ToString("yyyy-MM-dd");
 
     public string? Tag
@@ -123,7 +123,7 @@ public partial class KeyItemViewModel : ObservableObject
 
         // Last 4 chars
         suffix = key.Substring(key.Length - 4);
-        
+
         return $"{prefix}{mask}{suffix}";
     }
 
@@ -183,7 +183,7 @@ public partial class KeyItemViewModel : ObservableObject
             var package = new DataPackage();
             package.SetText(rawKey);
             Clipboard.SetContent(package);
-            
+
             // Explicitly clear local var if possible (though string is immutable, GC handles it)
             // The requirement was to not keep it in memory as a field. 
             // We are using a local var 'rawKey' which will be collected.

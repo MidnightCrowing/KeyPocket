@@ -3,23 +3,18 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
-using KeyPocket.UI.Messages;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using KeyPocket.Core.Models;
 using KeyPocket.Core.Services;
 using KeyPocket.UI.Helpers;
+using KeyPocket.UI.Messages;
 
 namespace KeyPocket.UI.ViewModels;
 
 public partial class ModelItemViewModel : ObservableObject
 {
-    internal readonly ModelInfo _model;
-
-    private readonly string _providerCurrency;
-    private readonly ProviderService _providerService;
-
     private static readonly string[] CapabilityOrder =
     {
         ModelTags.Text,
@@ -29,6 +24,11 @@ public partial class ModelItemViewModel : ObservableObject
         ModelTags.Video,
         ModelTags.Embeddings
     };
+
+    internal readonly ModelInfo _model;
+
+    private readonly string _providerCurrency;
+    private readonly ProviderService _providerService;
 
     [ObservableProperty] private string? _providerIcon; // Keep observable if needed, though mostly static for item
 
@@ -57,9 +57,7 @@ public partial class ModelItemViewModel : ObservableObject
         {
             var iconName = ProviderIconHelper.GetIconForModel(Id) ?? ProviderIconHelper.GetIconForModel(DisplayName);
             if (!string.IsNullOrEmpty(iconName))
-            {
                 return ProviderIconHelper.GetPresetIconUri(iconName, ThemeHelper.IsDarkTheme());
-            }
             return null; // Or fallback to ProviderIcon? Let's keep it null for now to only show special ones.
         }
     }

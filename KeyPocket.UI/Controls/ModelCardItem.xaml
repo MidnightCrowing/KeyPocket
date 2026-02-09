@@ -3,7 +3,6 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:controls="using:KeyPocket.UI.Controls"
     xmlns:converters="using:KeyPocket.UI.Converters"
-    xmlns:vm="using:KeyPocket.UI.ViewModels"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <UserControl.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVis" />

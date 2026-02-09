@@ -1,6 +1,7 @@
 using KeyPocket.UI.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 
 namespace KeyPocket.UI.Controls;
 
@@ -33,12 +34,12 @@ public sealed partial class ModelListItem : UserControl
         }
     }
 
-    private void OnPointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    private void OnPointerEntered(object sender, PointerRoutedEventArgs e)
     {
         UpdateHoverState(true);
     }
 
-    private void OnPointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    private void OnPointerExited(object sender, PointerRoutedEventArgs e)
     {
         UpdateHoverState(false);
     }
@@ -48,12 +49,8 @@ public sealed partial class ModelListItem : UserControl
         CopyBtn.SetValue(OpacityProperty, isHovered ? 1d : 0d);
 
         if (isHovered)
-        {
             FavoriteBtn.SetValue(OpacityProperty, 1d);
-        }
         else
-        {
             FavoriteBtn.ClearValue(OpacityProperty);
-        }
     }
 }

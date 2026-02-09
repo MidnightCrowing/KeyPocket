@@ -1,6 +1,6 @@
 using System;
-using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Data;
 
 namespace KeyPocket.UI.Converters;
 
@@ -11,8 +11,8 @@ public class EnumToBoolConverter : IValueConverter
         if (value == null || parameter == null)
             return false;
 
-        string? checkValue = value.ToString();
-        string? targetValue = parameter.ToString();
+        var checkValue = value.ToString();
+        var targetValue = parameter.ToString();
 
         if (checkValue == null || targetValue == null) return false;
 
@@ -22,7 +22,6 @@ public class EnumToBoolConverter : IValueConverter
     public object ConvertBack(object value, Type targetType, object parameter, string language)
     {
         if (value is bool boolValue && boolValue && parameter != null)
-        {
             try
             {
                 return Enum.Parse(targetType, parameter.ToString()!);
@@ -31,7 +30,7 @@ public class EnumToBoolConverter : IValueConverter
             {
                 return DependencyProperty.UnsetValue;
             }
-        }
+
         return DependencyProperty.UnsetValue;
     }
 }

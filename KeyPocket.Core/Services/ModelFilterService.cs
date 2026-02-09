@@ -3,12 +3,12 @@ using KeyPocket.Core.Models;
 namespace KeyPocket.Core.Services;
 
 /// <summary>
-/// 模型过滤和排序服务
+///     模型过滤和排序服务
 /// </summary>
 public class ModelFilterService
 {
     /// <summary>
-    /// 应用过滤和排序条件到模型列表
+    ///     应用过滤和排序条件到模型列表
     /// </summary>
     public List<ModelInfo> ApplyFilters(
         List<ModelInfo> allModels,
@@ -32,7 +32,6 @@ public class ModelFilterService
         // 3. Capability 过滤
         // 如果所有 Capability 都选中或都未选中,则不应用过滤
         if (criteria.SelectedCapabilities.Count > 0 && criteria.SelectedCapabilities.Count < 6)
-        {
             query = query.Where(m =>
                 (criteria.SelectedCapabilities.Contains("Text") && m.Tags.Contains(ModelTags.Text)) ||
                 (criteria.SelectedCapabilities.Contains("File") && m.Tags.Contains(ModelTags.File)) ||
@@ -41,18 +40,15 @@ public class ModelFilterService
                 (criteria.SelectedCapabilities.Contains("Video") && m.Tags.Contains(ModelTags.Video)) ||
                 (criteria.SelectedCapabilities.Contains("Embeddings") && m.Tags.Contains(ModelTags.Embeddings))
             );
-        }
 
         // 4. 价格范围过滤
         if (criteria.MinPrice.HasValue || criteria.MaxPrice.HasValue)
-        {
             query = query.Where(m =>
             {
                 var price = m.InputPricePerMTokens ?? 0;
                 return price >= (criteria.MinPrice ?? 0) &&
                        price <= (criteria.MaxPrice ?? decimal.MaxValue);
             });
-        }
 
         // 5. 排序
         query = criteria.SortOption switch
@@ -69,7 +65,7 @@ public class ModelFilterService
 }
 
 /// <summary>
-/// 模型过滤条件
+///     模型过滤条件
 /// </summary>
 public class ModelFilterCriteria
 {
@@ -82,7 +78,7 @@ public class ModelFilterCriteria
 }
 
 /// <summary>
-/// 模型排序选项
+///     模型排序选项
 /// </summary>
 public enum ModelSortOption
 {

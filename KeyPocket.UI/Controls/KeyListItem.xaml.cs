@@ -1,5 +1,5 @@
-using System;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.System;
 using KeyPocket.UI.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -53,13 +53,9 @@ public sealed partial class KeyListItem : UserControl
         if (FavoriteBtn == null) return;
 
         if (isHovered)
-        {
             FavoriteBtn.Opacity = 1;
-        }
         else
-        {
             FavoriteBtn.Opacity = KeyItem?.IsFavorite == true ? 1 : 0;
-        }
     }
 
     private void OnCopyClicked(object sender, RoutedEventArgs e)
@@ -78,12 +74,12 @@ public sealed partial class KeyListItem : UserControl
     {
         if (KeyItem == null) return;
 
-        if (e.Key == Windows.System.VirtualKey.Enter)
+        if (e.Key == VirtualKey.Enter)
         {
             KeyItem.CommitEditTagCommand.Execute(null);
             e.Handled = true;
         }
-        else if (e.Key == Windows.System.VirtualKey.Escape)
+        else if (e.Key == VirtualKey.Escape)
         {
             KeyItem.CancelEditTagCommand.Execute(null);
             e.Handled = true;

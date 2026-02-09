@@ -4,6 +4,7 @@ using KeyPocket.Core.Services;
 using KeyPocket.UI.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Navigation;
 
 namespace KeyPocket.UI.Pages;
@@ -76,7 +77,7 @@ public sealed partial class ModelsPage : Page
         ViewModel.ResetFilters();
     }
 
-    private void ProviderGroup_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
+    private void ProviderGroup_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
     {
         if (sender is FrameworkElement element && element.DataContext is TreeViewNode node &&
             node.Content is ProviderGroupViewModel group && group.ProviderId != Guid.Empty)

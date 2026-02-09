@@ -43,7 +43,7 @@ public sealed partial class KeysPage : Page
     private void UpdateTreeView()
     {
         // If not loaded or view mode indicates it might not be ready, check null
-        if (KeysTreeView == null) return; 
+        if (KeysTreeView == null) return;
 
         KeysTreeView.RootNodes.Clear();
 

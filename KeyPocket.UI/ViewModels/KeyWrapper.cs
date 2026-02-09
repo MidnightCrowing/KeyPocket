@@ -7,7 +7,6 @@ namespace KeyPocket.UI.ViewModels;
 
 public partial class KeyWrapper : ObservableObject
 {
-    private string? _originalTag;
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsReadOnly))]
     private bool _isEditing;
 
@@ -22,6 +21,7 @@ public partial class KeyWrapper : ObservableObject
     [ObservableProperty] private string _maskedKey = "";
 
     [ObservableProperty] private string _newKey = "";
+    private string? _originalTag;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasTag))]

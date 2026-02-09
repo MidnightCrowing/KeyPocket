@@ -1,26 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows.Input;
 using Windows.ApplicationModel.DataTransfer;
-using Windows.Storage;
-using Windows.Storage.Pickers;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
 using KeyPocket.Core.Models;
-using KeyPocket.Core.Services;
-using KeyPocket.UI.Helpers;
-using KeyPocket.UI.Messages;
-using Microsoft.UI.Dispatching;
-using WinRT.Interop;
-using UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding;
 
 namespace KeyPocket.UI.ViewModels;
 
@@ -263,5 +246,4 @@ public partial class ProviderSettingsViewModel : ObservableObject
             return string.Empty;
         }
     }
-
 }

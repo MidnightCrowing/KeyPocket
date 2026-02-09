@@ -71,9 +71,9 @@
                 Width="200"
                 x:Uid="Keys_SearchBox" />
 
-             <!--  Favorites Filter  -->
-             <ToggleButton
-                Grid.Column="2" 
+            <!--  Favorites Filter  -->
+            <ToggleButton
+                Grid.Column="2"
                 IsChecked="{x:Bind ViewModel.ShowFavoritesOnly, Mode=TwoWay}"
                 ToolTipService.ToolTip="Show favorites only">
                 <FontIcon FontSize="16" Glyph="&#xE735;" />
@@ -99,34 +99,37 @@
 
         <!--  List / Card Switcher  -->
         <ctk:SwitchPresenter Grid.Row="1" Value="{x:Bind ViewModel.ViewMode, Mode=OneWay}">
-             <ctk:Case Value="{x:Bind vm:KeysViewMode.List}">
+            <ctk:Case Value="{x:Bind vm:KeysViewMode.List}">
                 <!--  HeaderedTreeView with DataTable  -->
-                 <ctk:HeaderedTreeView ItemTemplateSelector="{StaticResource KeysItemTemplateSelector}" Loaded="KeysTreeView_Loaded" x:Name="KeysTreeView">
+                <ctk:HeaderedTreeView
+                    ItemTemplateSelector="{StaticResource KeysItemTemplateSelector}"
+                    Loaded="KeysTreeView_Loaded"
+                    x:Name="KeysTreeView">
                     <ctk:HeaderedTreeView.Header>
                         <ctk:DataTable ColumnSpacing="16" Margin="16,0">
-                             <!--  Provider Name Column (Auto)  -->
-                             <ctk:DataColumn
+                            <!--  Provider Name Column (Auto)  -->
+                            <ctk:DataColumn
                                 Content="Provider"
                                 DesiredWidth="Auto"
                                 x:Uid="Keys_List_Provider" />
-                             <!--  Key Column (*)  -->
-                             <ctk:DataColumn
+                            <!--  Key Column (*)  -->
+                            <ctk:DataColumn
                                 Content="Key"
                                 DesiredWidth="*"
                                 x:Uid="Keys_List_Key" />
-                             <!--  Tag Column (Auto)  -->
-                             <ctk:DataColumn
+                            <!--  Tag Column (Auto)  -->
+                            <ctk:DataColumn
                                 Content="Tag"
                                 DesiredWidth="150"
                                 x:Uid="Keys_List_Tag" />
                         </ctk:DataTable>
                     </ctk:HeaderedTreeView.Header>
-                 </ctk:HeaderedTreeView>
-             </ctk:Case>
-             <ctk:Case Value="{x:Bind vm:KeysViewMode.Card}">
-                  <ScrollViewer>
+                </ctk:HeaderedTreeView>
+            </ctk:Case>
+            <ctk:Case Value="{x:Bind vm:KeysViewMode.Card}">
+                <ScrollViewer>
                     <muxc:ItemsRepeater ItemTemplate="{StaticResource KeyCardTemplate}" ItemsSource="{x:Bind ViewModel.FilteredKeys, Mode=OneWay}">
-                         <muxc:ItemsRepeater.Layout>
+                        <muxc:ItemsRepeater.Layout>
                             <muxc:UniformGridLayout
                                 ItemsStretch="Fill"
                                 MinColumnSpacing="12"
@@ -135,8 +138,8 @@
                                 Orientation="Horizontal" />
                         </muxc:ItemsRepeater.Layout>
                     </muxc:ItemsRepeater>
-                  </ScrollViewer>
-             </ctk:Case>
+                </ScrollViewer>
+            </ctk:Case>
         </ctk:SwitchPresenter>
     </Grid>
 </Page>

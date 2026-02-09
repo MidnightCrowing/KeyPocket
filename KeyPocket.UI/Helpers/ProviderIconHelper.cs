@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 using Windows.ApplicationModel;
+using Windows.Storage;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
-using System.Text.Json;
-using Windows.Storage;
 
 namespace KeyPocket.UI.Helpers;
 
@@ -18,6 +18,9 @@ public static class ProviderIconHelper
     ///     默认图标字形（固定为 Robot）
     /// </summary>
     public const string DefaultIconGlyph = "\uE99A";
+
+    private static List<ModelIconMapping> _modelIconMappings = new();
+    private static bool _isMappingLoaded;
 
     /// <summary>
     ///     检查是否为自定义图标（即 IconPath 不为空）
@@ -117,15 +120,15 @@ public static class ProviderIconHelper
             // Actually, the warning is because the *file exists* with that name.
             // So renaming the file fixes the warning.
             // Now we need Code to find the renamed file.
-            
+
             if (File.Exists(themeSpecificPath))
                 return new Uri($"ms-appx:///Assets/ProviderIcons/{baseName}{suffix}.png");
-                
+
             // Fallback: Check for underscore replacement (e.g. z.ai-dark -> z_ai-dark)
             var sanitizedBaseName = baseName.Replace('.', '_');
             var sanitizedPath = Path.Combine(assetsPath, $"{sanitizedBaseName}{suffix}.png");
-            
-             if (File.Exists(sanitizedPath))
+
+            if (File.Exists(sanitizedPath))
                 return new Uri($"ms-appx:///Assets/ProviderIcons/{sanitizedBaseName}{suffix}.png");
         }
         catch
@@ -155,15 +158,13 @@ public static class ProviderIconHelper
         {
             var fileName = Path.GetFileNameWithoutExtension(file);
             // Remove -dark or -light suffix (case-insensitive)
-            if (fileName.EndsWith("-dark", StringComparison.OrdinalIgnoreCase) || 
+            if (fileName.EndsWith("-dark", StringComparison.OrdinalIgnoreCase) ||
                 fileName.EndsWith("-light", StringComparison.OrdinalIgnoreCase))
             {
                 var lastDashIndex = fileName.LastIndexOf('-');
-                if (lastDashIndex > 0)
-                {
-                    fileName = fileName.Substring(0, lastDashIndex).Trim();
-                }
+                if (lastDashIndex > 0) fileName = fileName.Substring(0, lastDashIndex).Trim();
             }
+
             names.Add(fileName);
         }
 
@@ -184,17 +185,6 @@ public static class ProviderIconHelper
         // Allow dots in preset names (e.g. z.ai) but ensure it is not a path
         return !(iconPath.Contains('/') || iconPath.Contains('\\'));
     }
-    /// <summary>
-    ///     Model Icon Mapping configuration class
-    /// </summary>
-    private class ModelIconMapping
-    {
-        public List<string> Keywords { get; set; } = new();
-        public string Icon { get; set; } = string.Empty;
-    }
-
-    private static List<ModelIconMapping> _modelIconMappings = new();
-    private static bool _isMappingLoaded = false;
 
     /// <summary>
     ///     Load model icon mapping from AppData or Defaults
@@ -219,13 +209,19 @@ public static class ProviderIconHelper
                 // 2. Load from Assets/Defaults (Built-in)
                 var appInstalledPath = Package.Current.InstalledLocation.Path;
                 var defaultFile = Path.Combine(appInstalledPath, "Assets", "Defaults", "model_icon_mapping.json");
-                
+
                 if (File.Exists(defaultFile))
                 {
                     jsonContent = File.ReadAllText(defaultFile);
-                    
+
                     // Optional: Copy to LocalFolder for user customization
-                    try { File.Copy(defaultFile, mappingFile); } catch { }
+                    try
+                    {
+                        File.Copy(defaultFile, mappingFile);
+                    }
+                    catch
+                    {
+                    }
                 }
             }
 
@@ -234,18 +230,16 @@ public static class ProviderIconHelper
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                 // Deserialize as Dictionary<IconName, List<Keywords>>
                 var rawMappings = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(jsonContent, options);
-                
+
                 if (rawMappings != null)
                 {
                     _modelIconMappings = new List<ModelIconMapping>();
                     foreach (var kvp in rawMappings)
-                    {
                         _modelIconMappings.Add(new ModelIconMapping
                         {
                             Icon = kvp.Key,
                             Keywords = kvp.Value
                         });
-                    }
                 }
             }
         }
@@ -265,24 +259,28 @@ public static class ProviderIconHelper
     public static string? GetIconForModel(string modelId)
     {
         if (string.IsNullOrWhiteSpace(modelId)) return null;
-        
+
         EnsureMappingLoaded();
 
         var target = modelId.ToLowerInvariant();
 
         foreach (var mapping in _modelIconMappings)
+        foreach (var keyword in mapping.Keywords)
         {
-            foreach (var keyword in mapping.Keywords)
-            {
-                if (string.IsNullOrWhiteSpace(keyword)) continue;
-                
-                if (target.Contains(keyword.ToLowerInvariant()))
-                {
-                    return mapping.Icon;
-                }
-            }
+            if (string.IsNullOrWhiteSpace(keyword)) continue;
+
+            if (target.Contains(keyword.ToLowerInvariant())) return mapping.Icon;
         }
 
         return null;
+    }
+
+    /// <summary>
+    ///     Model Icon Mapping configuration class
+    /// </summary>
+    private class ModelIconMapping
+    {
+        public List<string> Keywords { get; set; } = new();
+        public string Icon { get; set; } = string.Empty;
     }
 }

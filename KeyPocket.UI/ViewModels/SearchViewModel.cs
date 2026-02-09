@@ -1,11 +1,11 @@
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using Windows.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using KeyPocket.Core.Services;
 using KeyPocket.UI.Helpers;
-using System.IO;
-using Windows.Storage;
 using KeyPocket.UI.Models;
 
 namespace KeyPocket.UI.ViewModels;
@@ -93,9 +93,7 @@ public partial class SearchViewModel : ObservableObject
             // Try to resolve model icon
             var iconName = ProviderIconHelper.GetIconForModel(x.Model.Id);
             if (iconName == null && !string.IsNullOrEmpty(x.Model.DisplayName))
-            {
                 iconName = ProviderIconHelper.GetIconForModel(x.Model.DisplayName);
-            }
 
             if (!string.IsNullOrEmpty(iconName))
             {
@@ -106,13 +104,12 @@ public partial class SearchViewModel : ObservableObject
                     item.IconKind = IconType.ImagePath;
                 }
             }
-            
+
             SearchResults.Add(item);
         }
 
         // 3. 特殊关键词：crash.log
         if (lowerQuery.Contains("crash") || lowerQuery.Contains("log"))
-        {
             SearchResults.Add(new SearchResultItem
             {
                 Title = "crash.log",
@@ -121,17 +118,15 @@ public partial class SearchViewModel : ObservableObject
                 Data = CrashLogHelper.GetCrashLogPath(),
                 Icon = "\uE7C3" // Page icon
             });
-        }
 
         // 4. 特殊关键词：model_icon_mapping.json
         if (lowerQuery.Contains("icon") || lowerQuery.Contains("mapping") || lowerQuery.Contains("json"))
         {
             var localFolder = ApplicationData.Current.LocalFolder;
             var mappingFile = Path.Combine(localFolder.Path, "model_icon_mapping.json");
-            
+
             // Ensure file exists (ProviderIconHelper handles copying if needed, but let's be safe)
             if (File.Exists(mappingFile))
-            {
                 SearchResults.Add(new SearchResultItem
                 {
                     Title = "model_icon_mapping.json",
@@ -140,7 +135,6 @@ public partial class SearchViewModel : ObservableObject
                     Data = mappingFile,
                     Icon = "\uE7C3" // Page icon
                 });
-            }
         }
     }
 }

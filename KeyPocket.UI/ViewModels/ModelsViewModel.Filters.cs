@@ -1,23 +1,67 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using KeyPocket.Core.Models;
 using KeyPocket.Core.Services;
 
 namespace KeyPocket.UI.ViewModels;
 
 public partial class ModelsViewModel
 {
-    partial void OnSearchTextChanged(string value) => ApplyFilters();
-    partial void OnShowFavoritesOnlyChanged(bool value) => ApplyFilters();
-    partial void OnIsTextSelectedChanged(bool value) => ApplyFilters();
-    partial void OnIsFileSelectedChanged(bool value) => ApplyFilters();
-    partial void OnIsImageSelectedChanged(bool value) => ApplyFilters();
-    partial void OnIsAudioSelectedChanged(bool value) => ApplyFilters();
-    partial void OnIsVideoSelectedChanged(bool value) => ApplyFilters();
-    partial void OnIsEmbeddingsSelectedChanged(bool value) => ApplyFilters();
-    partial void OnMinPriceIndexChanged(int value) => ApplyFilters();
-    partial void OnMaxPriceIndexChanged(int value) => ApplyFilters();
-    partial void OnSortOptionChanged(ModelSortOption value) => ApplyFilters();
+    partial void OnSearchTextChanged(string value)
+    {
+        ApplyFilters();
+    }
+
+    partial void OnShowFavoritesOnlyChanged(bool value)
+    {
+        ApplyFilters();
+    }
+
+    partial void OnIsTextSelectedChanged(bool value)
+    {
+        ApplyFilters();
+    }
+
+    partial void OnIsFileSelectedChanged(bool value)
+    {
+        ApplyFilters();
+    }
+
+    partial void OnIsImageSelectedChanged(bool value)
+    {
+        ApplyFilters();
+    }
+
+    partial void OnIsAudioSelectedChanged(bool value)
+    {
+        ApplyFilters();
+    }
+
+    partial void OnIsVideoSelectedChanged(bool value)
+    {
+        ApplyFilters();
+    }
+
+    partial void OnIsEmbeddingsSelectedChanged(bool value)
+    {
+        ApplyFilters();
+    }
+
+    partial void OnMinPriceIndexChanged(int value)
+    {
+        ApplyFilters();
+    }
+
+    partial void OnMaxPriceIndexChanged(int value)
+    {
+        ApplyFilters();
+    }
+
+    partial void OnSortOptionChanged(ModelSortOption value)
+    {
+        ApplyFilters();
+    }
 
     private void ApplyFilters()
     {
@@ -31,7 +75,7 @@ public partial class ModelsViewModel
             SortOption = SortOption
         };
 
-        var allModelsData = _allModels.Select(vm => new Core.Models.ModelInfo
+        var allModelsData = _allModels.Select(vm => new ModelInfo
         {
             Id = vm.Id,
             DisplayName = vm.DisplayName,

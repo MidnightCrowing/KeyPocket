@@ -3,11 +3,11 @@ using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
 using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.WinUI.Controls;
 using KeyPocket.UI.Messages;
 using KeyPocket.UI.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 
 namespace KeyPocket.UI.Pages.ProviderSettings;
@@ -106,36 +106,27 @@ public sealed partial class ProviderSettingsModelsContent : UserControl
         }
     }
 
-    private void OnTokenItemAdding(CommunityToolkit.WinUI.Controls.TokenizingTextBox sender,
-        CommunityToolkit.WinUI.Controls.TokenItemAddingEventArgs e)
+    private void OnTokenItemAdding(TokenizingTextBox sender,
+        TokenItemAddingEventArgs e)
     {
         var match = ModelWrapper.AvailableTagsList.FirstOrDefault(t =>
             t.Equals(e.TokenText, StringComparison.OrdinalIgnoreCase));
 
         if (match != null)
-        {
             e.Item = match;
-        }
         else
-        {
             e.Cancel = true;
-        }
     }
 
     private void OnTokenTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
     {
         if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput &&
             sender.DataContext is ModelWrapper wrapper)
-        {
             wrapper.UpdateSuggestions(sender.Text);
-        }
     }
 
     private void OnPriceValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
     {
-        if (sender.DataContext is ModelWrapper wrapper)
-        {
-            wrapper.RefreshCurrencySymbol();
-        }
+        if (sender.DataContext is ModelWrapper wrapper) wrapper.RefreshCurrencySymbol();
     }
 }

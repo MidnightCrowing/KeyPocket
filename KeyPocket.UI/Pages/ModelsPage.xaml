@@ -3,7 +3,6 @@
     x:Class="KeyPocket.UI.Pages.ModelsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:controls="using:KeyPocket.UI.Controls"
-    xmlns:converters="using:KeyPocket.UI.Converters"
     xmlns:ctk="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="using:KeyPocket.UI.Helpers"

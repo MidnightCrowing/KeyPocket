@@ -1,6 +1,7 @@
 using KeyPocket.UI.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 
 namespace KeyPocket.UI.Controls;
 
@@ -24,13 +25,13 @@ public sealed partial class ModelCardItem : UserControl
         set => SetValue(ModelProperty, value);
     }
 
-    private void OnPointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    private void OnPointerEntered(object sender, PointerRoutedEventArgs e)
     {
         CopyBtn.SetValue(OpacityProperty, 1d);
         FavoriteBtn.SetValue(OpacityProperty, 1d);
     }
 
-    private void OnPointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    private void OnPointerExited(object sender, PointerRoutedEventArgs e)
     {
         CopyBtn.SetValue(OpacityProperty, 0d);
         FavoriteBtn.ClearValue(OpacityProperty);

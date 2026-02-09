@@ -3,8 +3,6 @@
     xmlns:controls="using:KeyPocket.UI.Controls"
     xmlns:ctk="using:CommunityToolkit.WinUI.Controls"
     xmlns:helpers="using:KeyPocket.UI.Helpers"
-    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
-    xmlns:vm="using:KeyPocket.UI.ViewModels"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Style

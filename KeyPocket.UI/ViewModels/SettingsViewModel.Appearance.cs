@@ -1,7 +1,7 @@
+using Windows.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using KeyPocket.UI.Helpers;
 using Microsoft.UI.Xaml;
-using Windows.Globalization;
 
 namespace KeyPocket.UI.ViewModels;
 

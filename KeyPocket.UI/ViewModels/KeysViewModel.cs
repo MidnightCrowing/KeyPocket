@@ -6,7 +6,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using KeyPocket.Core.Services;
 using KeyPocket.UI.Messages;
-using Windows.ApplicationModel.Resources;
 
 namespace KeyPocket.UI.ViewModels;
 
@@ -15,11 +14,8 @@ public partial class KeysViewModel : ObservableObject
     private readonly ObservableCollection<KeyItemViewModel> _allKeys = new();
     private readonly ProviderService _providerService;
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(KeysCountText))]
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(KeysCountText))]
     private ObservableCollection<KeyItemViewModel> _filteredKeys = new();
-
-    public string KeysCountText => $"{FilteredKeys.Count} keys";
 
     [ObservableProperty] private ObservableCollection<KeyProviderGroupViewModel> _groupedKeys = new();
 
@@ -27,8 +23,7 @@ public partial class KeysViewModel : ObservableObject
 
     [ObservableProperty] private bool _showFavoritesOnly;
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ViewModeIndex))]
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(ViewModeIndex))]
     private KeysViewMode _viewMode = KeysViewMode.List;
 
     public KeysViewModel(ProviderService providerService)
@@ -40,18 +35,17 @@ public partial class KeysViewModel : ObservableObject
         // ModelsViewModel does this. KeyItemViewModel might need it? 
         // KeyItemViewModel takes providerIcon string. ProviderGroupViewModel uses Helper to get Uri.
         // KeyProviderGroupViewModel also uses Helper. So we might need to refresh on theme change.
-         WeakReferenceMessenger.Default.Register<ThemeChangedMessage>(this, (r, m) =>
+        WeakReferenceMessenger.Default.Register<ThemeChangedMessage>(this, (r, m) =>
         {
             App.MainWindow.DispatcherQueue.TryEnqueue(() =>
             {
-                 // Refresh icons in groups
-                 foreach(var group in GroupedKeys)
-                 {
-                     group.RefreshIcon();
-                 }
+                // Refresh icons in groups
+                foreach (var group in GroupedKeys) group.RefreshIcon();
             });
         });
     }
+
+    public string KeysCountText => $"{FilteredKeys.Count} keys";
 
     public int ViewModeIndex
     {
@@ -85,7 +79,10 @@ public partial class KeysViewModel : ObservableObject
         ApplyFilters();
     }
 
-    partial void OnViewModeChanged(KeysViewMode value) => OnPropertyChanged(nameof(ViewModeIndex));
+    partial void OnViewModeChanged(KeysViewMode value)
+    {
+        OnPropertyChanged(nameof(ViewModeIndex));
+    }
 
     private void ApplyFilters()
     {
@@ -119,7 +116,10 @@ public partial class KeysViewModel : ObservableObject
             .ToDictionary(x => x.Name, x => x.Index);
 
         var grouped = keys
-            .GroupBy(k => new { k.ProviderName, ProviderIcon = k.ProviderIcon }) // KeyItemViewModel needs ProviderIcon public property? Checked: it has _providerIcon backing field, but only constructor param. 
+            .GroupBy(k => new
+            {
+                k.ProviderName, k.ProviderIcon
+            }) // KeyItemViewModel needs ProviderIcon public property? Checked: it has _providerIcon backing field, but only constructor param. 
             // Wait, KeyItemViewModel.cs verification: 
             // [ObservableProperty] private string? _providerIcon; -> This generates Public ProviderIcon property. So it is fine.
             .OrderBy(g => providerOrderMap.TryGetValue(g.Key.ProviderName, out var index) ? index : int.MaxValue)
