@@ -98,7 +98,7 @@
     <value>能力</value>
   </data>
   <data name="Filter_Pricing.Text" xml:space="preserve">
-    <value>提示词价格</value>
+    <value>价格</value>
   </data>
   <data name="Filter_Price_Free.Text" xml:space="preserve">
     <value>免费</value>

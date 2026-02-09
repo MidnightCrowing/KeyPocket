@@ -98,7 +98,7 @@
     <value>Capability</value>
   </data>
   <data name="Filter_Pricing.Text" xml:space="preserve">
-    <value>Prompt Pricing</value>
+    <value>Pricing</value>
   </data>
   <data name="Filter_Price_Free.Text" xml:space="preserve">
     <value>Free</value>

@@ -1,6 +1,5 @@
 using System;
 using System.ComponentModel;
-using KeyPocket.Core.Services;
 using KeyPocket.UI.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -64,17 +63,6 @@ public sealed partial class ModelsPage : Page
 
             ModelsTreeView.RootNodes.Add(groupNode);
         }
-    }
-
-    private void SortOption_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is MenuFlyoutItem item && item.Tag is string tag)
-            ViewModel.SortOption = Enum.Parse<ModelSortOption>(tag);
-    }
-
-    private void ResetFilters_Click(object sender, RoutedEventArgs e)
-    {
-        ViewModel.ResetFilters();
     }
 
     private void ProviderGroup_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
