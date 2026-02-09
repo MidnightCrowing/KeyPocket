@@ -73,7 +73,7 @@
                 VerticalAlignment="Center"
                 Width="28"
                 x:Name="CopyBtn"
-                x:Uid="Models/CopyID">
+                x:Uid="/Models/CopyID">
                 <FontIcon FontSize="14" Glyph="&#xE8C8;" />
             </controls:CopyButton>
 
@@ -90,7 +90,7 @@
                 VerticalAlignment="Center"
                 Width="28"
                 x:Name="FavoriteBtn"
-                x:Uid="Models/Favorites">
+                x:Uid="/Models/Favorites">
                 <FontIcon
                     FontSize="14"
                     Foreground="{x:Bind Model.IsFavorite, Mode=OneWay, Converter={StaticResource BoolToBrushConverter}}"

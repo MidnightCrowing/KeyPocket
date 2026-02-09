@@ -68,13 +68,13 @@ public partial class ModelsViewModel : ObservableObject
     }
 
     public string InputPriceHeader =>
-        string.Format(ResourceLoader.GetForViewIndependentUse().GetString("Models/InputPriceFormat"), CurrencySymbol);
+        string.Format(ResourceLoader.GetForViewIndependentUse("Models").GetString("InputPriceFormat"), CurrencySymbol);
 
     public string OutputPriceHeader =>
-        string.Format(ResourceLoader.GetForViewIndependentUse().GetString("Models/OutputPriceFormat"), CurrencySymbol);
+        string.Format(ResourceLoader.GetForViewIndependentUse("Models").GetString("OutputPriceFormat"), CurrencySymbol);
 
     public string ModelsCountText =>
-        string.Format(ResourceLoader.GetForViewIndependentUse().GetString("Models/CountFormat"), FilteredModels.Count);
+        string.Format(ResourceLoader.GetForViewIndependentUse("Models").GetString("CountFormat"), FilteredModels.Count);
 
     public int ViewModeIndex
     {

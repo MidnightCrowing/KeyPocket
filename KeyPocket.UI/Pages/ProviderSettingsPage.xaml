@@ -21,13 +21,13 @@
                     Margin="0,0,0,8"
                     Style="{StaticResource TitleTextBlockStyle}"
                     Text="Provider Settings"
-                    x:Uid="ProviderSettings/Title" />
+                    x:Uid="/ProviderSettings/Title" />
                 <TextBlock
                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                     Margin="0,0,0,24"
                     Style="{StaticResource BodyTextBlockStyle}"
                     Text="Manage your provider details, API keys, and model configurations."
-                    x:Uid="ProviderSettings/Subtitle" />
+                    x:Uid="/ProviderSettings/Subtitle" />
 
                 <Border
                     Background="{ThemeResource SurfaceStrokeColorDefaultBrush}"
@@ -45,12 +45,12 @@
                         <TextBlock
                             Style="{StaticResource SubtitleTextBlockStyle}"
                             Text="General"
-                            x:Uid="ProviderSettings/General" />
+                            x:Uid="/ProviderSettings/General" />
                         <TextBlock
                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                             Style="{StaticResource CaptionTextBlockStyle}"
                             Text="Basic provider information."
-                            x:Uid="ProviderSettings/GeneralDesc" />
+                            x:Uid="/ProviderSettings/GeneralDesc" />
                     </StackPanel>
 
                     <sections:ProviderSettingsGeneralContent Grid.Column="1" ViewModel="{x:Bind ViewModel, Mode=OneWay}" />
@@ -74,14 +74,14 @@
                                 Style="{StaticResource SubtitleTextBlockStyle}"
                                 Text="API Keys"
                                 VerticalAlignment="Center"
-                                x:Uid="ProviderSettings/ApiKeys" />
+                                x:Uid="/ProviderSettings/ApiKeys" />
                             <InfoBadge Value="{x:Bind ViewModel.ApiKeys.Count, Mode=OneWay}" />
                         </StackPanel>
                         <TextBlock
                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                             Style="{StaticResource CaptionTextBlockStyle}"
                             Text="Manage access keys for this provider."
-                            x:Uid="ProviderSettings/ApiKeysDesc" />
+                            x:Uid="/ProviderSettings/ApiKeysDesc" />
                     </StackPanel>
 
                     <sections:ProviderSettingsApiKeysContent Grid.Column="1" ViewModel="{x:Bind ViewModel, Mode=OneWay}" />
@@ -105,14 +105,14 @@
                                 Style="{StaticResource SubtitleTextBlockStyle}"
                                 Text="Models"
                                 VerticalAlignment="Center"
-                                x:Uid="ProviderSettings/Models" />
+                                x:Uid="/ProviderSettings/Models" />
                             <InfoBadge Value="{x:Bind ViewModel.Models.Count, Mode=OneWay}" />
                         </StackPanel>
                         <TextBlock
                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                             Style="{StaticResource CaptionTextBlockStyle}"
                             Text="Configure available models."
-                            x:Uid="ProviderSettings/ModelsDesc" />
+                            x:Uid="/ProviderSettings/ModelsDesc" />
                     </StackPanel>
 
                     <sections:ProviderSettingsModelsContent Grid.Column="1" ViewModel="{x:Bind ViewModel, Mode=OneWay}" />
@@ -128,7 +128,7 @@
                         Foreground="{ThemeResource SystemFillColorCriticalBrush}"
                         Style="{StaticResource SubtitleTextBlockStyle}"
                         Text="Danger Zone"
-                        x:Uid="ProviderSettings/DangerZone" />
+                        x:Uid="/ProviderSettings/DangerZone" />
 
                     <Border
                         BorderBrush="{ThemeResource SystemFillColorCriticalBrush}"
@@ -144,12 +144,12 @@
                                 <TextBlock
                                     Style="{StaticResource BodyStrongTextBlockStyle}"
                                     Text="Delete this provider"
-                                    x:Uid="ProviderSettings/DeleteProvider" />
+                                    x:Uid="/ProviderSettings/DeleteProvider" />
                                 <TextBlock
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                     Style="{StaticResource CaptionTextBlockStyle}"
                                     Text="Once you delete a provider, there is no going back. Please be certain."
-                                    x:Uid="ProviderSettings/DeleteProviderDesc" />
+                                    x:Uid="/ProviderSettings/DeleteProviderDesc" />
                             </StackPanel>
 
                             <Button
@@ -159,7 +159,7 @@
                                 Content="Delete this provider"
                                 Foreground="White"
                                 Grid.Column="1"
-                                x:Uid="ProviderSettings/DeleteProviderButton" />
+                                x:Uid="/ProviderSettings/DeleteProviderButton" />
                         </Grid>
                     </Border>
                 </StackPanel>

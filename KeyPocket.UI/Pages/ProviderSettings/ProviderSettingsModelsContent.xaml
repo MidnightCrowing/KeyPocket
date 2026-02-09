@@ -94,7 +94,7 @@
                                     Grid.Row="0"
                                     HorizontalAlignment="Left"
                                     Visibility="{x:Bind HasInputPrice, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}"
-                                    x:Uid="ProviderSettings/ModelInputPriceLabel" />
+                                    x:Uid="/ProviderSettings/ModelInputPriceLabel" />
                                 <TextBlock
                                     FontFamily="Consolas"
                                     FontSize="12"
@@ -114,7 +114,7 @@
                                     Grid.Row="1"
                                     HorizontalAlignment="Left"
                                     Visibility="{x:Bind HasOutputPrice, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}"
-                                    x:Uid="ProviderSettings/ModelOutputPriceLabel" />
+                                    x:Uid="/ProviderSettings/ModelOutputPriceLabel" />
                                 <TextBlock
                                     FontFamily="Consolas"
                                     FontSize="12"
@@ -136,14 +136,14 @@
                                     Padding="8"
                                     Tag="{x:Bind Id, Mode=OneWay}"
                                     ToolTipService.ToolTip="Copy Model ID"
-                                    x:Uid="ProviderSettings/CopyModelID" />
+                                    x:Uid="/ProviderSettings/CopyModelID" />
                                 <Button
                                     Background="Transparent"
                                     BorderThickness="0"
                                     Command="{x:Bind StartEditCommand}"
                                     Padding="8"
                                     ToolTipService.ToolTip="Edit"
-                                    x:Uid="ProviderSettings/Edit">
+                                    x:Uid="/ProviderSettings/Edit">
                                     <FontIcon
                                         FontFamily="{StaticResource SymbolThemeFontFamily}"
                                         FontSize="16"
@@ -197,11 +197,11 @@
                                         Margin="0,0,0,4"
                                         Style="{StaticResource CaptionTextBlockStyle}"
                                         Text="Model ID"
-                                        x:Uid="ProviderSettings/ModelId" />
+                                        x:Uid="/ProviderSettings/ModelId" />
                                     <TextBox
                                         PlaceholderText="e.g. gpt-4"
                                         Text="{x:Bind NewId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                        x:Uid="ProviderSettings/ModelIdPlaceholder" />
+                                        x:Uid="/ProviderSettings/ModelIdPlaceholder" />
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="2">
@@ -209,11 +209,11 @@
                                         Margin="0,0,0,4"
                                         Style="{StaticResource CaptionTextBlockStyle}"
                                         Text="Display Name (Optional)"
-                                        x:Uid="ProviderSettings/ModelName" />
+                                        x:Uid="/ProviderSettings/ModelName" />
                                     <TextBox
                                         PlaceholderText="e.g. GPT-4"
                                         Text="{x:Bind NewName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                        x:Uid="ProviderSettings/ModelNamePlaceholder" />
+                                        x:Uid="/ProviderSettings/ModelNamePlaceholder" />
                                 </StackPanel>
                             </Grid>
 
@@ -230,7 +230,7 @@
                                         <TextBlock
                                             Style="{StaticResource CaptionTextBlockStyle}"
                                             Text="Input Price (per M tokens)"
-                                            x:Uid="ProviderSettings/InputPrice" />
+                                            x:Uid="/ProviderSettings/InputPrice" />
                                     </StackPanel>
                                     <Grid ColumnSpacing="8">
                                         <Grid.ColumnDefinitions>
@@ -252,7 +252,7 @@
                                             SpinButtonPlacementMode="Inline"
                                             Value="{x:Bind InputPriceValueOrZero, Mode=TwoWay}"
                                             ValueChanged="OnPriceValueChanged"
-                                            x:Uid="ProviderSettings/InputPricePlaceholder" />
+                                            x:Uid="/ProviderSettings/InputPricePlaceholder" />
                                     </Grid>
                                 </StackPanel>
 
@@ -261,7 +261,7 @@
                                         <TextBlock
                                             Style="{StaticResource CaptionTextBlockStyle}"
                                             Text="Output Price (per M tokens)"
-                                            x:Uid="ProviderSettings/OutputPrice" />
+                                            x:Uid="/ProviderSettings/OutputPrice" />
                                     </StackPanel>
                                     <Grid ColumnSpacing="8">
                                         <Grid.ColumnDefinitions>
@@ -283,7 +283,7 @@
                                             SpinButtonPlacementMode="Inline"
                                             Value="{x:Bind OutputPriceValueOrZero, Mode=TwoWay}"
                                             ValueChanged="OnPriceValueChanged"
-                                            x:Uid="ProviderSettings/OutputPricePlaceholder" />
+                                            x:Uid="/ProviderSettings/OutputPricePlaceholder" />
                                     </Grid>
                                 </StackPanel>
                             </Grid>
@@ -302,7 +302,7 @@
                                     Style="{StaticResource CaptionTextBlockStyle}"
                                     Text="Tags"
                                     VerticalAlignment="Center"
-                                    x:Uid="ProviderSettings/Tags" />
+                                    x:Uid="/ProviderSettings/Tags" />
                                 <ctk:TokenizingTextBox
                                     Grid.Column="1"
                                     ItemsSource="{x:Bind Tags}"
@@ -312,7 +312,7 @@
                                     TokenDelimiter=","
                                     TokenItemAdding="OnTokenItemAdding"
                                     VerticalAlignment="Center"
-                                    x:Uid="ProviderSettings/TagsPlaceholder">
+                                    x:Uid="/ProviderSettings/TagsPlaceholder">
                                     <ctk:TokenizingTextBox.SuggestedItemTemplate>
                                         <DataTemplate>
                                             <TextBlock Padding="8,4" Text="{Binding}" />
@@ -331,11 +331,11 @@
                                     Command="{x:Bind ConfirmAddCommand}"
                                     Content="Confirm"
                                     Style="{StaticResource AccentButtonStyle}"
-                                    x:Uid="ProviderSettings/Confirm" />
+                                    x:Uid="/ProviderSettings/Confirm" />
                                 <Button
                                     Command="{x:Bind CancelAddCommand}"
                                     Content="Cancel"
-                                    x:Uid="ProviderSettings/Cancel" />
+                                    x:Uid="/ProviderSettings/Cancel" />
                             </StackPanel>
                         </Grid>
                     </Grid>
@@ -347,12 +347,18 @@
             <Button
                 Command="{x:Bind ViewModel.AddModelCommand, Mode=OneWay}"
                 Content="Add Model"
-                x:Uid="ProviderSettings/AddModel" />
-            <Button x:Uid="ProviderSettings/Import">
+                x:Uid="/ProviderSettings/AddModel" />
+            <Button Content="Import" x:Uid="/ProviderSettings/Import">
                 <Button.Flyout>
                     <MenuFlyout Placement="Bottom">
-                        <MenuFlyoutItem Command="{x:Bind ViewModel.ImportCsvCommand, Mode=OneWay}" x:Uid="ProviderSettings/ImportFromCsv" />
-                        <MenuFlyoutItem Command="{x:Bind ViewModel.GenerateCsvTemplateCommand, Mode=OneWay}" x:Uid="ProviderSettings/CreateCsvTemplate" />
+                        <MenuFlyoutItem
+                            Command="{x:Bind ViewModel.ImportCsvCommand, Mode=OneWay}"
+                            Text="Import from CSV"
+                            x:Uid="/ProviderSettings/ImportFromCsv" />
+                        <MenuFlyoutItem
+                            Command="{x:Bind ViewModel.GenerateCsvTemplateCommand, Mode=OneWay}"
+                            Text="Create CSV Template"
+                            x:Uid="/ProviderSettings/CreateCsvTemplate" />
                     </MenuFlyout>
                 </Button.Flyout>
             </Button>

@@ -129,14 +129,14 @@
                 FontSize="12"
                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                 TextTrimming="CharacterEllipsis">
-                <Run Text="by " x:Uid="Models/Card_By" />
+                <Run Text="by " x:Uid="/Models/Card_By" />
                 <Run Text="{x:Bind Model.ProviderName, Mode=OneWay}" />
                 <Run Text=" | " />
-                <Run Text="In: " x:Uid="Models/Card_In" />
+                <Run Text="In: " x:Uid="/Models/Card_In" />
                 <Run Text="{x:Bind Model.InputPriceFormatted, Mode=OneWay}" />
                 <Run Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Model.InputPriceOriginal, Mode=OneWay}" />
                 <Run Text=" | " />
-                <Run Text="Out: " x:Uid="Models/Card_Out" />
+                <Run Text="Out: " x:Uid="/Models/Card_Out" />
                 <Run Text="{x:Bind Model.OutputPriceFormatted, Mode=OneWay}" />
                 <Run Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Model.OutputPriceOriginal, Mode=OneWay}" />
             </TextBlock>

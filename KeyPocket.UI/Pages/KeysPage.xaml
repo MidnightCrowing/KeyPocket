@@ -69,7 +69,7 @@
                 PlaceholderText="Search tags..."
                 Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 Width="200"
-                x:Uid="Keys/SearchBox" />
+                x:Uid="/Keys/SearchBox" />
 
             <!--  Favorites Filter  -->
             <ToggleButton
@@ -111,17 +111,17 @@
                             <ctk:DataColumn
                                 Content="Provider"
                                 DesiredWidth="Auto"
-                                x:Uid="Keys/List_Provider" />
+                                x:Uid="/Keys/List_Provider" />
                             <!--  Key Column (*)  -->
                             <ctk:DataColumn
                                 Content="Key"
                                 DesiredWidth="*"
-                                x:Uid="Keys/List_Key" />
+                                x:Uid="/Keys/List_Key" />
                             <!--  Tag Column (Auto)  -->
                             <ctk:DataColumn
                                 Content="Tag"
                                 DesiredWidth="150"
-                                x:Uid="Keys/List_Tag" />
+                                x:Uid="/Keys/List_Tag" />
                         </ctk:DataTable>
                     </ctk:HeaderedTreeView.Header>
                 </ctk:HeaderedTreeView>

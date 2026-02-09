@@ -57,7 +57,7 @@
                     VerticalAlignment="Center"
                     Width="24"
                     x:Name="CopyBtn"
-                    x:Uid="Keys/CopyKey">
+                    x:Uid="/Keys/CopyKey">
                     <FontIcon FontSize="12" Glyph="&#xE8C8;" />
                 </controls:CopyButton>
             </StackPanel>
@@ -75,7 +75,7 @@
                 VerticalAlignment="Center"
                 Width="24"
                 x:Name="FavoriteBtn"
-                x:Uid="Keys/Favorites">
+                x:Uid="/Keys/Favorites">
                 <FontIcon
                     FontSize="12"
                     Foreground="{x:Bind KeyItem.IsFavorite, Mode=OneWay, Converter={StaticResource BoolToBrushConverter}}"

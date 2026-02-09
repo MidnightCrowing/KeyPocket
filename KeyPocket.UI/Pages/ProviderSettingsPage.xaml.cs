@@ -55,13 +55,13 @@ public sealed partial class ProviderSettingsPage : Page, INotifyPropertyChanged
 
     private async void OnDeleteProviderClicked(object sender, RoutedEventArgs e)
     {
-        var resourceLoader = ResourceLoader.GetForViewIndependentUse();
+        var resourceLoader = ResourceLoader.GetForViewIndependentUse("ProviderSettings");
         var dialog = new ContentDialog
         {
-            Title = resourceLoader.GetString("ProviderSettings/DeleteDialog_Title"),
-            Content = resourceLoader.GetString("ProviderSettings/DeleteDialog_Content"),
-            PrimaryButtonText = resourceLoader.GetString("ProviderSettings/DeleteDialog_PrimaryButton"),
-            CloseButtonText = resourceLoader.GetString("ProviderSettings/DeleteDialog_CloseButton"),
+            Title = resourceLoader.GetString("DeleteDialog_Title"),
+            Content = resourceLoader.GetString("DeleteDialog_Content"),
+            PrimaryButtonText = resourceLoader.GetString("DeleteDialog_PrimaryButton"),
+            CloseButtonText = resourceLoader.GetString("DeleteDialog_CloseButton"),
             DefaultButton = ContentDialogButton.Close,
             XamlRoot = XamlRoot
         };

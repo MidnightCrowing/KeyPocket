@@ -19,7 +19,7 @@
             <TextBlock
                 Style="{StaticResource BodyStrongTextBlockStyle}"
                 Text="Name"
-                x:Uid="ProviderSettings/Name" />
+                x:Uid="/ProviderSettings/Name" />
             <TextBox Text="{x:Bind ViewModel.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         </StackPanel>
 
@@ -27,9 +27,9 @@
             <TextBlock
                 Style="{StaticResource BodyStrongTextBlockStyle}"
                 Text="Icon"
-                x:Uid="ProviderSettings/Icon" />
+                x:Uid="/ProviderSettings/Icon" />
             <StackPanel Orientation="Horizontal" Spacing="8">
-                <Button Content="Presets" x:Uid="ProviderSettings/Presets">
+                <Button Content="Presets" x:Uid="/ProviderSettings/Presets">
                     <Button.Flyout>
                         <Flyout Placement="Bottom" x:Name="DefaultIconFlyout">
                             <GridView
@@ -73,14 +73,14 @@
                 <Button
                     Click="OnChangeIconClicked"
                     Content="Browse..."
-                    x:Uid="ProviderSettings/Browse" />
+                    x:Uid="/ProviderSettings/Browse" />
 
                 <Button
                     Click="OnRemoveIconClicked"
                     Content="Remove Icon"
                     Style="{StaticResource DefaultButtonStyle}"
                     Visibility="{x:Bind ViewModel.HasCustomIcon, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}"
-                    x:Uid="ProviderSettings/RemoveIcon" />
+                    x:Uid="/ProviderSettings/RemoveIcon" />
             </StackPanel>
         </StackPanel>
 
@@ -94,7 +94,7 @@
                 <TextBlock
                     Style="{StaticResource BodyStrongTextBlockStyle}"
                     Text="API Mode"
-                    x:Uid="ProviderSettings/ApiMode" />
+                    x:Uid="/ProviderSettings/ApiMode" />
                 <ComboBox
                     HorizontalAlignment="Stretch"
                     ItemsSource="{x:Bind ViewModel.ProviderTypes, Mode=OneWay}"
@@ -105,16 +105,16 @@
                 <TextBlock
                     Style="{StaticResource BodyStrongTextBlockStyle}"
                     Text="Base URL"
-                    x:Uid="ProviderSettings/BaseUrl" />
+                    x:Uid="/ProviderSettings/BaseUrl" />
                 <TextBox
                     PlaceholderText="https://api.openai.com/v1"
                     Text="{x:Bind ViewModel.BaseUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    x:Uid="ProviderSettings/BaseUrlPlaceholder" />
+                    x:Uid="/ProviderSettings/BaseUrlPlaceholder" />
                 <TextBlock
                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                     Style="{StaticResource CaptionTextBlockStyle}"
                     Text="The base URL of the API provider."
-                    x:Uid="ProviderSettings/BaseUrlDesc" />
+                    x:Uid="/ProviderSettings/BaseUrlDesc" />
             </StackPanel>
         </Grid>
 
@@ -122,7 +122,7 @@
             <TextBlock
                 Style="{StaticResource BodyStrongTextBlockStyle}"
                 Text="Provider Currency"
-                x:Uid="ProviderSettings/ProviderCurrency" />
+                x:Uid="/ProviderSettings/ProviderCurrency" />
             <ComboBox
                 HorizontalAlignment="Stretch"
                 ItemsSource="{x:Bind ViewModel.AvailableCurrencies, Mode=OneWay}"
@@ -131,14 +131,14 @@
                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                 Style="{StaticResource CaptionTextBlockStyle}"
                 Text="The currency used by this provider for billing."
-                x:Uid="ProviderSettings/ProviderCurrencyDesc" />
+                x:Uid="/ProviderSettings/ProviderCurrencyDesc" />
         </StackPanel>
 
         <StackPanel Spacing="8">
             <TextBlock
                 Style="{StaticResource BodyStrongTextBlockStyle}"
                 Text="Description"
-                x:Uid="ProviderSettings/Description" />
+                x:Uid="/ProviderSettings/Description" />
             <TextBox
                 AcceptsReturn="True"
                 Height="80"
@@ -151,6 +151,6 @@
             Content="Save Changes"
             HorizontalAlignment="Right"
             Style="{StaticResource AccentButtonStyle}"
-            x:Uid="ProviderSettings/Save" />
+            x:Uid="/ProviderSettings/Save" />
     </StackPanel>
 </UserControl>
