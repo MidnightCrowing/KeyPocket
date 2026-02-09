@@ -100,7 +100,7 @@
                 PlaceholderText="Search models..."
                 Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 Width="200"
-                x:Uid="Models_SearchBox" />
+                x:Uid="Models/SearchBox" />
 
             <!--  Filter Button  -->
             <DropDownButton Grid.Column="2" ToolTipService.ToolTip="Filter">
@@ -116,13 +116,13 @@
                                     FontWeight="SemiBold"
                                     Text="Filters"
                                     VerticalAlignment="Center"
-                                    x:Uid="Models_Filter_Title" />
+                                    x:Uid="Models/Filter_Title" />
                                 <Button
                                     Click="ResetFilters_Click"
                                     Content="Reset"
                                     HorizontalAlignment="Right"
                                     Style="{StaticResource TextBlockButtonStyle}"
-                                    x:Uid="Models_Filter_Reset" />
+                                    x:Uid="Models/Filter_Reset" />
                             </Grid>
 
                             <!--  Capability Section  -->
@@ -130,7 +130,7 @@
                                 <TextBlock
                                     FontWeight="SemiBold"
                                     Text="Capability"
-                                    x:Uid="Models_Filter_Capability" />
+                                    x:Uid="Models/Filter_Capability" />
                                 <ctk:Segmented
                                     ItemContainerStyle="{StaticResource CustomSegmentedItemStyle}"
                                     SelectionMode="Multiple"
@@ -139,32 +139,32 @@
                                         Content="Text"
                                         IsSelected="{x:Bind ViewModel.IsTextSelected, Mode=TwoWay}"
                                         ToolTipService.ToolTip="Text/Chat models"
-                                        x:Uid="Models_Segment_Text" />
+                                        x:Uid="Models/Segment_Text" />
                                     <ctk:SegmentedItem
                                         Content="File"
                                         IsSelected="{x:Bind ViewModel.IsFileSelected, Mode=TwoWay}"
                                         ToolTipService.ToolTip="File processing models"
-                                        x:Uid="Models_Segment_File" />
+                                        x:Uid="Models/Segment_File" />
                                     <ctk:SegmentedItem
                                         Content="Image"
                                         IsSelected="{x:Bind ViewModel.IsImageSelected, Mode=TwoWay}"
                                         ToolTipService.ToolTip="Image models"
-                                        x:Uid="Models_Segment_Image" />
+                                        x:Uid="Models/Segment_Image" />
                                     <ctk:SegmentedItem
                                         Content="Audio"
                                         IsSelected="{x:Bind ViewModel.IsAudioSelected, Mode=TwoWay}"
                                         ToolTipService.ToolTip="Audio models"
-                                        x:Uid="Models_Segment_Audio" />
+                                        x:Uid="Models/Segment_Audio" />
                                     <ctk:SegmentedItem
                                         Content="Video"
                                         IsSelected="{x:Bind ViewModel.IsVideoSelected, Mode=TwoWay}"
                                         ToolTipService.ToolTip="Video models"
-                                        x:Uid="Models_Segment_Video" />
+                                        x:Uid="Models/Segment_Video" />
                                     <ctk:SegmentedItem
                                         Content="Embeddings"
                                         IsSelected="{x:Bind ViewModel.IsEmbeddingsSelected, Mode=TwoWay}"
                                         ToolTipService.ToolTip="Embedding models"
-                                        x:Uid="Models_Segment_Embeddings" />
+                                        x:Uid="Models/Segment_Embeddings" />
                                 </ctk:Segmented>
                             </StackPanel>
 
@@ -173,7 +173,7 @@
                                 <TextBlock
                                     FontWeight="SemiBold"
                                     Text="Prompt Pricing"
-                                    x:Uid="Models_Filter_Pricing" />
+                                    x:Uid="Models/Filter_Pricing" />
 
                                 <ctk:RangeSelector
                                     Maximum="6"
@@ -261,7 +261,7 @@
                                         Grid.Column="0"
                                         HorizontalAlignment="Left"
                                         Text="Free"
-                                        x:Uid="Models_Filter_Price_Free" />
+                                        x:Uid="Models/Filter_Price_Free" />
 
                                     <!--  1: 0.1  -->
                                     <TextBlock
@@ -329,11 +329,11 @@
                                 <TextBlock
                                     FontWeight="SemiBold"
                                     Text="Status"
-                                    x:Uid="Models_Filter_Status" />
+                                    x:Uid="Models/Filter_Status" />
                                 <CheckBox
                                     Content="Show favorites only"
                                     IsChecked="{x:Bind ViewModel.ShowFavoritesOnly, Mode=TwoWay}"
-                                    x:Uid="Models_Filter_FavoritesOnly" />
+                                    x:Uid="Models/Filter_FavoritesOnly" />
                             </StackPanel>
                         </StackPanel>
                     </Flyout>
@@ -353,14 +353,14 @@
                             IsChecked="{x:Bind ViewModel.SortOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=NameAsc, Mode=OneWay}"
                             Tag="NameAsc"
                             Text="Name (A-Z)"
-                            x:Uid="Models_Sort_NameAsc" />
+                            x:Uid="Models/Sort_NameAsc" />
                         <RadioMenuFlyoutItem
                             Click="SortOption_Click"
                             GroupName="Sort"
                             IsChecked="{x:Bind ViewModel.SortOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=NameDesc, Mode=OneWay}"
                             Tag="NameDesc"
                             Text="Name (Z-A)"
-                            x:Uid="Models_Sort_NameDesc" />
+                            x:Uid="Models/Sort_NameDesc" />
                         <MenuFlyoutSeparator />
                         <RadioMenuFlyoutItem
                             Click="SortOption_Click"
@@ -368,14 +368,14 @@
                             IsChecked="{x:Bind ViewModel.SortOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=PriceLowHigh, Mode=OneWay}"
                             Tag="PriceLowHigh"
                             Text="Pricing: Low to High"
-                            x:Uid="Models_Sort_PriceLow" />
+                            x:Uid="Models/Sort_PriceLow" />
                         <RadioMenuFlyoutItem
                             Click="SortOption_Click"
                             GroupName="Sort"
                             IsChecked="{x:Bind ViewModel.SortOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=PriceHighLow, Mode=OneWay}"
                             Tag="PriceHighLow"
                             Text="Pricing: High to Low"
-                            x:Uid="Models_Sort_PriceHigh" />
+                            x:Uid="Models/Sort_PriceHigh" />
 
                     </MenuFlyout>
                 </DropDownButton.Flyout>
@@ -411,12 +411,12 @@
                             <ctk:DataColumn
                                 Content="Provider"
                                 DesiredWidth="Auto"
-                                x:Uid="Models_List_Provider" />
+                                x:Uid="Models/List_Provider" />
                             <!--  Model Name Column  -->
                             <ctk:DataColumn
                                 Content="Model Name"
                                 DesiredWidth="*"
-                                x:Uid="Models_List_ModelName" />
+                                x:Uid="Models/List_ModelName" />
                             <!--  Input Price Column  -->
                             <ctk:DataColumn Content="{x:Bind ViewModel.InputPriceHeader, Mode=OneWay}" DesiredWidth="160" />
                             <!--  Output Price Column  -->

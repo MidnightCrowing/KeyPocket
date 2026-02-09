@@ -63,7 +63,6 @@ public partial class App : Application
     {
         InitializeServices();
 
-
         _window = new MainWindow();
         MainWindow = _window;
 

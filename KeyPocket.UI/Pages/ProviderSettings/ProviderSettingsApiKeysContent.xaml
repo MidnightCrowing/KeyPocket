@@ -75,7 +75,7 @@
                                         ToolTipService.ToolTip="Add Tag"
                                         VerticalAlignment="Center"
                                         Visibility="{x:Bind IsTagDisplayVisible, Converter={StaticResource BoolToVisConverter}, Mode=OneWay}"
-                                        x:Uid="ProviderSettings_AddTag">
+                                        x:Uid="ProviderSettings/AddTag">
                                         <FontIcon
                                             FontFamily="{StaticResource SymbolThemeFontFamily}"
                                             FontSize="16"
@@ -91,7 +91,7 @@
                                         ToolTipService.ToolTip="Click to edit tag"
                                         VerticalAlignment="Center"
                                         Visibility="{x:Bind IsTagTextVisible, Converter={StaticResource BoolToVisConverter}, Mode=OneWay}"
-                                        x:Uid="ProviderSettings_EditTag" />
+                                        x:Uid="ProviderSettings/EditTag" />
 
                                     <!--  Tag Input (shown when editing)  -->
                                     <TextBox
@@ -101,7 +101,7 @@
                                         VerticalAlignment="Center"
                                         Visibility="{x:Bind IsTagEditing, Converter={StaticResource BoolToVisConverter}, Mode=OneWay}"
                                         Width="80"
-                                        x:Uid="Keys_Tag" />
+                                        x:Uid="Keys/Tag" />
                                 </Grid>
 
                                 <controls:CopyButton
@@ -110,14 +110,14 @@
                                     Padding="8"
                                     Tag="{x:Bind Id, Mode=OneWay}"
                                     ToolTipService.ToolTip="Copy Key"
-                                    x:Uid="Keys_CopyKey" />
+                                    x:Uid="Keys/CopyKey" />
                                 <Button
                                     Background="Transparent"
                                     BorderThickness="0"
                                     Command="{x:Bind ToggleFavoriteCommand}"
                                     Padding="8"
                                     ToolTipService.ToolTip="Favorite"
-                                    x:Uid="ProviderSettings_Favorite">
+                                    x:Uid="ProviderSettings/Favorite">
                                     <FontIcon
                                         FontFamily="{StaticResource SymbolThemeFontFamily}"
                                         FontSize="16"
@@ -129,7 +129,7 @@
                                     Command="{x:Bind DeleteCommand}"
                                     Padding="8"
                                     ToolTipService.ToolTip="Delete"
-                                    x:Uid="ProviderSettings_Delete">
+                                    x:Uid="ProviderSettings/Delete">
                                     <FontIcon
                                         FontFamily="{StaticResource SymbolThemeFontFamily}"
                                         FontSize="16"
@@ -149,7 +149,7 @@
                             <PasswordBox
                                 Password="{x:Bind NewKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 PlaceholderText="Enter API Key (sk-...)"
-                                x:Uid="ProviderSettings_ApiKeyPlaceholder" />
+                                x:Uid="ProviderSettings/ApiKeyPlaceholder" />
 
                             <StackPanel
                                 Grid.Column="1"
@@ -161,12 +161,12 @@
                                     CommandParameter="{x:Bind}"
                                     Content="Confirm"
                                     Style="{StaticResource AccentButtonStyle}"
-                                    x:Uid="ProviderSettings_Confirm" />
+                                    x:Uid="ProviderSettings/Confirm" />
                                 <Button
                                     Command="{x:Bind CancelAddCommand}"
                                     CommandParameter="{x:Bind}"
                                     Content="Cancel"
-                                    x:Uid="ProviderSettings_Cancel" />
+                                    x:Uid="ProviderSettings/Cancel" />
                             </StackPanel>
                         </Grid>
                     </Grid>
@@ -176,6 +176,6 @@
         <Button
             Command="{x:Bind ViewModel.AddKeyCommand, Mode=OneWay}"
             Content="Add API Key"
-            x:Uid="ProviderSettings_AddApiKey" />
+            x:Uid="ProviderSettings/AddApiKey" />
     </StackPanel>
 </UserControl>

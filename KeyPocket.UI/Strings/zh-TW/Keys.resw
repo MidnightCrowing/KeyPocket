@@ -58,28 +58,37 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="MainWindow.Title" xml:space="preserve">
-    <value>KeyPocket</value>
+  <data name="Header_Provider.Text" xml:space="preserve">
+    <value>服務商</value>
   </data>
-  <data name="AppTitleBar.Title" xml:space="preserve">
-    <value>KeyPocket</value>
+  <data name="Header_KeyName.Text" xml:space="preserve">
+    <value>金鑰名稱</value>
   </data>
-  <data name="Shell_SearchBox.PlaceholderText" xml:space="preserve">
-    <value>搜索..</value>
-  </data>
-  <data name="Shell_Home.Content" xml:space="preserve">
-    <value>首页</value>
-  </data>
-  <data name="Shell_Models.Content" xml:space="preserve">
+  <data name="Header_Model.Text" xml:space="preserve">
     <value>模型</value>
   </data>
-  <data name="Shell_Keys.Content" xml:space="preserve">
-    <value>密钥</value>
+  <data name="Header_Status.Text" xml:space="preserve">
+    <value>狀態</value>
   </data>
-  <data name="Shell_Providers.Content" xml:space="preserve">
-    <value>服务商</value>
+  <data name="Header_Balance.Text" xml:space="preserve">
+    <value>餘額</value>
   </data>
-  <data name="Shell_AddProvider.Content" xml:space="preserve">
-    <value>添加服务商</value>
+  <data name="Status_Active.Text" xml:space="preserve">
+    <value>有效</value>
+  </data>
+  <data name="Status_Expired.Text" xml:space="preserve">
+    <value>過期</value>
+  </data>
+  <data name="Status_QuotaExceeded.Text" xml:space="preserve">
+    <value>額度耗盡</value>
+  </data>
+  <data name="Status_Initial.Text" xml:space="preserve">
+    <value>有效</value>
+  </data>
+  <data name="SearchBox.PlaceholderText" xml:space="preserve">
+    <value>搜尋標籤...</value>
+  </data>
+  <data name="CopyKey.ToolTipService.ToolTip" xml:space="preserve">
+    <value>複製金鑰</value>
   </data>
 </root>

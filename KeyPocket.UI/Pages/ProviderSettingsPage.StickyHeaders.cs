@@ -25,19 +25,19 @@ public sealed partial class ProviderSettingsPage
         var resourceLoader = ResourceLoader.GetForViewIndependentUse();
 
         _stickyGeneral = CreateStickyHeaderBorder(
-            resourceLoader.GetString("ProviderSettings_General/Text"),
-            resourceLoader.GetString("ProviderSettings_GeneralDesc/Text"));
+            resourceLoader.GetString("ProviderSettings/General/Text"),
+            resourceLoader.GetString("ProviderSettings/GeneralDesc/Text"));
         StickyHeadersCanvas.Children.Add(_stickyGeneral);
 
         (_stickyApiKeys, _stickyApiKeysBadge) = CreateStickyHeaderBorderWithBadge(
-            resourceLoader.GetString("ProviderSettings_ApiKeys/Text"),
-            resourceLoader.GetString("ProviderSettings_ApiKeysDesc/Text"),
+            resourceLoader.GetString("ProviderSettings/ApiKeys/Text"),
+            resourceLoader.GetString("ProviderSettings/ApiKeysDesc/Text"),
             ViewModel?.ApiKeys.Count ?? 0);
         StickyHeadersCanvas.Children.Add(_stickyApiKeys);
 
         (_stickyModels, _stickyModelsBadge) = CreateStickyHeaderBorderWithBadge(
-            resourceLoader.GetString("ProviderSettings_Models/Text"),
-            resourceLoader.GetString("ProviderSettings_ModelsDesc/Text"),
+            resourceLoader.GetString("ProviderSettings/Models/Text"),
+            resourceLoader.GetString("ProviderSettings/ModelsDesc/Text"),
             ViewModel?.Models.Count ?? 0);
         StickyHeadersCanvas.Children.Add(_stickyModels);
 

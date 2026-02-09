@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Provider_EditTooltip.ToolTipService.ToolTip" xml:space="preserve">
+    <value>双击编辑服务商设置</value>
+  </data>
+  <data name="SearchBox.PlaceholderText" xml:space="preserve">
+    <value>搜索模型...</value>
+  </data>
+  <data name="Capability.Text" xml:space="preserve">
+    <value>能力:</value>
+  </data>
+  <data name="SortBy.Text" xml:space="preserve">
+    <value>排序:</value>
+  </data>
+  <data name="Favorites.ToolTipService.ToolTip" xml:space="preserve">
+    <value>收藏</value>
+  </data>
+  <data name="Tag_Chat.Text" xml:space="preserve">
+    <value>对话</value>
+  </data>
+  <data name="Tag_Embedding.Text" xml:space="preserve">
+    <value>嵌入</value>
+  </data>
+  <data name="Price_In.Text" xml:space="preserve">
+    <value>输入:</value>
+  </data>
+  <data name="Price_Out.Text" xml:space="preserve">
+    <value>输出:</value>
+  </data>
+  <data name="CopyID.ToolTipService.ToolTip" xml:space="preserve">
+    <value>复制 ID</value>
+  </data>
+  <data name="Filter_Title.Text" xml:space="preserve">
+    <value>筛选</value>
+  </data>
+  <data name="Filter_Reset.Content" xml:space="preserve">
+    <value>重置</value>
+  </data>
+  <data name="Filter_Capability.Text" xml:space="preserve">
+    <value>能力</value>
+  </data>
+  <data name="Filter_Pricing.Text" xml:space="preserve">
+    <value>提示词价格</value>
+  </data>
+  <data name="Filter_Price_Free.Text" xml:space="preserve">
+    <value>免费</value>
+  </data>
+  <data name="Filter_Status.Text" xml:space="preserve">
+    <value>状态</value>
+  </data>
+  <data name="Filter_FavoritesOnly.Content" xml:space="preserve">
+    <value>仅显示收藏</value>
+  </data>
+  <data name="Sort_NameAsc.Text" xml:space="preserve">
+    <value>名称 (A-Z)</value>
+  </data>
+  <data name="Sort_NameDesc.Text" xml:space="preserve">
+    <value>名称 (Z-A)</value>
+  </data>
+  <data name="Sort_PriceLow.Text" xml:space="preserve">
+    <value>价格: 从低到高</value>
+  </data>
+  <data name="Sort_PriceHigh.Text" xml:space="preserve">
+    <value>价格: 从高到低</value>
+  </data>
+  <data name="Segment_Text.Content" xml:space="preserve">
+    <value>Text</value>
+  </data>
+  <data name="Segment_Text.ToolTipService.ToolTip" xml:space="preserve">
+    <value>文本/对话模型</value>
+  </data>
+  <data name="Segment_File.Content" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="Segment_File.ToolTipService.ToolTip" xml:space="preserve">
+    <value>文件处理模型</value>
+  </data>
+  <data name="Segment_Image.Content" xml:space="preserve">
+    <value>Image</value>
+  </data>
+  <data name="Segment_Image.ToolTipService.ToolTip" xml:space="preserve">
+    <value>图像模型</value>
+  </data>
+  <data name="Segment_Audio.Content" xml:space="preserve">
+    <value>Audio</value>
+  </data>
+  <data name="Segment_Audio.ToolTipService.ToolTip" xml:space="preserve">
+    <value>音频模型</value>
+  </data>
+  <data name="Segment_Video.Content" xml:space="preserve">
+    <value>Video</value>
+  </data>
+  <data name="Segment_Video.ToolTipService.ToolTip" xml:space="preserve">
+    <value>视频模型</value>
+  </data>
+  <data name="Segment_Embeddings.Content" xml:space="preserve">
+    <value>Embeddings</value>
+  </data>
+  <data name="Segment_Embeddings.ToolTipService.ToolTip" xml:space="preserve">
+    <value>嵌入模型</value>
+  </data>
+  <data name="List_Provider.Content" xml:space="preserve">
+    <value>服务商</value>
+  </data>
+  <data name="List_ModelName.Content" xml:space="preserve">
+    <value>模型名称</value>
+  </data>
+  <data name="Card_By.Text" xml:space="preserve">
+    <value>来自 </value>
+  </data>
+  <data name="Card_In.Text" xml:space="preserve">
+    <value>输入:</value>
+  </data>
+  <data name="Card_Out.Text" xml:space="preserve">
+    <value>输出:</value>
+  </data>
+  <data name="InputPriceFormat" xml:space="preserve">
+    <value>输入 ({0}/1M)</value>
+  </data>
+  <data name="OutputPriceFormat" xml:space="preserve">
+    <value>输出 ({0}/1M)</value>
+  </data>
+  <data name="CountFormat" xml:space="preserve">
+    <value>{0} 个模型</value>
+  </data>
+</root>

@@ -34,7 +34,7 @@
             Title="Disclaimer"
             Visibility="Collapsed"
             x:Name="DisclaimerInfoBar"
-            x:Uid="Home_Disclaimer" />
+            x:Uid="Home/Disclaimer" />
 
         <!--  Empty State  -->
         <StackPanel
@@ -48,13 +48,13 @@
                 HorizontalAlignment="Center"
                 Style="{StaticResource SubtitleTextBlockStyle}"
                 Text="No Providers Configured"
-                x:Uid="Home_NoProviders" />
+                x:Uid="Home/NoProviders" />
             <Button
                 Click="OnAddProviderClicked"
                 Content="Add Your First Provider"
                 HorizontalAlignment="Center"
                 Style="{StaticResource AccentButtonStyle}"
-                x:Uid="Home_AddFirstProvider" />
+                x:Uid="Home/AddFirstProvider" />
         </StackPanel>
 
         <!--  Content Grid  -->

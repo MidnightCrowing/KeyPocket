@@ -58,28 +58,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="MainWindow.Title" xml:space="preserve">
-    <value>KeyPocket</value>
+  <data name="NoProviders.Text" xml:space="preserve">
+    <value>尚未配置服務商</value>
   </data>
-  <data name="AppTitleBar.Title" xml:space="preserve">
-    <value>KeyPocket</value>
+  <data name="AddFirstProvider.Content" xml:space="preserve">
+    <value>新增你的第一個服務商</value>
   </data>
-  <data name="Shell_SearchBox.PlaceholderText" xml:space="preserve">
-    <value>搜索..</value>
+  <data name="Disclaimer.Title" xml:space="preserve">
+    <value>免責聲明</value>
   </data>
-  <data name="Shell_Home.Content" xml:space="preserve">
-    <value>首页</value>
-  </data>
-  <data name="Shell_Models.Content" xml:space="preserve">
-    <value>模型</value>
-  </data>
-  <data name="Shell_Keys.Content" xml:space="preserve">
-    <value>密钥</value>
-  </data>
-  <data name="Shell_Providers.Content" xml:space="preserve">
-    <value>服务商</value>
-  </data>
-  <data name="Shell_AddProvider.Content" xml:space="preserve">
-    <value>添加服务商</value>
+  <data name="Disclaimer.Message" xml:space="preserve">
+    <value>本軟體並非專業的金鑰管理解決方案。如果您有專業的安全需求,請使用專業的密碼管理器或企業級金鑰管理系統。</value>
   </data>
 </root>

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Provider_EditTooltip.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Double click to edit provider settings</value>
+  </data>
+  <data name="SearchBox.PlaceholderText" xml:space="preserve">
+    <value>Search models...</value>
+  </data>
+  <data name="Capability.Text" xml:space="preserve">
+    <value>Capability:</value>
+  </data>
+  <data name="SortBy.Text" xml:space="preserve">
+    <value>Sort by:</value>
+  </data>
+  <data name="Favorites.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Favorites</value>
+  </data>
+  <data name="Tag_Chat.Text" xml:space="preserve">
+    <value>Chat</value>
+  </data>
+  <data name="Tag_Embedding.Text" xml:space="preserve">
+    <value>Embedding</value>
+  </data>
+  <data name="Price_In.Text" xml:space="preserve">
+    <value>In:</value>
+  </data>
+  <data name="Price_Out.Text" xml:space="preserve">
+    <value>Out:</value>
+  </data>
+  <data name="CopyID.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Copy ID</value>
+  </data>
+  <data name="Filter_Title.Text" xml:space="preserve">
+    <value>Filters</value>
+  </data>
+  <data name="Filter_Reset.Content" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="Filter_Capability.Text" xml:space="preserve">
+    <value>Capability</value>
+  </data>
+  <data name="Filter_Pricing.Text" xml:space="preserve">
+    <value>Prompt Pricing</value>
+  </data>
+  <data name="Filter_Price_Free.Text" xml:space="preserve">
+    <value>Free</value>
+  </data>
+  <data name="Filter_Status.Text" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Filter_FavoritesOnly.Content" xml:space="preserve">
+    <value>Show favorites only</value>
+  </data>
+  <data name="Sort_NameAsc.Text" xml:space="preserve">
+    <value>Name (A-Z)</value>
+  </data>
+  <data name="Sort_NameDesc.Text" xml:space="preserve">
+    <value>Name (Z-A)</value>
+  </data>
+  <data name="Sort_PriceLow.Text" xml:space="preserve">
+    <value>Pricing: Low to High</value>
+  </data>
+  <data name="Sort_PriceHigh.Text" xml:space="preserve">
+    <value>Pricing: High to Low</value>
+  </data>
+  <data name="Segment_Text.Content" xml:space="preserve">
+    <value>Text</value>
+  </data>
+  <data name="Segment_Text.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Text/Chat models</value>
+  </data>
+  <data name="Segment_File.Content" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="Segment_File.ToolTipService.ToolTip" xml:space="preserve">
+    <value>File processing models</value>
+  </data>
+  <data name="Segment_Image.Content" xml:space="preserve">
+    <value>Image</value>
+  </data>
+  <data name="Segment_Image.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Image models</value>
+  </data>
+  <data name="Segment_Audio.Content" xml:space="preserve">
+    <value>Audio</value>
+  </data>
+  <data name="Segment_Audio.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Audio models</value>
+  </data>
+  <data name="Segment_Video.Content" xml:space="preserve">
+    <value>Video</value>
+  </data>
+  <data name="Segment_Video.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Video models</value>
+  </data>
+  <data name="Segment_Embeddings.Content" xml:space="preserve">
+    <value>Embeddings</value>
+  </data>
+  <data name="Segment_Embeddings.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Embedding models</value>
+  </data>
+  <data name="List_Provider.Content" xml:space="preserve">
+    <value>Provider</value>
+  </data>
+  <data name="List_ModelName.Content" xml:space="preserve">
+    <value>Model Name</value>
+  </data>
+  <data name="Card_By.Text" xml:space="preserve">
+    <value>by </value>
+  </data>
+  <data name="Card_In.Text" xml:space="preserve">
+    <value>In:</value>
+  </data>
+  <data name="Card_Out.Text" xml:space="preserve">
+    <value>Out:</value>
+  </data>
+  <data name="InputPriceFormat" xml:space="preserve">
+    <value>Input ({0}/1M)</value>
+  </data>
+  <data name="OutputPriceFormat" xml:space="preserve">
+    <value>Output ({0}/1M)</value>
+  </data>
+  <data name="CountFormat" xml:space="preserve">
+    <value>{0} models</value>
+  </data>
+</root>

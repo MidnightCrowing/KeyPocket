@@ -94,7 +94,7 @@
                             FontWeight="SemiBold"
                             Text="Add Exchange Rate"
                             VerticalAlignment="Center"
-                            x:Uid="Settings_AddExchangeRate" />
+                            x:Uid="Settings/AddExchangeRate" />
                     </StackPanel>
 
                     <!--  Edit Mode: Inputs  -->
@@ -108,7 +108,7 @@
                             PlaceholderText="From"
                             SelectedItem="{Binding ElementName=Root, Path=ViewModel.NewRateSource, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             Width="100"
-                            x:Uid="Settings_AddRate_From" />
+                            x:Uid="Settings/AddRate_From" />
                         <FontIcon
                             FontSize="12"
                             Glyph="&#xE72A;"
@@ -119,7 +119,7 @@
                             PlaceholderText="To"
                             SelectedItem="{Binding ElementName=Root, Path=ViewModel.NewRateTarget, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             Width="100"
-                            x:Uid="Settings_AddRate_To" />
+                            x:Uid="Settings/AddRate_To" />
                         <TextBlock
                             Opacity="0.5"
                             Text="="
@@ -131,7 +131,7 @@
                             SpinButtonPlacementMode="Inline"
                             Value="{Binding ElementName=Root, Path=ViewModel.NewRateValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             Width="160"
-                            x:Uid="Settings_AddRate_Rate" />
+                            x:Uid="Settings/AddRate_Rate" />
 
                         <Button
                             Command="{Binding ElementName=Root, Path=ViewModel.AddCustomRateCommand}"
@@ -165,32 +165,32 @@
                     MaxWidth="1064"
                     Style="{StaticResource TitleTextBlockStyle}"
                     Text="Settings"
-                    x:Uid="Settings_Title" />
+                    x:Uid="Settings/Title" />
 
                 <!--  Appearance  -->
                 <TextBlock
                     Style="{StaticResource SettingsSectionHeaderTextBlockStyle}"
                     Text="Appearance"
-                    x:Uid="Settings_Appearance" />
+                    x:Uid="Settings/Appearance" />
 
                 <ctk:SettingsCard
                     Description="Select which app theme to display"
                     Header="App theme"
-                    x:Uid="Settings_Theme">
+                    x:Uid="Settings/Theme">
                     <ctk:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE790;" />
                     </ctk:SettingsCard.HeaderIcon>
                     <ComboBox AutomationProperties.AutomationId="themeModeComboBox" SelectedIndex="{x:Bind ViewModel.ThemeIndex, Mode=TwoWay}">
-                        <ComboBoxItem Content="Light" x:Uid="Settings_Theme_Light" />
-                        <ComboBoxItem Content="Dark" x:Uid="Settings_Theme_Dark" />
-                        <ComboBoxItem Content="Use system setting" x:Uid="Settings_Theme_System" />
+                        <ComboBoxItem Content="Light" x:Uid="Settings/Theme_Light" />
+                        <ComboBoxItem Content="Dark" x:Uid="Settings/Theme_Dark" />
+                        <ComboBoxItem Content="Use system setting" x:Uid="Settings/Theme_System" />
                     </ComboBox>
                 </ctk:SettingsCard>
 
                 <ctk:SettingsCard
                     Description="Select application language"
                     Header="Language"
-                    x:Uid="Settings_Language">
+                    x:Uid="Settings/Language">
                     <ctk:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE775;" />
                     </ctk:SettingsCard.HeaderIcon>
@@ -199,12 +199,12 @@
                             Foreground="{ThemeResource SystemFillColorCriticalBrush}"
                             VerticalAlignment="Center"
                             Visibility="{x:Bind ViewModel.ShowRestartWarning, Mode=OneWay, Converter={StaticResource BoolToVis}}"
-                            x:Uid="Settings_RestartRequired" />
+                            x:Uid="Settings/RestartRequired" />
                         <ComboBox SelectedIndex="{x:Bind ViewModel.LanguageIndex, Mode=TwoWay}">
-                            <ComboBoxItem Content="Use system setting" x:Uid="Settings_Language_Auto" />
-                            <ComboBoxItem Content="English" x:Uid="Settings_Language_En" />
-                            <ComboBoxItem Content="Simplified Chinese" x:Uid="Settings_Language_Zh" />
-                            <ComboBoxItem Content="Traditional Chinese" x:Uid="Settings_Language_ZhTw" />
+                            <ComboBoxItem Content="Use system setting" x:Uid="Settings/Language_Auto" />
+                            <ComboBoxItem Content="English" x:Uid="Settings/Language_En" />
+                            <ComboBoxItem Content="Simplified Chinese" x:Uid="Settings/Language_Zh" />
+                            <ComboBoxItem Content="Traditional Chinese" x:Uid="Settings/Language_ZhTw" />
                         </ComboBox>
                     </StackPanel>
                 </ctk:SettingsCard>
@@ -213,13 +213,13 @@
                 <TextBlock
                     Style="{StaticResource SettingsSectionHeaderTextBlockStyle}"
                     Text="Exchange Rates"
-                    x:Uid="Settings_ExchangeRates" />
+                    x:Uid="Settings/ExchangeRates" />
 
                 <!--  1. Display Currency Selection  -->
                 <ctk:SettingsCard
                     Description="Set default display currency"
                     Header="Display Currency"
-                    x:Uid="Settings_DisplayCurrency">
+                    x:Uid="Settings/DisplayCurrency">
                     <ctk:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE1D0;" />
                     </ctk:SettingsCard.HeaderIcon>
@@ -281,7 +281,7 @@
                     Header="Exchange Rate Details"
                     IsExpanded="False"
                     x:Name="RatesExpander"
-                    x:Uid="Settings_ExchangeRateDetails">
+                    x:Uid="Settings/ExchangeRateDetails">
                     <ctk:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE825;" />
                     </ctk:SettingsExpander.HeaderIcon>
@@ -291,12 +291,12 @@
                 <TextBlock
                     Style="{StaticResource SettingsSectionHeaderTextBlockStyle}"
                     Text="About"
-                    x:Uid="Settings_About" />
+                    x:Uid="Settings/About" />
                 <ctk:SettingsExpander
                     Description="© 2026 KeyPocket Community."
                     Header="{StaticResource AppTitleName}"
                     Margin="0,0,0,36"
-                    x:Uid="Settings_AboutExpander">
+                    x:Uid="Settings/AboutExpander">
                     <ctk:SettingsExpander.HeaderIcon>
                         <BitmapIcon ShowAsMonochrome="False" UriSource="/Assets/KeyPocket.png" />
                     </ctk:SettingsExpander.HeaderIcon>
@@ -310,7 +310,7 @@
                             Command="{x:Bind ViewModel.OpenGitHubCommand}"
                             Header="GitHub"
                             IsClickEnabled="True"
-                            x:Uid="Settings_GitHub">
+                            x:Uid="Settings/GitHub">
                             <ctk:SettingsCard.ActionIcon>
                                 <FontIcon Glyph="&#xE8A7;" />
                             </ctk:SettingsCard.ActionIcon>
@@ -321,7 +321,7 @@
                             Command="{x:Bind ViewModel.OpenFeedbackCommand}"
                             Header="Open an issue or pull request"
                             IsClickEnabled="True"
-                            x:Uid="Settings_Issue">
+                            x:Uid="Settings/Issue">
                             <ctk:SettingsCard.ActionIcon>
                                 <FontIcon Glyph="&#xE8A7;" />
                             </ctk:SettingsCard.ActionIcon>
@@ -332,12 +332,12 @@
                             ContentAlignment="Vertical"
                             Header="Resources &amp; Sources"
                             HorizontalContentAlignment="Left"
-                            x:Uid="Settings_Resources">
+                            x:Uid="Settings/Resources">
                             <StackPanel Margin="-12,0,0,0" Orientation="Vertical">
                                 <HyperlinkButton
                                     Content="AI &#47; LLM Model Icon"
                                     NavigateUri="https://lobehub.com/icons"
-                                    x:Uid="Settings_IconLink" />
+                                    x:Uid="Settings/IconLink" />
                             </StackPanel>
                         </ctk:SettingsCard>
 
@@ -346,7 +346,7 @@
                             ContentAlignment="Vertical"
                             Header="License"
                             HorizontalContentAlignment="Left"
-                            x:Uid="Settings_License">
+                            x:Uid="Settings/License">
                             <StackPanel Margin="-12,0,0,0" Orientation="Vertical">
                                 <HyperlinkButton Content="MIT License" NavigateUri="https://github.com/MidnightCrowing/KeyPocket/blob/main/LICENSE" />
                             </StackPanel>

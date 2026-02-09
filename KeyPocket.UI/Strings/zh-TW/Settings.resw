@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Title.Text" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="Appearance.Text" xml:space="preserve">
+    <value>外觀</value>
+  </data>
+  <data name="Language.Header" xml:space="preserve">
+    <value>語言</value>
+  </data>
+  <data name="Language.Description" xml:space="preserve">
+    <value>選擇應用程式語言</value>
+  </data>
+  <data name="Language_Auto.Content" xml:space="preserve">
+    <value>跟隨系統</value>
+  </data>
+  <data name="Language_En.Content" xml:space="preserve">
+    <value>英語 (English)</value>
+  </data>
+  <data name="Language_Zh.Content" xml:space="preserve">
+    <value>簡體中文</value>
+  </data>
+  <data name="Language_ZhTw.Content" xml:space="preserve">
+    <value>繁體中文</value>
+  </data>
+  <data name="Theme.Header" xml:space="preserve">
+    <value>應用程式主題</value>
+  </data>
+  <data name="Theme.Description" xml:space="preserve">
+    <value>選擇要顯示的應用程式主題</value>
+  </data>
+  <data name="Theme_Light.Content" xml:space="preserve">
+    <value>淺色</value>
+  </data>
+  <data name="Theme_Dark.Content" xml:space="preserve">
+    <value>深色</value>
+  </data>
+  <data name="Theme_System.Content" xml:space="preserve">
+    <value>跟隨系統</value>
+  </data>
+  <data name="ExchangeRates.Text" xml:space="preserve">
+    <value>匯率</value>
+  </data>
+  <data name="DisplayCurrency.Header" xml:space="preserve">
+    <value>顯示貨幣</value>
+  </data>
+  <data name="DisplayCurrency.Description" xml:space="preserve">
+    <value>設定預設顯示貨幣</value>
+  </data>
+  <data name="ExchangeRateDetails.Header" xml:space="preserve">
+    <value>匯率詳情</value>
+  </data>
+  <data name="ExchangeRateDetails.Description" xml:space="preserve">
+    <value>設定貨幣之間的匯率</value>
+  </data>
+  <data name="AddExchangeRate.Text" xml:space="preserve">
+    <value>新增匯率</value>
+  </data>
+  <data name="AddRate_From.PlaceholderText" xml:space="preserve">
+    <value>從 (來源貨幣)</value>
+  </data>
+  <data name="AddRate_To.PlaceholderText" xml:space="preserve">
+    <value>到 (目標貨幣)</value>
+  </data>
+  <data name="AddRate_Rate.PlaceholderText" xml:space="preserve">
+    <value>匯率</value>
+  </data>
+  <data name="About.Text" xml:space="preserve">
+    <value>關於</value>
+  </data>
+  <data name="AboutExpander.Header" xml:space="preserve">
+    <value>KeyPocket</value>
+  </data>
+  <data name="AboutExpander.Description" xml:space="preserve">
+    <value>© 2026 KeyPocket Community.</value>
+  </data>
+  <data name="GitHub.Header" xml:space="preserve">
+    <value>GitHub</value>
+  </data>
+  <data name="Issue.Header" xml:space="preserve">
+    <value>Open an issue or pull request</value>
+  </data>
+  <data name="Resources.Header" xml:space="preserve">
+    <value>資源與來源</value>
+  </data>
+  <data name="License.Header" xml:space="preserve">
+    <value>授權條款</value>
+  </data>
+  <data name="IconLink.Content" xml:space="preserve">
+    <value>AI / LLM 模型圖示</value>
+  </data>
+  <data name="RestartRequired.Text" xml:space="preserve">
+    <value>重新啟動應用程式後生效</value>
+  </data>
+</root>
