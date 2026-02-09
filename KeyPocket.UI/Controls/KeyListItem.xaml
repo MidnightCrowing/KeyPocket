@@ -84,19 +84,35 @@
         </Grid>
 
         <!--  Tag Column (Inline Edit)  -->
-        <Grid Margin="0,0,16,0" VerticalAlignment="Center">
+        <Grid
+            HorizontalAlignment="Stretch"
+            Margin="0,0,16,0"
+            PointerEntered="OnTagColumnPointerEntered"
+            PointerExited="OnTagColumnPointerExited"
+            VerticalAlignment="Center">
             <Button
                 Background="Transparent"
                 BorderThickness="0"
                 Command="{x:Bind KeyItem.StartEditTagCommand}"
                 HorizontalAlignment="Stretch"
                 HorizontalContentAlignment="Left"
+                MinHeight="28"
                 Padding="0"
-                Visibility="{x:Bind KeyItem.IsEditingTag, Converter={StaticResource NegBoolToVis}, Mode=OneWay}">
-                <TextBlock
-                    FontSize="12"
-                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                    Text="{x:Bind KeyItem.Tag, Mode=OneWay, TargetNullValue='Add Tag...'}" />
+                x:Name="TagButton">
+                <Border
+                    CornerRadius="4"
+                    HorizontalAlignment="Stretch"
+                    Padding="6,2"
+                    Visibility="Collapsed"
+                    x:Name="TagBorder">
+                    <Border.Background>
+                        <SolidColorBrush Color="{x:Bind KeyItem.TagColor, Mode=OneWay}" Opacity="0.15" />
+                    </Border.Background>
+                    <TextBlock
+                        FontSize="12"
+                        Foreground="{x:Bind KeyItem.TagBrush, Mode=OneWay}"
+                        Text="{x:Bind KeyItem.Tag, Mode=OneWay}" />
+                </Border>
             </Button>
 
             <TextBox
@@ -104,7 +120,7 @@
                 KeyDown="TagTextBox_KeyDown"
                 Loaded="TagTextBox_Loaded"
                 LostFocus="TagTextBox_LostFocus"
-                MinHeight="0"
+                MinHeight="28"
                 Padding="8,4"
                 Text="{x:Bind KeyItem.Tag, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 Visibility="{x:Bind KeyItem.IsEditingTag, Converter={StaticResource BoolToVis}, Mode=OneWay}"

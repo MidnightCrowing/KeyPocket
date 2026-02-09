@@ -19,11 +19,10 @@
 
             <!--  Provider Group Template  -->
             <DataTemplate x:DataType="muxc:TreeViewNode" x:Key="ProviderGroupTemplate">
-                <ctk:DataRow>
+                <ctk:DataRow DoubleTapped="ProviderGroup_DoubleTapped">
                     <!--  Provider Name & Icon  -->
                     <StackPanel
                         Background="Transparent"
-                        DoubleTapped="ProviderGroup_DoubleTapped"
                         MinHeight="24"
                         Orientation="Horizontal"
                         Spacing="8"

@@ -29,7 +29,11 @@ public sealed partial class KeyCardItem : UserControl
 
     private static void OnKeyItemChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        if (d is KeyCardItem control) control.UpdateButtonsVisibility(false);
+        if (d is KeyCardItem control)
+        {
+            control.Bindings.Update();
+            control.UpdateButtonsVisibility(false);
+        }
     }
 
     private void OnPointerEntered(object sender, PointerRoutedEventArgs e)

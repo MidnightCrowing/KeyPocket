@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
 using KeyPocket.UI.ViewModels;
@@ -9,6 +10,7 @@ namespace KeyPocket.UI.Controls;
 
 public sealed partial class KeyListItem : UserControl
 {
+    private KeyItemViewModel? _currentKeyItem;
     public static readonly DependencyProperty KeyItemProperty =
         DependencyProperty.Register(
             nameof(KeyItem),
@@ -31,19 +33,39 @@ public sealed partial class KeyListItem : UserControl
     {
         if (d is KeyListItem control)
         {
+            if (e.OldValue is KeyItemViewModel oldVm)
+                oldVm.PropertyChanged -= control.OnKeyItemPropertyChanged;
+
+            if (e.NewValue is KeyItemViewModel newVm)
+                newVm.PropertyChanged += control.OnKeyItemPropertyChanged;
+
+            control._currentKeyItem = e.NewValue as KeyItemViewModel;
             control.Bindings.Update();
             control.UpdateButtonsVisibility(false);
+            control.UpdateTagBorderVisibility(false);
         }
     }
 
     private void OnPointerEntered(object sender, PointerRoutedEventArgs e)
     {
         UpdateButtonsVisibility(true);
+        UpdateTagBorderVisibility(true);
     }
 
     private void OnPointerExited(object sender, PointerRoutedEventArgs e)
     {
         UpdateButtonsVisibility(false);
+        UpdateTagBorderVisibility(false);
+    }
+
+    private void OnTagColumnPointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        UpdateTagBorderVisibility(true);
+    }
+
+    private void OnTagColumnPointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        UpdateTagBorderVisibility(false);
     }
 
     private void UpdateButtonsVisibility(bool isHovered)
@@ -56,6 +78,28 @@ public sealed partial class KeyListItem : UserControl
             FavoriteBtn.Opacity = 1;
         else
             FavoriteBtn.Opacity = KeyItem?.IsFavorite == true ? 1 : 0;
+    }
+
+    private void UpdateTagBorderVisibility(bool isHovered)
+    {
+        if (TagBorder == null || KeyItem == null) return;
+
+        if (KeyItem.IsEditingTag)
+        {
+            TagBorder.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        TagBorder.Visibility = KeyItem.HasTag ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void OnKeyItemPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(KeyItemViewModel.Tag) ||
+            e.PropertyName == nameof(KeyItemViewModel.IsEditingTag))
+        {
+            UpdateTagBorderVisibility(false);
+        }
     }
 
     private void OnCopyClicked(object sender, RoutedEventArgs e)

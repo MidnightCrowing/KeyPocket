@@ -2,8 +2,12 @@ using System;
 using Windows.ApplicationModel.DataTransfer;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using KeyPocket.Core.Models;
 using KeyPocket.Core.Services;
+using KeyPocket.UI.Helpers;
+using KeyPocket.UI.Messages;
+using Microsoft.UI.Xaml.Media;
 
 namespace KeyPocket.UI.ViewModels;
 
@@ -13,7 +17,10 @@ public partial class KeyItemViewModel : ObservableObject
     private readonly ProviderService _providerService;
 
     [ObservableProperty] private string _displayKey = string.Empty;
-    [ObservableProperty] private bool _isEditingTag;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsTagDisplayVisible))]
+    [NotifyPropertyChangedFor(nameof(IsTagRowVisible))]
+    private bool _isEditingTag;
     [ObservableProperty] private string _maskedKey = "Loading...";
     private string? _originalTag;
     [ObservableProperty] private string? _providerIcon;
@@ -26,6 +33,13 @@ public partial class KeyItemViewModel : ObservableObject
         _providerService = providerService;
 
         Initialize();
+
+        WeakReferenceMessenger.Default.Register<ThemeChangedMessage>(this, (r, m) =>
+        {
+            OnPropertyChanged(nameof(IconUri));
+            OnPropertyChanged(nameof(TagColor));
+            OnPropertyChanged(nameof(TagBrush));
+        });
     }
 
     public Guid Id => _apiKey.Id;
@@ -48,11 +62,26 @@ public partial class KeyItemViewModel : ObservableObject
                 _apiKey.Tag = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(HasTag));
+                OnPropertyChanged(nameof(IsTagDisplayVisible));
+                OnPropertyChanged(nameof(IsTagRowVisible));
+                OnPropertyChanged(nameof(TagBrush));
             }
         }
     }
 
     public bool HasTag => !string.IsNullOrEmpty(Tag);
+
+    public bool IsTagDisplayVisible => HasTag && !IsEditingTag;
+
+    public bool IsTagRowVisible => HasTag || IsEditingTag;
+
+    public bool IsCustomIcon => ProviderIconHelper.HasCustomIcon(ProviderIcon);
+    public string DefaultGlyph => ProviderIconHelper.DefaultIconGlyph;
+    public Uri? IconUri => ProviderIconHelper.GetIconUri(ProviderIcon, ThemeHelper.IsDarkTheme());
+
+    public string TagColor => TagHelper.GetTagColor(Tag);
+
+    public SolidColorBrush TagBrush => new SolidColorBrush(TagHelper.ParseHexColor(TagColor));
 
     public bool IsFavorite
     {

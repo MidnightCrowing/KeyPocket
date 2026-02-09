@@ -18,7 +18,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <ctk:DataRow>
+    <ctk:DataRow DoubleTapped="OnDoubleTapped">
         <StackPanel
             Background="Transparent"
             MinHeight="24"

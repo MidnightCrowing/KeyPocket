@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel;
 using KeyPocket.UI.ViewModels;
 using Microsoft.UI.Xaml;
@@ -66,5 +67,11 @@ public sealed partial class KeysPage : Page
     private void KeysTreeView_Loaded(object sender, RoutedEventArgs e)
     {
         UpdateTreeView();
+    }
+
+    private void OnProviderGroupDoubleTapped(object sender, Guid providerId)
+    {
+        if (providerId == Guid.Empty) return;
+        Frame.Navigate(typeof(ProviderSettingsPage), providerId.ToString());
     }
 }
