@@ -15,156 +15,8 @@
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../Controls/CopyButton.xaml" />
+                <ResourceDictionary Source="Models/ModelsPage.Resources.xaml" />
             </ResourceDictionary.MergedDictionaries>
-
-            <!--  Converters  -->
-            <converters:BoolToVisibilityConverter x:Key="BoolToVis" />
-            <converters:NegatedBoolToVisibilityConverter x:Key="NegBoolToVis" />
-            <converters:BoolToDoubleConverter x:Key="BoolToOpacity" />
-            <converters:FavoriteIconConverter x:Key="BoolToGlyphConverter" />
-            <converters:FavoriteColorConverter x:Key="BoolToBrushConverter" />
-            <converters:EnumToBoolConverter x:Key="EnumToBoolConverter" />
-
-            <!--  Custom Segmented Item Style  -->
-            <Style
-                BasedOn="{StaticResource ButtonSegmentedItemStyle}"
-                TargetType="ctk:SegmentedItem"
-                x:Key="CustomSegmentedItemStyle">
-                <Setter Property="Padding" Value="8,5" />
-            </Style>
-
-            <!--  Template Selector  -->
-            <helpers:ModelsItemTemplateSelector
-                ModelTemplate="{StaticResource ModelItemTemplate}"
-                ProviderTemplate="{StaticResource ProviderGroupTemplate}"
-                x:Key="ModelsItemTemplateSelector" />
-
-            <!--  Model Item Template  -->
-            <DataTemplate x:DataType="muxc:TreeViewNode" x:Key="ModelItemTemplate">
-                <ctk:DataRow>
-                    <!--  Provider column (Spacer)  -->
-                    <TextBlock />
-
-                    <!--  Model Name + Actions (Favorite/Copy)  -->
-                    <Grid
-                        Background="Transparent"
-                        HorizontalAlignment="Stretch"
-                        PointerEntered="ModelItem_PointerEntered"
-                        PointerExited="ModelItem_PointerExited"
-                        VerticalAlignment="Center">
-                        <!--  Transparent background to catch pointer events  -->
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <!--  Derived Model Icon (Custom Avatar Style)  -->
-                        <Grid
-                            Height="20"
-                            Margin="0,0,8,0"
-                            VerticalAlignment="Center"
-                            Width="20">
-                            <Border
-                                Background="{ThemeResource LayerFillColorDefaultBrush}"
-                                BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
-                                BorderThickness="1.5"
-                                CornerRadius="10"
-                                Visibility="{x:Bind ((vm:ModelItemViewModel)Content).HasModelIcon, Converter={StaticResource BoolToVis}, Mode=OneWay}">
-                                <BitmapIcon
-                                    Height="12"
-                                    HorizontalAlignment="Center"
-                                    ShowAsMonochrome="False"
-                                    UriSource="{x:Bind ((vm:ModelItemViewModel)Content).ModelIconUri, Mode=OneWay}"
-                                    VerticalAlignment="Center"
-                                    Width="12" />
-                            </Border>
-                        </Grid>
-
-                        <!--  Name  -->
-                        <TextBlock
-                            Grid.Column="1"
-                            Text="{x:Bind ((vm:ModelItemViewModel)Content).DisplayName}"
-                            TextTrimming="CharacterEllipsis"
-                            VerticalAlignment="Center" />
-
-                        <!--  Actions - Copy (Next to Name)  -->
-                        <controls:CopyButton
-                            Background="Transparent"
-                            BorderThickness="0"
-                            Click="CopyButton_Click"
-                            Grid.Column="2"
-                            Height="28"
-                            Margin="4,0,0,0"
-                            Opacity="0"
-                            Padding="4"
-                            Tag="{x:Bind ((vm:ModelItemViewModel)Content).Id, Mode=OneWay}"
-                            ToolTipService.ToolTip="Copy ID"
-                            VerticalAlignment="Center"
-                            Width="28"
-                            x:Name="ListCopyBtn"
-                            x:Uid="Models_CopyID">
-                            <!--  Interaction handled in code-behind  -->
-                            <FontIcon FontSize="14" Glyph="&#xE8C8;" />
-                        </controls:CopyButton>
-
-                        <!--  Actions - Favorite (Far Right)  -->
-                        <Button
-                            Background="Transparent"
-                            BorderThickness="0"
-                            Command="{x:Bind ((vm:ModelItemViewModel)Content).ToggleFavoriteCommand}"
-                            Grid.Column="4"
-                            Height="28"
-                            Opacity="{x:Bind ((vm:ModelItemViewModel)Content).IsFavorite, Converter={StaticResource BoolToOpacity}, Mode=OneWay}"
-                            Padding="4"
-                            ToolTipService.ToolTip="Favorite"
-                            VerticalAlignment="Center"
-                            Width="28"
-                            x:Name="ListFavoriteBtn"
-                            x:Uid="Models_Favorites">
-                            <FontIcon
-                                FontSize="14"
-                                Foreground="{x:Bind ((vm:ModelItemViewModel)Content).IsFavorite, Mode=OneWay, Converter={StaticResource BoolToBrushConverter}}"
-                                Glyph="{x:Bind ((vm:ModelItemViewModel)Content).IsFavorite, Mode=OneWay, Converter={StaticResource BoolToGlyphConverter}, ConverterParameter='Fill'}" />
-                        </Button>
-                    </Grid>
-
-                    <!--  Input Price  -->
-                    <StackPanel
-                        Orientation="Horizontal"
-                        Spacing="4"
-                        VerticalAlignment="Center">
-                        <TextBlock
-                            FontFamily="Consolas"
-                            Text="{x:Bind ((vm:ModelItemViewModel)Content).InputPriceFormatted}"
-                            VerticalAlignment="Center" />
-                        <TextBlock
-                            FontFamily="Consolas"
-                            Opacity="0.5"
-                            Text="{x:Bind ((vm:ModelItemViewModel)Content).InputPriceOriginal}"
-                            VerticalAlignment="Center" />
-                    </StackPanel>
-
-                    <!--  Output Price  -->
-                    <StackPanel
-                        Orientation="Horizontal"
-                        Spacing="4"
-                        VerticalAlignment="Center">
-                        <TextBlock
-                            FontFamily="Consolas"
-                            Text="{x:Bind ((vm:ModelItemViewModel)Content).OutputPriceFormatted}"
-                            VerticalAlignment="Center" />
-                        <TextBlock
-                            FontFamily="Consolas"
-                            Opacity="0.5"
-                            Text="{x:Bind ((vm:ModelItemViewModel)Content).OutputPriceOriginal}"
-                            VerticalAlignment="Center" />
-                    </StackPanel>
-                </ctk:DataRow>
-            </DataTemplate>
 
             <!--  Provider Group Template  -->
             <DataTemplate x:DataType="muxc:TreeViewNode" x:Key="ProviderGroupTemplate">
@@ -177,8 +29,7 @@
                         Orientation="Horizontal"
                         Spacing="8"
                         ToolTipService.ToolTip="Double click to edit provider settings"
-                        VerticalAlignment="Center"
-                        x:Uid="Models_Provider_EditTooltip">
+                        VerticalAlignment="Center">
                         <!--  Icon  -->
                         <Grid
                             AllowDrop="False"
@@ -207,146 +58,16 @@
                 </ctk:DataRow>
             </DataTemplate>
 
-            <!--  Model Card Template  -->
-            <DataTemplate x:DataType="vm:ModelItemViewModel" x:Key="ModelCardTemplate">
-                <Border
-                    Background="{ThemeResource LayerFillColorDefaultBrush}"
-                    BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
-                    BorderThickness="1"
-                    CornerRadius="12"
-                    Padding="16"
-                    PointerEntered="ModelCard_PointerEntered"
-                    PointerExited="ModelCard_PointerExited">
-                    <StackPanel Spacing="12">
-                        <!--  Header  -->
-                        <Grid
-                            ColumnSpacing="8">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
+            <!--  Template Selector  -->
+            <helpers:ModelsItemTemplateSelector
+                ModelTemplate="{StaticResource ModelItemTemplate}"
+                ProviderTemplate="{StaticResource ProviderGroupTemplate}"
+                x:Key="ModelsItemTemplateSelector" />
 
-                            <!--  Model Icon  -->
-                            <Grid
-                                Height="20"
-                                VerticalAlignment="Center"
-                                Width="20">
-                                <Border
-                                    Background="{ThemeResource LayerFillColorDefaultBrush}"
-                                    BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
-                                    BorderThickness="1.5"
-                                    CornerRadius="10"
-                                    Visibility="{x:Bind HasModelIcon, Converter={StaticResource BoolToVis}, Mode=OneWay}">
-                                    <BitmapIcon
-                                        Height="12"
-                                        HorizontalAlignment="Center"
-                                        ShowAsMonochrome="False"
-                                        UriSource="{x:Bind ModelIconUri, Mode=OneWay}"
-                                        VerticalAlignment="Center"
-                                        Width="12" />
-                                </Border>
-                            </Grid>
-
-                            <!--  Model Name  -->
-                            <TextBlock
-                                FontWeight="SemiBold"
-                                Grid.Column="1"
-                                Text="{x:Bind DisplayName}"
-                                TextTrimming="CharacterEllipsis"
-                                VerticalAlignment="Center" />
-
-                            <!--  Copy  -->
-                            <controls:CopyButton
-                                Background="Transparent"
-                                BorderThickness="0"
-                                Click="CopyButton_Click"
-                                Grid.Column="3"
-                                Height="28"
-                                Opacity="0"
-                                Padding="4"
-                                Tag="{x:Bind Id, Mode=OneWay}"
-                                ToolTipService.ToolTip="Copy ID"
-                                VerticalAlignment="Center"
-                                Width="28"
-                                x:Name="CardCopyBtn"
-                                x:Uid="Models_CopyID">
-                                <FontIcon FontSize="14" Glyph="&#xE8C8;" />
-                            </controls:CopyButton>
-
-                            <!--  Favorite  -->
-                            <Button
-                                Background="Transparent"
-                                BorderThickness="0"
-                                Command="{x:Bind ToggleFavoriteCommand}"
-                                Grid.Column="2"
-                                Height="28"
-                                Opacity="{x:Bind IsFavorite, Converter={StaticResource BoolToOpacity}, Mode=OneWay}"
-                                Padding="4"
-                                ToolTipService.ToolTip="Favorite"
-                                VerticalAlignment="Center"
-                                Width="28"
-                                x:Name="CardFavoriteBtn"
-                                x:Uid="Models_Favorites">
-                                <FontIcon
-                                    FontSize="14"
-                                    Foreground="{x:Bind IsFavorite, Mode=OneWay, Converter={StaticResource BoolToBrushConverter}}"
-                                    Glyph="{x:Bind IsFavorite, Mode=OneWay, Converter={StaticResource BoolToGlyphConverter}, ConverterParameter='Fill'}" />
-                            </Button>
-                        </Grid>
-
-                        <!--  Tags  -->
-                        <ItemsControl ItemsSource="{x:Bind CapabilityTags, Mode=OneWay}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Horizontal" Spacing="6" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border
-                                        Background="{ThemeResource LayerFillColorDefaultBrush}"
-                                        BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
-                                        BorderThickness="1"
-                                        CornerRadius="9"
-                                        Padding="8,2">
-                                        <StackPanel Orientation="Horizontal" Spacing="6">
-                                            <Ellipse
-                                                Fill="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                                Height="6"
-                                                VerticalAlignment="Center"
-                                                Width="6" />
-                                            <TextBlock
-                                                FontSize="12"
-                                                Text="{Binding}"
-                                                VerticalAlignment="Center" />
-                                        </StackPanel>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                        <!--  Footer  -->
-                        <TextBlock
-                            FontSize="12"
-                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                            TextTrimming="CharacterEllipsis">
-                            <Run Text="by " x:Uid="Models_Card_By" />
-                            <Run Text="{x:Bind ProviderName}" />
-                            <Run Text=" | " />
-                            <Run Text="In:" x:Uid="Models_Card_In" />
-                            <Run Text="{x:Bind InputPriceFormatted}" />
-                            <Run Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind InputPriceOriginal}" />
-                            <Run Text=" | " />
-                            <Run Text="Out:" x:Uid="Models_Card_Out" />
-                            <Run Text="{x:Bind OutputPriceFormatted}" />
-                            <Run Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind OutputPriceOriginal}" />
-                        </TextBlock>
-                    </StackPanel>
-                </Border>
+            <!--  Model Item Template  -->
+            <DataTemplate x:DataType="muxc:TreeViewNode" x:Key="ModelItemTemplate">
+                <controls:ModelListItem Model="{Binding Content}" />
             </DataTemplate>
-
         </ResourceDictionary>
     </Page.Resources>
 
@@ -709,7 +430,12 @@
             <ctk:Case Value="{x:Bind vm:ModelsViewMode.Card}">
                 <!--  Card View  -->
                 <ScrollViewer>
-                    <muxc:ItemsRepeater ItemTemplate="{StaticResource ModelCardTemplate}" ItemsSource="{x:Bind ViewModel.FilteredModels, Mode=OneWay}">
+                    <muxc:ItemsRepeater ItemsSource="{x:Bind ViewModel.FilteredModels, Mode=OneWay}">
+                        <muxc:ItemsRepeater.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ModelItemViewModel">
+                                <controls:ModelCardItem Model="{x:Bind}" />
+                            </DataTemplate>
+                        </muxc:ItemsRepeater.ItemTemplate>
                         <muxc:ItemsRepeater.Layout>
                             <muxc:UniformGridLayout
                                 ItemsStretch="Fill"

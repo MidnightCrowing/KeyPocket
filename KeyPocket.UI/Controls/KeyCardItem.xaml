@@ -1,0 +1,133 @@
+<UserControl
+    x:Class="KeyPocket.UI.Controls.KeyCardItem"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:controls="using:KeyPocket.UI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:KeyPocket.UI.ViewModels"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance Type=vm:KeyItemViewModel, IsDesignTimeCreatable=False}">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="KeyItemResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Border
+        Background="{ThemeResource LayerFillColorDefaultBrush}"
+        BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
+        BorderThickness="1"
+        CornerRadius="12"
+        Padding="16"
+        PointerEntered="OnPointerEntered"
+        PointerExited="OnPointerExited">
+        <StackPanel Spacing="12">
+            <Grid ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <FontIcon Glyph="&#xE8D7;" FontSize="16" />
+
+                <TextBlock
+                    FontWeight="SemiBold"
+                    Grid.Column="1"
+                    Text="{x:Bind KeyItem.ProviderName}"
+                    TextTrimming="CharacterEllipsis"
+                    VerticalAlignment="Center" />
+
+                <Button
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Command="{x:Bind KeyItem.ToggleFavoriteCommand}"
+                    Grid.Column="2"
+                    Height="28"
+                    Opacity="{x:Bind KeyItem.IsFavorite, Converter={StaticResource BoolToOpacity}, Mode=OneWay}"
+                    Padding="4"
+                    ToolTipService.ToolTip="Favorite"
+                    VerticalAlignment="Center"
+                    Width="28"
+                    x:Name="FavoriteBtn"
+                    x:Uid="Keys_Favorites">
+                    <FontIcon
+                        FontSize="14"
+                        Foreground="{x:Bind KeyItem.IsFavorite, Mode=OneWay, Converter={StaticResource BoolToBrushConverter}}"
+                        Glyph="{x:Bind KeyItem.IsFavorite, Mode=OneWay, Converter={StaticResource BoolToGlyphConverter}, ConverterParameter='Fill'}" />
+                </Button>
+            </Grid>
+
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock
+                    FontFamily="Consolas"
+                    Text="{x:Bind KeyItem.DisplayKey}"
+                    Style="{StaticResource BodyStrongTextBlockStyle}"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Left" />
+
+                <controls:CopyButton
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Click="OnCopyClicked"
+                    Height="28"
+                    Opacity="0"
+                    Padding="4"
+                    Tag="{x:Bind KeyItem.Id, Mode=OneWay}"
+                    ToolTipService.ToolTip="Copy Key"
+                    VerticalAlignment="Center"
+                    Width="28"
+                    x:Name="CopyBtn"
+                    x:Uid="Keys_CopyKey">
+                    <FontIcon FontSize="14" Glyph="&#xE8C8;" />
+                </controls:CopyButton>
+            </StackPanel>
+
+            <Grid HorizontalAlignment="Left">
+                <Button
+                    Padding="0"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Left"
+                    Visibility="{x:Bind KeyItem.IsEditingTag, Converter={StaticResource NegBoolToVis}, Mode=OneWay}"
+                    Command="{x:Bind KeyItem.StartEditTagCommand}">
+                    <Border
+                        Background="{ThemeResource LayerFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Padding="8,2"
+                        Visibility="{x:Bind KeyItem.HasTag, Converter={StaticResource BoolToVis}, Mode=OneWay}">
+                        <TextBlock
+                            FontSize="12"
+                            Text="{x:Bind KeyItem.Tag}"
+                            VerticalAlignment="Center" />
+                    </Border>
+                </Button>
+
+                <TextBox
+                    x:Name="TagTextBox"
+                    FontSize="12"
+                    Padding="8,4"
+                    MinHeight="0"
+                    Width="200"
+                    Text="{x:Bind KeyItem.Tag, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Visibility="{x:Bind KeyItem.IsEditingTag, Converter={StaticResource BoolToVis}, Mode=OneWay}"
+                    KeyDown="TagTextBox_KeyDown"
+                    Loaded="TagTextBox_Loaded"
+                    LostFocus="TagTextBox_LostFocus" />
+            </Grid>
+
+            <TextBlock
+                FontSize="12"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}">
+                <Run Text="{x:Bind KeyItem.FormattedCreatedAt}" />
+            </TextBlock>
+        </StackPanel>
+    </Border>
+</UserControl>

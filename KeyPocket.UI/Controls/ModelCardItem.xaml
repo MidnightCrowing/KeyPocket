@@ -1,0 +1,146 @@
+<UserControl
+    x:Class="KeyPocket.UI.Controls.ModelCardItem"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:controls="using:KeyPocket.UI.Controls"
+    xmlns:converters="using:KeyPocket.UI.Converters"
+    xmlns:vm="using:KeyPocket.UI.ViewModels"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVis" />
+        <converters:BoolToDoubleConverter x:Key="BoolToOpacity" />
+        <converters:FavoriteIconConverter x:Key="BoolToGlyphConverter" />
+        <converters:FavoriteColorConverter x:Key="BoolToBrushConverter" />
+    </UserControl.Resources>
+    <Border
+        Background="{ThemeResource LayerFillColorDefaultBrush}"
+        BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
+        BorderThickness="1"
+        CornerRadius="12"
+        Padding="16"
+        PointerEntered="OnPointerEntered"
+        PointerExited="OnPointerExited">
+        <StackPanel Spacing="12">
+            <!--  Header  -->
+            <Grid ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!--  Model Icon  -->
+                <Grid
+                    Height="20"
+                    VerticalAlignment="Center"
+                    Width="20">
+                    <Border
+                        Background="{ThemeResource LayerFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
+                        BorderThickness="1.5"
+                        CornerRadius="10"
+                        Visibility="{x:Bind Model.HasModelIcon, Converter={StaticResource BoolToVis}, Mode=OneWay}">
+                        <BitmapIcon
+                            Height="12"
+                            HorizontalAlignment="Center"
+                            ShowAsMonochrome="False"
+                            UriSource="{x:Bind Model.ModelIconUri, Mode=OneWay}"
+                            VerticalAlignment="Center"
+                            Width="12" />
+                    </Border>
+                </Grid>
+
+                <!--  Model Name  -->
+                <TextBlock
+                    FontWeight="SemiBold"
+                    Grid.Column="1"
+                    Text="{x:Bind Model.DisplayName, Mode=OneWay}"
+                    TextTrimming="CharacterEllipsis"
+                    VerticalAlignment="Center" />
+
+                <!--  Favorite  -->
+                <Button
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Command="{x:Bind Model.ToggleFavoriteCommand}"
+                    Grid.Column="2"
+                    Height="28"
+                    Opacity="{x:Bind Model.IsFavorite, Converter={StaticResource BoolToOpacity}, Mode=OneWay}"
+                    Padding="4"
+                    ToolTipService.ToolTip="Favorite"
+                    VerticalAlignment="Center"
+                    Width="28"
+                    x:Name="FavoriteBtn">
+                    <FontIcon
+                        FontSize="14"
+                        Foreground="{x:Bind Model.IsFavorite, Mode=OneWay, Converter={StaticResource BoolToBrushConverter}}"
+                        Glyph="{x:Bind Model.IsFavorite, Mode=OneWay, Converter={StaticResource BoolToGlyphConverter}, ConverterParameter='Fill'}" />
+                </Button>
+
+                <!--  Copy  -->
+                <controls:CopyButton
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Command="{x:Bind Model.CopyIdCommand}"
+                    Grid.Column="3"
+                    Height="28"
+                    Opacity="0"
+                    Padding="4"
+                    ToolTipService.ToolTip="Copy ID"
+                    VerticalAlignment="Center"
+                    Width="28"
+                    x:Name="CopyBtn">
+                    <FontIcon FontSize="14" Glyph="&#xE8C8;" />
+                </controls:CopyButton>
+            </Grid>
+
+            <!--  Tags  -->
+            <ItemsControl ItemsSource="{x:Bind Model.CapabilityTags, Mode=OneWay}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" Spacing="6" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border
+                            Background="{ThemeResource LayerFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="9"
+                            Padding="8,2">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Ellipse
+                                    Fill="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                    Height="6"
+                                    VerticalAlignment="Center"
+                                    Width="6" />
+                                <TextBlock
+                                    FontSize="12"
+                                    Text="{Binding}"
+                                    VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!--  Footer  -->
+            <TextBlock
+                FontSize="12"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                TextTrimming="CharacterEllipsis">
+                <Run Text="by " />
+                <Run Text="{x:Bind Model.ProviderName, Mode=OneWay}" />
+                <Run Text=" | " />
+                <Run Text="In: " />
+                <Run Text="{x:Bind Model.InputPriceFormatted, Mode=OneWay}" />
+                <Run Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Model.InputPriceOriginal, Mode=OneWay}" />
+                <Run Text=" | " />
+                <Run Text="Out: " />
+                <Run Text="{x:Bind Model.OutputPriceFormatted, Mode=OneWay}" />
+                <Run Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Model.OutputPriceOriginal, Mode=OneWay}" />
+            </TextBlock>
+        </StackPanel>
+    </Border>
+</UserControl>

@@ -1,0 +1,103 @@
+using System;
+using Windows.ApplicationModel.DataTransfer;
+using KeyPocket.UI.ViewModels;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+
+namespace KeyPocket.UI.Controls;
+
+public sealed partial class KeyCardItem : UserControl
+{
+    public static readonly DependencyProperty KeyItemProperty =
+        DependencyProperty.Register(
+            nameof(KeyItem),
+            typeof(KeyItemViewModel),
+            typeof(KeyCardItem),
+            new PropertyMetadata(null, OnKeyItemChanged));
+
+    public KeyCardItem()
+    {
+        InitializeComponent();
+    }
+
+    public KeyItemViewModel? KeyItem
+    {
+        get => (KeyItemViewModel?)GetValue(KeyItemProperty);
+        set => SetValue(KeyItemProperty, value);
+    }
+
+    private static void OnKeyItemChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is KeyCardItem control) control.UpdateButtonsVisibility(false);
+    }
+
+    private void OnPointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        UpdateButtonsVisibility(true);
+    }
+
+    private void OnPointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        UpdateButtonsVisibility(false);
+    }
+
+    private void UpdateButtonsVisibility(bool isHovered)
+    {
+        if (CopyBtn != null) CopyBtn.Opacity = isHovered ? 1 : 0;
+
+        if (FavoriteBtn == null) return;
+
+        if (isHovered)
+        {
+            FavoriteBtn.Opacity = 1;
+        }
+        else
+        {
+            FavoriteBtn.Opacity = KeyItem?.IsFavorite == true ? 1 : 0;
+        }
+    }
+
+    private void OnCopyClicked(object sender, RoutedEventArgs e)
+    {
+        if (KeyItem == null) return;
+
+        var decryptedKey = App.ProviderService.GetDecryptedApiKey(KeyItem.ProviderId, KeyItem.Id);
+        if (string.IsNullOrEmpty(decryptedKey)) return;
+
+        var package = new DataPackage();
+        package.SetText(decryptedKey);
+        Clipboard.SetContent(package);
+    }
+
+    private void TagTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (KeyItem == null) return;
+
+        if (e.Key == Windows.System.VirtualKey.Enter)
+        {
+            KeyItem.CommitEditTagCommand.Execute(null);
+            e.Handled = true;
+        }
+        else if (e.Key == Windows.System.VirtualKey.Escape)
+        {
+            KeyItem.CancelEditTagCommand.Execute(null);
+            e.Handled = true;
+        }
+    }
+
+    private void TagTextBox_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            textBox.Focus(FocusState.Programmatic);
+            textBox.SelectAll();
+        }
+    }
+
+    private void TagTextBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        if (KeyItem == null) return;
+        if (KeyItem.IsEditingTag) KeyItem.CommitEditTagCommand.Execute(null);
+    }
+}

@@ -134,8 +134,7 @@ public sealed partial class MainWindow
         if (insertIndex == -1) return;
 
         // Create Icon using helper
-        var isDark = ThemeHelper.IsDarkTheme();
-        var icon = ProviderIconHelper.ResolveIconElement(provider.IconPath, isDark);
+        var icon = ProviderIconHelper.ResolveIconElement(provider.IconPath, ThemeHelper.IsDarkTheme());
 
         var navItem = new NavigationViewItem
         {
@@ -153,7 +152,7 @@ public sealed partial class MainWindow
                     navItem.Content = p.Name;
                 else if (e.PropertyName == nameof(SidebarProviderItem.IconPath) ||
                          e.PropertyName == nameof(SidebarProviderItem.Type))
-                    navItem.Icon = ProviderIconHelper.ResolveIconElement(p.IconPath, isDark);
+                    navItem.Icon = ProviderIconHelper.ResolveIconElement(p.IconPath, ThemeHelper.IsDarkTheme());
             }
         };
 

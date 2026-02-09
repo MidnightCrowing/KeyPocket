@@ -1,0 +1,33 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:controls="using:KeyPocket.UI.Controls"
+    xmlns:ctk="using:CommunityToolkit.WinUI.Controls"
+    xmlns:helpers="using:KeyPocket.UI.Helpers"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:vm="using:KeyPocket.UI.ViewModels"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style
+        BasedOn="{StaticResource ButtonSegmentedItemStyle}"
+        TargetType="ctk:SegmentedItem"
+        x:Key="CustomSegmentedItemStyle">
+        <Setter Property="Padding" Value="8,5" />
+    </Style>
+
+    <DataTemplate x:Key="KeyItemTemplate">
+        <controls:KeyListItem KeyItem="{Binding Content}" />
+    </DataTemplate>
+
+    <DataTemplate x:Key="ProviderGroupTemplate">
+        <controls:KeyProviderGroupItem Group="{Binding Content}" />
+    </DataTemplate>
+
+    <DataTemplate x:Key="KeyCardTemplate">
+        <controls:KeyCardItem KeyItem="{Binding}" />
+    </DataTemplate>
+
+    <helpers:KeysItemTemplateSelector
+        KeyTemplate="{StaticResource KeyItemTemplate}"
+        ProviderTemplate="{StaticResource ProviderGroupTemplate}"
+        x:Key="KeysItemTemplateSelector" />
+</ResourceDictionary>

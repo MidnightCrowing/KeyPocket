@@ -1,6 +1,5 @@
 using System;
 using System.ComponentModel;
-using Windows.ApplicationModel.DataTransfer;
 using KeyPocket.Core.Services;
 using KeyPocket.UI.ViewModels;
 using Microsoft.UI.Xaml;
@@ -64,78 +63,6 @@ public sealed partial class ModelsPage : Page
 
             ModelsTreeView.RootNodes.Add(groupNode);
         }
-    }
-
-    private void CopyButton_Click(object sender, RoutedEventArgs e)
-    {
-        // Copy logic is handled by command or direct clipboard
-        if (sender is Button button && button.Tag is string text)
-        {
-            var package = new DataPackage();
-            package.SetText(text);
-            Clipboard.SetContent(package);
-        }
-    }
-
-    private void ModelItem_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-    {
-        if (sender is Grid grid)
-        {
-            var copyBtn = FindDescendant<Button>(grid, "ListCopyBtn");
-            var favBtn = FindDescendant<Button>(grid, "ListFavoriteBtn");
-
-            if (favBtn != null) favBtn.Opacity = 1;
-            if (copyBtn != null) copyBtn.Opacity = 1;
-        }
-    }
-
-    private void ModelItem_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-    {
-        if (sender is Grid grid)
-        {
-            var copyBtn = FindDescendant<Button>(grid, "ListCopyBtn");
-            var favBtn = FindDescendant<Button>(grid, "ListFavoriteBtn");
-
-            if (copyBtn != null) copyBtn.Opacity = 0;
-            if (favBtn != null) favBtn.ClearValue(OpacityProperty);
-        }
-    }
-
-    private void ModelCard_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-    {
-        if (sender is Border border)
-        {
-            var favBtn = FindDescendant<Button>(border, "CardFavoriteBtn");
-            var copyBtn = FindDescendant<Button>(border, "CardCopyBtn");
-
-            if (favBtn != null) favBtn.Opacity = 1;
-            if (copyBtn != null) copyBtn.Opacity = 1;
-        }
-    }
-
-    private void ModelCard_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-    {
-        if (sender is Border border)
-        {
-            var favBtn = FindDescendant<Button>(border, "CardFavoriteBtn");
-            var copyBtn = FindDescendant<Button>(border, "CardCopyBtn");
-
-            if (copyBtn != null) copyBtn.Opacity = 0;
-            if (favBtn != null) favBtn.ClearValue(OpacityProperty);
-        }
-    }
-
-    private T? FindDescendant<T>(DependencyObject element, string name) where T : FrameworkElement
-    {
-        int count = Microsoft.UI.Xaml.Media.VisualTreeHelper.GetChildrenCount(element);
-        for (int i = 0; i < count; i++)
-        {
-            var child = Microsoft.UI.Xaml.Media.VisualTreeHelper.GetChild(element, i);
-            if (child is T t && t.Name == name) return t;
-            var result = FindDescendant<T>(child, name);
-            if (result != null) return result;
-        }
-        return null;
     }
 
     private void SortOption_Click(object sender, RoutedEventArgs e)

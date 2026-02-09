@@ -1,0 +1,365 @@
+<UserControl
+    x:Class="KeyPocket.UI.Pages.ProviderSettings.ProviderSettingsModelsContent"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:controls="using:KeyPocket.UI.Controls"
+    xmlns:converters="using:KeyPocket.UI.Converters"
+    xmlns:ctk="using:CommunityToolkit.WinUI.Controls"
+    xmlns:vm="using:KeyPocket.UI.ViewModels"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../../Controls/CopyButton.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <converters:BoolToVisibilityConverter x:Key="BoolToVisConverter" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <StackPanel
+        HorizontalAlignment="Stretch"
+        MaxWidth="800"
+        Spacing="16">
+        <ListView
+            AllowDrop="True"
+            CanDragItems="True"
+            CanReorderItems="True"
+            ItemsSource="{x:Bind ViewModel.Models, Mode=OneWay}"
+            ScrollViewer.VerticalScrollMode="Disabled"
+            SelectionMode="None">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="Margin" Value="0,0,0,8" />
+                    <Setter Property="MinHeight" Value="0" />
+                    <Setter Property="Background" Value="Transparent" />
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="vm:ModelWrapper">
+                    <Grid
+                        Background="{ThemeResource LayerFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Padding="12">
+
+                        <!--  Read Only View  -->
+                        <Grid Visibility="{x:Bind IsReadOnly, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel
+                                Grid.Column="0"
+                                Orientation="Horizontal"
+                                Spacing="8"
+                                VerticalAlignment="Center">
+                                <BitmapIcon
+                                    Height="14"
+                                    ShowAsMonochrome="False"
+                                    UriSource="{x:Bind ModelIconUri, Mode=OneWay}"
+                                    Visibility="{x:Bind HasModelIcon, Converter={StaticResource BoolToVisConverter}, Mode=OneWay}"
+                                    Width="14" />
+                                <TextBlock
+                                    Style="{StaticResource BodyStrongTextBlockStyle}"
+                                    Text="{x:Bind Name, Mode=OneWay}"
+                                    VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <!--  Price Info  -->
+                            <Grid
+                                ColumnSpacing="4"
+                                Grid.Column="1"
+                                Margin="0,0,24,0"
+                                RowSpacing="2"
+                                VerticalAlignment="Center">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <!--  Input Price  -->
+                                <TextBlock
+                                    FontFamily="Consolas"
+                                    FontSize="12"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Grid.Column="0"
+                                    Grid.Row="0"
+                                    HorizontalAlignment="Left"
+                                    Visibility="{x:Bind HasInputPrice, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}"
+                                    x:Uid="ProviderSettings_ModelInputPriceLabel" />
+                                <TextBlock
+                                    FontFamily="Consolas"
+                                    FontSize="12"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Grid.Column="1"
+                                    Grid.Row="0"
+                                    HorizontalAlignment="Right"
+                                    Text="{x:Bind InputPriceDisplay, Mode=OneWay}"
+                                    Visibility="{x:Bind HasInputPrice, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}" />
+
+                                <!--  Output Price  -->
+                                <TextBlock
+                                    FontFamily="Consolas"
+                                    FontSize="12"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Grid.Column="0"
+                                    Grid.Row="1"
+                                    HorizontalAlignment="Left"
+                                    Visibility="{x:Bind HasOutputPrice, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}"
+                                    x:Uid="ProviderSettings_ModelOutputPriceLabel" />
+                                <TextBlock
+                                    FontFamily="Consolas"
+                                    FontSize="12"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Grid.Column="1"
+                                    Grid.Row="1"
+                                    HorizontalAlignment="Right"
+                                    Text="{x:Bind OutputPriceDisplay, Mode=OneWay}"
+                                    Visibility="{x:Bind HasOutputPrice, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}" />
+                            </Grid>
+
+                            <StackPanel
+                                Grid.Column="2"
+                                Orientation="Horizontal"
+                                Spacing="4">
+                                <controls:CopyButton
+                                    Click="OnCopyModelIdClicked"
+                                    Content="&#xE8C8;"
+                                    Padding="8"
+                                    Tag="{x:Bind Id, Mode=OneWay}"
+                                    ToolTipService.ToolTip="Copy Model ID"
+                                    x:Uid="ProviderSettings_CopyModelID" />
+                                <Button
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Command="{x:Bind StartEditCommand}"
+                                    Padding="8"
+                                    ToolTipService.ToolTip="Edit"
+                                    x:Uid="ProviderSettings_Edit">
+                                    <FontIcon
+                                        FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                        FontSize="16"
+                                        Glyph="&#xE70F;" />
+                                </Button>
+                                <Button
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Command="{x:Bind ToggleFavoriteCommand}"
+                                    Padding="8"
+                                    ToolTipService.ToolTip="Favorite">
+                                    <FontIcon
+                                        FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                        FontSize="16"
+                                        Glyph="{x:Bind FavoriteIcon, Mode=OneWay}" />
+                                </Button>
+                                <Button
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Command="{x:Bind DeleteCommand}"
+                                    Padding="8"
+                                    ToolTipService.ToolTip="Delete">
+                                    <FontIcon
+                                        FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                        FontSize="16"
+                                        Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                                        Glyph="&#xE74D;" />
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+
+                        <!--  Edit View  -->
+                        <Grid KeyDown="OnModelEditKeyDown" Visibility="{x:Bind IsEditing, Mode=OneWay, Converter={StaticResource BoolToVisConverter}}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <!--  Row 1: ID and Name  -->
+                            <Grid Grid.Row="0" Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="12" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel>
+                                    <TextBlock
+                                        Margin="0,0,0,4"
+                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                        Text="Model ID"
+                                        x:Uid="ProviderSettings_ModelId" />
+                                    <TextBox
+                                        PlaceholderText="e.g. gpt-4"
+                                        Text="{x:Bind NewId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        x:Uid="ProviderSettings_ModelIdPlaceholder" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock
+                                        Margin="0,0,0,4"
+                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                        Text="Display Name (Optional)"
+                                        x:Uid="ProviderSettings_ModelName" />
+                                    <TextBox
+                                        PlaceholderText="e.g. GPT-4"
+                                        Text="{x:Bind NewName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        x:Uid="ProviderSettings_ModelNamePlaceholder" />
+                                </StackPanel>
+                            </Grid>
+
+                            <!--  Row 2: Pricing  -->
+                            <Grid Grid.Row="1" Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="12" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel>
+                                    <StackPanel Margin="0,0,0,4" Orientation="Horizontal">
+                                        <TextBlock
+                                            Style="{StaticResource CaptionTextBlockStyle}"
+                                            Text="Input Price (per M tokens)"
+                                            x:Uid="ProviderSettings_InputPrice" />
+                                    </StackPanel>
+                                    <Grid ColumnSpacing="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock
+                                            FontSize="16"
+                                            FontWeight="SemiBold"
+                                            Grid.Column="0"
+                                            Text="{x:Bind ProviderSymbol, Mode=OneWay}"
+                                            VerticalAlignment="Center" />
+                                        <NumberBox
+                                            Grid.Column="1"
+                                            HorizontalAlignment="Stretch"
+                                            LargeChange="0.1"
+                                            PlaceholderText="e.g. 0.03"
+                                            SmallChange="0.01"
+                                            SpinButtonPlacementMode="Inline"
+                                            Value="{x:Bind InputPriceValueOrZero, Mode=TwoWay}"
+                                            ValueChanged="OnPriceValueChanged"
+                                            x:Uid="ProviderSettings_InputPricePlaceholder" />
+                                    </Grid>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <StackPanel Margin="0,0,0,4" Orientation="Horizontal">
+                                        <TextBlock
+                                            Style="{StaticResource CaptionTextBlockStyle}"
+                                            Text="Output Price (per M tokens)"
+                                            x:Uid="ProviderSettings_OutputPrice" />
+                                    </StackPanel>
+                                    <Grid ColumnSpacing="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock
+                                            FontSize="16"
+                                            FontWeight="SemiBold"
+                                            Grid.Column="0"
+                                            Text="{x:Bind ProviderSymbol, Mode=OneWay}"
+                                            VerticalAlignment="Center" />
+                                        <NumberBox
+                                            Grid.Column="1"
+                                            HorizontalAlignment="Stretch"
+                                            LargeChange="0.1"
+                                            PlaceholderText="e.g. 0.06"
+                                            SmallChange="0.01"
+                                            SpinButtonPlacementMode="Inline"
+                                            Value="{x:Bind OutputPriceValueOrZero, Mode=TwoWay}"
+                                            ValueChanged="OnPriceValueChanged"
+                                            x:Uid="ProviderSettings_OutputPricePlaceholder" />
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
+
+                            <!--  Row 2: Tags  -->
+                            <Grid Grid.Row="2" Margin="0,0,0,12" ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Grid.Column="0"
+                                    VerticalAlignment="Center"
+                                    Style="{StaticResource CaptionTextBlockStyle}"
+                                    Text="Tags"
+                                    x:Uid="ProviderSettings_Tags" />
+                                <ctk:TokenizingTextBox
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    ItemsSource="{x:Bind Tags}"
+                                    PlaceholderText="Select tags..."
+                                    SuggestedItemsSource="{x:Bind SuggestedTags}"
+                                    TextChanged="OnTokenTextChanged"
+                                    TokenDelimiter=","
+                                    TokenItemAdding="OnTokenItemAdding"
+                                    x:Uid="ProviderSettings_TagsPlaceholder">
+                                    <ctk:TokenizingTextBox.SuggestedItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" Padding="8,4" />
+                                        </DataTemplate>
+                                    </ctk:TokenizingTextBox.SuggestedItemTemplate>
+                                </ctk:TokenizingTextBox>
+                            </Grid>
+
+                            <!--  Row 3: Buttons  -->
+                            <StackPanel
+                                Grid.Row="3"
+                                HorizontalAlignment="Right"
+                                Orientation="Horizontal"
+                                Spacing="8">
+                                <Button
+                                    Command="{x:Bind ConfirmAddCommand}"
+                                    Content="Confirm"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    x:Uid="ProviderSettings_Confirm" />
+                                <Button
+                                    Command="{x:Bind CancelAddCommand}"
+                                    Content="Cancel"
+                                    x:Uid="ProviderSettings_Cancel" />
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button
+                Command="{x:Bind ViewModel.AddModelCommand, Mode=OneWay}"
+                Content="Add Model"
+                x:Uid="ProviderSettings_AddModel" />
+            <Button x:Uid="ProviderSettings_Import">
+                <Button.Flyout>
+                    <MenuFlyout Placement="Bottom">
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.ImportCsvCommand, Mode=OneWay}" x:Uid="ProviderSettings_ImportFromCsv" />
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.GenerateCsvTemplateCommand, Mode=OneWay}" x:Uid="ProviderSettings_CreateCsvTemplate" />
+                    </MenuFlyout>
+                </Button.Flyout>
+            </Button>
+        </StackPanel>
+
+        <!--  CSV Import Result InfoBar  -->
+        <InfoBar
+            IsClosable="True"
+            IsOpen="False"
+            Margin="0,8,0,0"
+            x:Name="CsvImportInfoBar" />
+    </StackPanel>
+</UserControl>

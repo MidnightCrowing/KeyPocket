@@ -19,12 +19,6 @@ public partial class KeysViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(KeysCountText))]
     private ObservableCollection<KeyItemViewModel> _filteredKeys = new();
 
-    // Use a resource string for format like "15 keys" or similar
-    // Since I don't have the exact resource key for "Keys_CountFormat", I'll mock it or use a simple string format for now
-    // logic: $"{FilteredKeys.Count} keys"
-    // Ideally I should add a resource string, but for now hardcode or use existing if any.
-    // ModelsPage uses "Models_CountFormat". I will assume I can just use a simple string or try to find a resource.
-    // User said "keys数量".
     public string KeysCountText => $"{FilteredKeys.Count} keys";
 
     [ObservableProperty] private ObservableCollection<KeyProviderGroupViewModel> _groupedKeys = new();

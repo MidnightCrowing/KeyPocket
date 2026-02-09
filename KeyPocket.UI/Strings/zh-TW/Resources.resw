@@ -261,7 +261,7 @@
     <value>移除圖示</value>
   </data>
   <data name="ProviderSettings_BaseUrl.Text" xml:space="preserve">
-    <value>Base URL (API 基址)</value>
+    <value>Base URL</value>
   </data>
   <data name="ProviderSettings_BaseUrlPlaceholder.PlaceholderText" xml:space="preserve">
     <value>https://api.openai.com/v1</value>
