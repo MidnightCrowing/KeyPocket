@@ -1,5 +1,4 @@
 <Page
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     mc:Ignorable="d"
     x:Class="KeyPocket.UI.Pages.KeysPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
