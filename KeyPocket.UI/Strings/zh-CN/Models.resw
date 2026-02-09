@@ -181,4 +181,16 @@
   <data name="CountFormat" xml:space="preserve">
     <value>{0} 个模型</value>
   </data>
+  <data name="Toolbar_Filter.ToolTipService.ToolTip" xml:space="preserve">
+    <value>筛选</value>
+  </data>
+  <data name="Toolbar_Sort.ToolTipService.ToolTip" xml:space="preserve">
+    <value>排序</value>
+  </data>
+  <data name="View_List.ToolTipService.ToolTip" xml:space="preserve">
+    <value>列表视图</value>
+  </data>
+  <data name="View_Card.ToolTipService.ToolTip" xml:space="preserve">
+    <value>卡片视图</value>
+  </data>
 </root>

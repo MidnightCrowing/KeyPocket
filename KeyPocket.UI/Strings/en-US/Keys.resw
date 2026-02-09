@@ -91,4 +91,22 @@
   <data name="CopyKey.ToolTipService.ToolTip" xml:space="preserve">
     <value>Copy Key</value>
   </data>
+  <data name="Filter_FavoritesOnly.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Show favorites only</value>
+  </data>
+  <data name="View_List.ToolTipService.ToolTip" xml:space="preserve">
+    <value>List view</value>
+  </data>
+  <data name="View_Card.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Card view</value>
+  </data>
+  <data name="List_Provider.Content" xml:space="preserve">
+    <value>Provider</value>
+  </data>
+  <data name="List_Key.Content" xml:space="preserve">
+    <value>Key</value>
+  </data>
+  <data name="List_Tag.Content" xml:space="preserve">
+    <value>Tag</value>
+  </data>
 </root>

@@ -15,7 +15,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <DropDownButton ToolTipService.ToolTip="Filter">
+    <DropDownButton ToolTipService.ToolTip="Filter" x:Uid="/Models/Toolbar_Filter">
         <DropDownButton.Content>
             <FontIcon FontSize="16" Glyph="&#xE71C;" />
         </DropDownButton.Content>

@@ -14,7 +14,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <DropDownButton ToolTipService.ToolTip="Sort">
+    <DropDownButton ToolTipService.ToolTip="Sort" x:Uid="/Models/Toolbar_Sort">
         <DropDownButton.Content>
             <FontIcon FontSize="16" Glyph="&#xE8CB;" />
         </DropDownButton.Content>

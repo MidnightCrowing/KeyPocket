@@ -91,4 +91,22 @@
   <data name="CopyKey.ToolTipService.ToolTip" xml:space="preserve">
     <value>複製金鑰</value>
   </data>
+  <data name="Filter_FavoritesOnly.ToolTipService.ToolTip" xml:space="preserve">
+    <value>只看收藏</value>
+  </data>
+  <data name="View_List.ToolTipService.ToolTip" xml:space="preserve">
+    <value>列表視圖</value>
+  </data>
+  <data name="View_Card.ToolTipService.ToolTip" xml:space="preserve">
+    <value>卡片視圖</value>
+  </data>
+  <data name="List_Provider.Content" xml:space="preserve">
+    <value>服務商</value>
+  </data>
+  <data name="List_Key.Content" xml:space="preserve">
+    <value>金鑰</value>
+  </data>
+  <data name="List_Tag.Content" xml:space="preserve">
+    <value>標籤</value>
+  </data>
 </root>

@@ -75,7 +75,8 @@
             <ToggleButton
                 Grid.Column="2"
                 IsChecked="{x:Bind ViewModel.ShowFavoritesOnly, Mode=TwoWay}"
-                ToolTipService.ToolTip="Show favorites only">
+                ToolTipService.ToolTip="Show favorites only"
+                x:Uid="/Keys/Filter_FavoritesOnly">
                 <FontIcon FontSize="16" Glyph="&#xE735;" />
             </ToggleButton>
 
@@ -84,12 +85,12 @@
                 Grid.Column="3"
                 ItemContainerStyle="{StaticResource CustomSegmentedItemStyle}"
                 SelectedIndex="{x:Bind ViewModel.ViewModeIndex, Mode=TwoWay}">
-                <ctk:SegmentedItem Height="28.8" ToolTipService.ToolTip="List view">
+                <ctk:SegmentedItem Height="28.8" ToolTipService.ToolTip="List view" x:Uid="/Keys/View_List">
                     <ctk:SegmentedItem.Content>
                         <FontIcon FontSize="16" Glyph="&#xE8FD;" />
                     </ctk:SegmentedItem.Content>
                 </ctk:SegmentedItem>
-                <ctk:SegmentedItem Height="28.8" ToolTipService.ToolTip="Card view">
+                <ctk:SegmentedItem Height="28.8" ToolTipService.ToolTip="Card view" x:Uid="/Keys/View_Card">
                     <ctk:SegmentedItem.Content>
                         <FontIcon FontSize="16" Glyph="&#xECA5;" />
                     </ctk:SegmentedItem.Content>
