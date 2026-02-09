@@ -1,4 +1,5 @@
 <Page
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     mc:Ignorable="d"
     x:Class="KeyPocket.UI.Pages.HomePage"
     x:Name="HomePageRoot"

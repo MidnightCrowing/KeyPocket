@@ -71,6 +71,7 @@ public partial class App : Application
 
         // Initialize helpers before showing the window
         ThemeHelper.Initialize();
+        BackdropHelper.ApplyToMainWindow(SettingsHelper.Current.SelectedBackdrop);
 
         _window.Activate();
     }

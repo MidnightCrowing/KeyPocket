@@ -1,4 +1,5 @@
 ﻿<Page
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     mc:Ignorable="d"
     x:Class="KeyPocket.UI.Pages.SettingsPage"
     x:Name="Root"
@@ -184,6 +185,21 @@
                         <ComboBoxItem Content="Light" x:Uid="/Settings/Theme_Light" />
                         <ComboBoxItem Content="Dark" x:Uid="/Settings/Theme_Dark" />
                         <ComboBoxItem Content="Use system setting" x:Uid="/Settings/Theme_System" />
+                    </ComboBox>
+                </ctk:SettingsCard>
+
+                <ctk:SettingsCard
+                    Description="Select window material"
+                    Header="Window material"
+                    x:Uid="/Settings/Backdrop">
+                    <ctk:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE790;" />
+                    </ctk:SettingsCard.HeaderIcon>
+                    <ComboBox SelectedIndex="{x:Bind ViewModel.BackdropIndex, Mode=TwoWay}">
+                        <ComboBoxItem Content="Mica" x:Uid="/Settings/Backdrop_Mica" />
+                        <ComboBoxItem Content="Mica Alt" x:Uid="/Settings/Backdrop_MicaAlt" />
+                        <ComboBoxItem Content="Acrylic" x:Uid="/Settings/Backdrop_Acrylic" />
+                        <ComboBoxItem Content="None" x:Uid="/Settings/Backdrop_None" />
                     </ComboBox>
                 </ctk:SettingsCard>
 

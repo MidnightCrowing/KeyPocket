@@ -1,4 +1,5 @@
 <Page
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     mc:Ignorable="d"
     x:Class="KeyPocket.UI.Pages.ModelsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -28,8 +29,8 @@
                         Orientation="Horizontal"
                         Spacing="8"
                         ToolTipService.ToolTip="Double click to edit provider settings"
-                        x:Uid="/Models/Provider_EditTooltip"
-                        VerticalAlignment="Center">
+                        VerticalAlignment="Center"
+                        x:Uid="/Models/Provider_EditTooltip">
                         <!--  Icon  -->
                         <Grid
                             AllowDrop="False"
@@ -105,22 +106,28 @@
                 x:Uid="/Models/SearchBox" />
 
             <!--  Filter Button  -->
-            <models:ModelsFilterButton Grid.Column="2" DataContext="{x:Bind ViewModel}" />
+            <models:ModelsFilterButton DataContext="{x:Bind ViewModel}" Grid.Column="2" />
 
             <!--  Sort Button  -->
-            <models:ModelsSortButton Grid.Column="3" DataContext="{x:Bind ViewModel}" />
+            <models:ModelsSortButton DataContext="{x:Bind ViewModel}" Grid.Column="3" />
 
             <!--  View Toggle  -->
             <ctk:Segmented
                 Grid.Column="4"
                 ItemContainerStyle="{StaticResource CustomSegmentedItemStyle}"
                 SelectedIndex="{x:Bind ViewModel.ViewModeIndex, Mode=TwoWay}">
-                <ctk:SegmentedItem Height="28.8" ToolTipService.ToolTip="List view" x:Uid="/Models/View_List">
+                <ctk:SegmentedItem
+                    Height="28.8"
+                    ToolTipService.ToolTip="List view"
+                    x:Uid="/Models/View_List">
                     <ctk:SegmentedItem.Content>
                         <FontIcon FontSize="16" Glyph="&#xE8FD;" />
                     </ctk:SegmentedItem.Content>
                 </ctk:SegmentedItem>
-                <ctk:SegmentedItem Height="28.8" ToolTipService.ToolTip="Card view" x:Uid="/Models/View_Card">
+                <ctk:SegmentedItem
+                    Height="28.8"
+                    ToolTipService.ToolTip="Card view"
+                    x:Uid="/Models/View_Card">
                     <ctk:SegmentedItem.Content>
                         <FontIcon FontSize="16" Glyph="&#xECA5;" />
                     </ctk:SegmentedItem.Content>

@@ -7,6 +7,8 @@ namespace KeyPocket.UI.ViewModels;
 
 public partial class SettingsViewModel
 {
+    [ObservableProperty] private int _backdropIndex;
+
     [ObservableProperty] private int _languageIndex;
 
     [ObservableProperty] private bool _showRestartWarning;
@@ -21,6 +23,20 @@ public partial class SettingsViewModel
             1 => ElementTheme.Dark,
             _ => ElementTheme.Default
         };
+    }
+
+    partial void OnBackdropIndexChanged(int value)
+    {
+        var kind = value switch
+        {
+            0 => WindowBackdropKind.Mica,
+            1 => WindowBackdropKind.MicaAlt,
+            2 => WindowBackdropKind.Acrylic,
+            _ => WindowBackdropKind.None
+        };
+
+        SettingsHelper.Current.SelectedBackdrop = kind;
+        BackdropHelper.ApplyToMainWindow(kind);
     }
 
     partial void OnLanguageIndexChanged(int value)

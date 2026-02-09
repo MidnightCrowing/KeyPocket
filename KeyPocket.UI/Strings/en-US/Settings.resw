@@ -151,4 +151,22 @@
   <data name="RestartRequired.Text" xml:space="preserve">
     <value>Restart required to apply changes</value>
   </data>
+  <data name="Backdrop.Header" xml:space="preserve">
+    <value>Window material</value>
+  </data>
+  <data name="Backdrop.Description" xml:space="preserve">
+    <value>Select window material</value>
+  </data>
+  <data name="Backdrop_Mica.Content" xml:space="preserve">
+    <value>Mica</value>
+  </data>
+  <data name="Backdrop_MicaAlt.Content" xml:space="preserve">
+    <value>Mica Alt</value>
+  </data>
+  <data name="Backdrop_Acrylic.Content" xml:space="preserve">
+    <value>Acrylic</value>
+  </data>
+  <data name="Backdrop_None.Content" xml:space="preserve">
+    <value>None</value>
+  </data>
 </root>

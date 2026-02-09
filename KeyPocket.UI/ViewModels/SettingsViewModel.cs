@@ -18,6 +18,14 @@ public partial class SettingsViewModel : ObservableObject
             _ => 2
         };
 
+        _backdropIndex = SettingsHelper.Current.SelectedBackdrop switch
+        {
+            WindowBackdropKind.Mica => 0,
+            WindowBackdropKind.MicaAlt => 1,
+            WindowBackdropKind.Acrylic => 2,
+            _ => 3
+        };
+
         var lang = ApplicationLanguages.PrimaryLanguageOverride;
         if (string.IsNullOrEmpty(lang))
             _languageIndex = 0;

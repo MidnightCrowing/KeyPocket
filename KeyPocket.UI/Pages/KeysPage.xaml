@@ -1,4 +1,5 @@
 <Page
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     mc:Ignorable="d"
     x:Class="KeyPocket.UI.Pages.KeysPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -85,12 +86,18 @@
                 Grid.Column="3"
                 ItemContainerStyle="{StaticResource CustomSegmentedItemStyle}"
                 SelectedIndex="{x:Bind ViewModel.ViewModeIndex, Mode=TwoWay}">
-                <ctk:SegmentedItem Height="28.8" ToolTipService.ToolTip="List view" x:Uid="/Keys/View_List">
+                <ctk:SegmentedItem
+                    Height="28.8"
+                    ToolTipService.ToolTip="List view"
+                    x:Uid="/Keys/View_List">
                     <ctk:SegmentedItem.Content>
                         <FontIcon FontSize="16" Glyph="&#xE8FD;" />
                     </ctk:SegmentedItem.Content>
                 </ctk:SegmentedItem>
-                <ctk:SegmentedItem Height="28.8" ToolTipService.ToolTip="Card view" x:Uid="/Keys/View_Card">
+                <ctk:SegmentedItem
+                    Height="28.8"
+                    ToolTipService.ToolTip="Card view"
+                    x:Uid="/Keys/View_Card">
                     <ctk:SegmentedItem.Content>
                         <FontIcon FontSize="16" Glyph="&#xECA5;" />
                     </ctk:SegmentedItem.Content>

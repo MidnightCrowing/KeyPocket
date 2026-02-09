@@ -151,4 +151,22 @@
   <data name="RestartRequired.Text" xml:space="preserve">
     <value>重新啟動應用程式後生效</value>
   </data>
+  <data name="Backdrop.Header" xml:space="preserve">
+    <value>視窗材質</value>
+  </data>
+  <data name="Backdrop.Description" xml:space="preserve">
+    <value>選擇視窗材質</value>
+  </data>
+  <data name="Backdrop_Mica.Content" xml:space="preserve">
+    <value>雲母</value>
+  </data>
+  <data name="Backdrop_MicaAlt.Content" xml:space="preserve">
+    <value>雲母 Alt</value>
+  </data>
+  <data name="Backdrop_Acrylic.Content" xml:space="preserve">
+    <value>壓克力</value>
+  </data>
+  <data name="Backdrop_None.Content" xml:space="preserve">
+    <value>無</value>
+  </data>
 </root>
