@@ -79,8 +79,11 @@ public sealed partial class ProviderSettingsPage : Page, INotifyPropertyChanged
             // 先执行删除
             ViewModel.DeleteProvider();
 
-            // 清理导航历史：移除所有指向该 Provider 的历史记录
-            CleanupNavigationHistory(providerId);
+            // Remove entries that navigate back to the deleted provider
+            NavigationHelper.RemovePageEntries(
+                Frame,
+                typeof(ProviderSettingsPage),
+                p => p is string s && s == providerId.ToString());
 
             // 直接导航（不使用 Dispatcher，因为删除是同步的）
             if (Frame.CanGoBack)
@@ -88,16 +91,6 @@ public sealed partial class ProviderSettingsPage : Page, INotifyPropertyChanged
             else
                 Frame.Navigate(typeof(HomePage));
         }
-    }
-
-    /// <summary>
-    ///     Cleanup navigation history for deleted provider
-    /// </summary>
-    private void CleanupNavigationHistory(Guid deletedProviderId)
-    {
-        // WinUI 3 Frame does not support direct manipulation of navigation history
-        // But we can avoid issues by not navigating back to the deleted page
-        // This method is reserved for future extensions
     }
 
     private void OnPageLoaded(object sender, RoutedEventArgs e)

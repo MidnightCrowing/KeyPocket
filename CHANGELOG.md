@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-02-09
+
+### Added
+- Home, Models, Keys, Settings, and Provider Settings pages with unified navigation.
+- Provider cards with custom/preset icons and drag-and-drop ordering on the Home page.
+- Models management with list/card views, provider grouping, favorites, filters (capability, price range, favorites), and sorting.
+- Model icon mapping plus preset icon assets for clearer model identification.
+- API key management with list/card views, provider grouping, favorites, inline tag editing, and copy actions.
+- Global search across providers, models, and API key tags, plus quick access to crash log and model icon mapping file.
+- Provider settings for API keys and models, including add/edit flows, tag editing, favorites, and delete actions.
+- CSV import for models with template support, validation, and result feedback.
+- Localization for core UI in en-US, zh-CN, and zh-TW.
+
+### Changed
+- Unified tag presentation with a shared `KeyTag` component to keep styling consistent across pages.
+- Refined favorites interactions across model list and card views to align with keys behavior.
+
 ## 2026-02-07
 
 ### Changed
@@ -18,4 +35,3 @@
   - Prices are automatically rounded to 3 decimal places
   - Import results displayed via InfoBar with severity levels (Success/Info/Warning/Error)
 - **Incremental Model Refresh**: Created `RefreshModels()` function that preserves editing state when refreshing model lists, preventing disruption to users actively editing cards
-
