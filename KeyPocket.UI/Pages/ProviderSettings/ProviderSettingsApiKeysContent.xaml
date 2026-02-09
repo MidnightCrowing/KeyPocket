@@ -84,14 +84,21 @@
 
                                     <!--  Tag Text Button (shown when tag exists and not editing)  -->
                                     <Button
+                                        Background="Transparent"
+                                        BorderThickness="0"
                                         Command="{x:Bind StartEditTagCommand}"
-                                        Content="{x:Bind Tag, Mode=OneWay}"
-                                        Padding="8,4"
-                                        Style="{StaticResource SubtleButtonStyle}"
+                                        HorizontalContentAlignment="Left"
+                                        Padding="0"
                                         ToolTipService.ToolTip="Click to edit tag"
                                         VerticalAlignment="Center"
                                         Visibility="{x:Bind IsTagTextVisible, Converter={StaticResource BoolToVisConverter}, Mode=OneWay}"
-                                        x:Uid="/ProviderSettings/EditTag" />
+                                        x:Uid="/ProviderSettings/EditTag">
+                                        <controls:KeyTag
+                                            FontSize="12"
+                                            TagCornerRadius="4"
+                                            TagPadding="6,2"
+                                            Text="{x:Bind Tag, Mode=OneWay}" />
+                                    </Button>
 
                                     <!--  Tag Input (shown when editing)  -->
                                     <TextBox

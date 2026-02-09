@@ -34,7 +34,21 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <FontIcon FontSize="16" Glyph="&#xE8D7;" />
+                <Grid
+                    Height="16"
+                    VerticalAlignment="Center"
+                    Width="16">
+                    <FontIcon
+                        FontSize="16"
+                        Glyph="{x:Bind KeyItem.DefaultGlyph, Mode=OneWay}"
+                        Visibility="{x:Bind KeyItem.IsCustomIcon, Converter={StaticResource NegBoolToVis}, Mode=OneWay}" />
+                    <BitmapIcon
+                        Height="16"
+                        ShowAsMonochrome="False"
+                        UriSource="{x:Bind KeyItem.IconUri, Mode=OneWay}"
+                        Visibility="{x:Bind KeyItem.IsCustomIcon, Converter={StaticResource BoolToVis}, Mode=OneWay}"
+                        Width="16" />
+                </Grid>
 
                 <TextBlock
                     FontWeight="SemiBold"
@@ -88,27 +102,27 @@
                 </controls:CopyButton>
             </StackPanel>
 
-            <Grid HorizontalAlignment="Left">
+            <Grid
+                HorizontalAlignment="Stretch"
+                PointerEntered="OnTagColumnPointerEntered"
+                PointerExited="OnTagColumnPointerExited">
                 <Button
                     Background="Transparent"
                     BorderThickness="0"
                     Command="{x:Bind KeyItem.StartEditTagCommand}"
                     HorizontalAlignment="Stretch"
                     HorizontalContentAlignment="Left"
+                    MinHeight="28"
                     Padding="0"
-                    Visibility="{x:Bind KeyItem.IsEditingTag, Converter={StaticResource NegBoolToVis}, Mode=OneWay}">
-                    <Border
-                        Background="{ThemeResource LayerFillColorDefaultBrush}"
-                        BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
-                        BorderThickness="1"
-                        CornerRadius="4"
-                        Padding="8,2"
-                        Visibility="{x:Bind KeyItem.HasTag, Converter={StaticResource BoolToVis}, Mode=OneWay}">
-                        <TextBlock
-                            FontSize="12"
-                            Text="{x:Bind KeyItem.Tag}"
-                            VerticalAlignment="Center" />
-                    </Border>
+                    x:Name="TagButton">
+                    <controls:KeyTag
+                        TagCornerRadius="4"
+                        FontSize="12"
+                        HorizontalAlignment="Stretch"
+                        TagPadding="6,2"
+                        Text="{x:Bind KeyItem.Tag, Mode=OneWay}"
+                        Visibility="Collapsed"
+                        x:Name="TagBorder" />
                 </Button>
 
                 <TextBox
@@ -116,17 +130,12 @@
                     KeyDown="TagTextBox_KeyDown"
                     Loaded="TagTextBox_Loaded"
                     LostFocus="TagTextBox_LostFocus"
-                    MinHeight="0"
+                    MinHeight="28"
                     Padding="8,4"
                     Text="{x:Bind KeyItem.Tag, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Visibility="{x:Bind KeyItem.IsEditingTag, Converter={StaticResource BoolToVis}, Mode=OneWay}"
-                    Width="200"
                     x:Name="TagTextBox" />
             </Grid>
-
-            <TextBlock FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}">
-                <Run Text="{x:Bind KeyItem.FormattedCreatedAt}" />
-            </TextBlock>
         </StackPanel>
     </Border>
 </UserControl>

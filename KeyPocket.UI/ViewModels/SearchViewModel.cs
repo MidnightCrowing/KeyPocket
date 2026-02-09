@@ -106,9 +106,31 @@ public partial class SearchViewModel : ObservableObject
             }
 
             SearchResults.Add(item);
-        }
 
-        // 3. 特殊关键词：crash.log
+        }
+        // 3. Search API Key tags
+        var tags = _providerService.GetAllProviders()
+            .SelectMany(p => p.ApiKeys)
+            .Select(k => k.Tag)
+            .Where(t => !string.IsNullOrWhiteSpace(t))
+            .Select(t => t!.Trim())
+            .Where(t => t.Contains(query, StringComparison.OrdinalIgnoreCase))
+            .GroupBy(t => t, StringComparer.OrdinalIgnoreCase)
+            .Select(g => g.First())
+            .Take(5);
+
+        foreach (var tag in tags)
+            SearchResults.Add(new SearchResultItem
+            {
+                Title = tag,
+                Description = "API Key Tag",
+                Type = SearchResultType.KeyTag,
+                Data = tag,
+                Icon = "\uE8EC", // Tag icon
+                IconKind = IconType.Glyph
+            });
+
+        // 4. Special keyword: crash.log
         if (lowerQuery.Contains("crash") || lowerQuery.Contains("log"))
             SearchResults.Add(new SearchResultItem
             {
@@ -119,7 +141,7 @@ public partial class SearchViewModel : ObservableObject
                 Icon = "\uE7C3" // Page icon
             });
 
-        // 4. 特殊关键词：model_icon_mapping.json
+        // 5. 特殊关键词：model_icon_mapping.json
         if (lowerQuery.Contains("icon") || lowerQuery.Contains("mapping") || lowerQuery.Contains("json"))
         {
             var localFolder = ApplicationData.Current.LocalFolder;

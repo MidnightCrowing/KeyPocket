@@ -112,7 +112,6 @@ public partial class ModelsViewModel
             3 => 0.5m,
             4 => 1m,
             5 => 5m,
-            6 => null,
             _ => null
         };
     }

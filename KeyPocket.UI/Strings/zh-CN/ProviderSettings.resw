@@ -167,13 +167,13 @@
     <value>模型 ID</value>
   </data>
   <data name="ModelIdPlaceholder.PlaceholderText" xml:space="preserve">
-    <value>例如 gpt-4</value>
+    <value>例如 gpt-5</value>
   </data>
   <data name="ModelName.Text" xml:space="preserve">
     <value>显示名称 (可选)</value>
   </data>
   <data name="ModelNamePlaceholder.PlaceholderText" xml:space="preserve">
-    <value>例如 GPT-4</value>
+    <value>例如 GPT-5</value>
   </data>
   <data name="InputPrice.Text" xml:space="preserve">
     <value>输入价格 (每百万 tokens)</value>

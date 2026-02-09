@@ -99,6 +99,8 @@ public sealed partial class KeyListItem : UserControl
             e.PropertyName == nameof(KeyItemViewModel.IsEditingTag))
         {
             UpdateTagBorderVisibility(false);
+            if (KeyItem?.IsEditingTag == true)
+                FocusTagTextBox();
         }
     }
 
@@ -132,16 +134,22 @@ public sealed partial class KeyListItem : UserControl
 
     private void TagTextBox_Loaded(object sender, RoutedEventArgs e)
     {
-        if (sender is TextBox textBox)
-        {
-            textBox.Focus(FocusState.Programmatic);
-            textBox.SelectAll();
-        }
+        if (sender is TextBox) FocusTagTextBox();
     }
 
     private void TagTextBox_LostFocus(object sender, RoutedEventArgs e)
     {
         if (KeyItem == null) return;
         if (KeyItem.IsEditingTag) KeyItem.CommitEditTagCommand.Execute(null);
+    }
+
+    private void FocusTagTextBox()
+    {
+        if (TagTextBox == null) return;
+        _ = DispatcherQueue.TryEnqueue(() =>
+        {
+            TagTextBox.Focus(FocusState.Programmatic);
+            TagTextBox.SelectAll();
+        });
     }
 }

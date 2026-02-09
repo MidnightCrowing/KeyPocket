@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using KeyPocket.UI.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -7,6 +8,7 @@ namespace KeyPocket.UI.Controls;
 
 public sealed partial class ModelListItem : UserControl
 {
+    private ModelItemViewModel? _currentModel;
     public static readonly DependencyProperty ModelProperty =
         DependencyProperty.Register(
             nameof(Model),
@@ -29,28 +31,41 @@ public sealed partial class ModelListItem : UserControl
     {
         if (d is ModelListItem control)
         {
+            if (e.OldValue is ModelItemViewModel oldVm)
+                oldVm.PropertyChanged -= control.OnModelPropertyChanged;
+
+            if (e.NewValue is ModelItemViewModel newVm)
+                newVm.PropertyChanged += control.OnModelPropertyChanged;
+
+            control._currentModel = e.NewValue as ModelItemViewModel;
             control.Bindings.Update();
-            control.UpdateHoverState(false);
+            control.UpdateButtonsVisibility(false);
         }
     }
 
     private void OnPointerEntered(object sender, PointerRoutedEventArgs e)
     {
-        UpdateHoverState(true);
+        UpdateButtonsVisibility(true);
     }
 
     private void OnPointerExited(object sender, PointerRoutedEventArgs e)
     {
-        UpdateHoverState(false);
+        UpdateButtonsVisibility(false);
     }
 
-    private void UpdateHoverState(bool isHovered)
+    private void UpdateButtonsVisibility(bool isHovered)
     {
         CopyBtn.SetValue(OpacityProperty, isHovered ? 1d : 0d);
 
         if (isHovered)
             FavoriteBtn.SetValue(OpacityProperty, 1d);
         else
-            FavoriteBtn.ClearValue(OpacityProperty);
+            FavoriteBtn.SetValue(OpacityProperty, Model?.IsFavorite == true ? 1d : 0d);
+    }
+
+    private void OnModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ModelItemViewModel.IsFavorite))
+            UpdateButtonsVisibility(false);
     }
 }

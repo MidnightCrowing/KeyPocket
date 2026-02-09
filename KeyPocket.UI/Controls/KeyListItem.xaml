@@ -99,20 +99,14 @@
                 MinHeight="28"
                 Padding="0"
                 x:Name="TagButton">
-                <Border
-                    CornerRadius="4"
+                <controls:KeyTag
+                    TagCornerRadius="4"
+                    FontSize="12"
                     HorizontalAlignment="Stretch"
-                    Padding="6,2"
+                    TagPadding="6,2"
+                    Text="{x:Bind KeyItem.Tag, Mode=OneWay}"
                     Visibility="Collapsed"
-                    x:Name="TagBorder">
-                    <Border.Background>
-                        <SolidColorBrush Color="{x:Bind KeyItem.TagColor, Mode=OneWay}" Opacity="0.15" />
-                    </Border.Background>
-                    <TextBlock
-                        FontSize="12"
-                        Foreground="{x:Bind KeyItem.TagBrush, Mode=OneWay}"
-                        Text="{x:Bind KeyItem.Tag, Mode=OneWay}" />
-                </Border>
+                    x:Name="TagBorder" />
             </Button>
 
             <TextBox

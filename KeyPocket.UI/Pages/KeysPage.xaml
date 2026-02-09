@@ -128,16 +128,17 @@
             </ctk:Case>
             <ctk:Case Value="{x:Bind vm:KeysViewMode.Card}">
                 <ScrollViewer>
-                    <muxc:ItemsRepeater ItemTemplate="{StaticResource KeyCardTemplate}" ItemsSource="{x:Bind ViewModel.FilteredKeys, Mode=OneWay}">
-                        <muxc:ItemsRepeater.Layout>
-                            <muxc:UniformGridLayout
-                                ItemsStretch="Fill"
-                                MinColumnSpacing="12"
-                                MinItemWidth="300"
-                                MinRowSpacing="12"
-                                Orientation="Horizontal" />
-                        </muxc:ItemsRepeater.Layout>
-                    </muxc:ItemsRepeater>
+                    <ItemsControl ItemTemplate="{StaticResource KeyCardTemplate}" ItemsSource="{x:Bind ViewModel.FilteredKeys, Mode=OneWay}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <ctk:StaggeredPanel
+                                    ColumnSpacing="12"
+                                    DesiredColumnWidth="300"
+                                    HorizontalAlignment="Stretch"
+                                    RowSpacing="12" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
                 </ScrollViewer>
             </ctk:Case>
         </ctk:SwitchPresenter>

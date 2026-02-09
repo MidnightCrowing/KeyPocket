@@ -333,6 +333,15 @@ public sealed partial class MainWindow
                 }
 
                 break;
+            case SearchResultType.KeyTag:
+                // Navigate to Keys page and prefill search text
+                if (item.Data is string tag)
+                {
+                    ContentFrame.Navigate(typeof(KeysPage), tag);
+                    NavView.SelectedItem = KeysPageItem;
+                }
+
+                break;
 
             case SearchResultType.SystemFile:
                 // 打开文件

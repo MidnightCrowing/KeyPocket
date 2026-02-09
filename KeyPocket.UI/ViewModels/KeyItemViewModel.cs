@@ -7,7 +7,6 @@ using KeyPocket.Core.Models;
 using KeyPocket.Core.Services;
 using KeyPocket.UI.Helpers;
 using KeyPocket.UI.Messages;
-using Microsoft.UI.Xaml.Media;
 
 namespace KeyPocket.UI.ViewModels;
 
@@ -37,8 +36,6 @@ public partial class KeyItemViewModel : ObservableObject
         WeakReferenceMessenger.Default.Register<ThemeChangedMessage>(this, (r, m) =>
         {
             OnPropertyChanged(nameof(IconUri));
-            OnPropertyChanged(nameof(TagColor));
-            OnPropertyChanged(nameof(TagBrush));
         });
     }
 
@@ -47,8 +44,6 @@ public partial class KeyItemViewModel : ObservableObject
     public string ProviderName { get; }
 
     public DateTime CreatedAt => _apiKey.CreatedAt;
-
-    public string FormattedCreatedAt => CreatedAt.ToString("yyyy-MM-dd");
 
     public string? Tag
     {
@@ -64,7 +59,6 @@ public partial class KeyItemViewModel : ObservableObject
                 OnPropertyChanged(nameof(HasTag));
                 OnPropertyChanged(nameof(IsTagDisplayVisible));
                 OnPropertyChanged(nameof(IsTagRowVisible));
-                OnPropertyChanged(nameof(TagBrush));
             }
         }
     }
@@ -78,10 +72,6 @@ public partial class KeyItemViewModel : ObservableObject
     public bool IsCustomIcon => ProviderIconHelper.HasCustomIcon(ProviderIcon);
     public string DefaultGlyph => ProviderIconHelper.DefaultIconGlyph;
     public Uri? IconUri => ProviderIconHelper.GetIconUri(ProviderIcon, ThemeHelper.IsDarkTheme());
-
-    public string TagColor => TagHelper.GetTagColor(Tag);
-
-    public SolidColorBrush TagBrush => new SolidColorBrush(TagHelper.ParseHexColor(TagColor));
 
     public bool IsFavorite
     {

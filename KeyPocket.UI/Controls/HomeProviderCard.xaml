@@ -223,26 +223,17 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
-                            <Border
-                                CornerRadius="3"
+                            <controls:KeyTag
+                                TagCornerRadius="3"
+                                FontSize="10"
+                                FontWeight="SemiBold"
                                 Grid.Column="0"
                                 HorizontalAlignment="Left"
                                 Margin="0,0,8,0"
-                                Padding="4,2"
+                                TagPadding="4,2"
+                                Text="{x:Bind Tag}"
                                 VerticalAlignment="Center"
-                                Visibility="{x:Bind HasTag, Converter={StaticResource BoolToVisConverter}}">
-                                <Border.Background>
-                                    <SolidColorBrush Color="{x:Bind TagColor}" Opacity="0.15" />
-                                </Border.Background>
-                                <TextBlock
-                                    FontSize="10"
-                                    FontWeight="SemiBold"
-                                    Text="{x:Bind Tag}">
-                                    <TextBlock.Foreground>
-                                        <SolidColorBrush Color="{x:Bind TagColor}" />
-                                    </TextBlock.Foreground>
-                                </TextBlock>
-                            </Border>
+                                Visibility="{x:Bind HasTag, Converter={StaticResource BoolToVisConverter}}" />
 
                             <TextBlock
                                 FontFamily="Consolas, Courier New, Monospace"

@@ -22,6 +22,8 @@ public sealed partial class KeysPage : Page
     {
         // Reload data when navigated to ensure we have latest providers/keys
         ViewModel.LoadData();
+        if (e.Parameter is string tag && !string.IsNullOrWhiteSpace(tag))
+            ViewModel.SearchText = tag;
         UpdateTreeView();
 
         // Subscribe to property changes to update tree

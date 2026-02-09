@@ -159,8 +159,4 @@ public class KeyItem
 
     public bool HasTag => !string.IsNullOrWhiteSpace(Tag);
 
-    /// <summary>
-    ///     根据 Tag 内容返回对应的颜色（支持主题适配）
-    /// </summary>
-    public string TagColor => TagHelper.GetTagColor(Tag);
 }

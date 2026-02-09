@@ -167,13 +167,13 @@
     <value>Model ID</value>
   </data>
   <data name="ModelIdPlaceholder.PlaceholderText" xml:space="preserve">
-    <value>e.g. gpt-4</value>
+    <value>e.g. gpt-5</value>
   </data>
   <data name="ModelName.Text" xml:space="preserve">
     <value>Display Name (Optional)</value>
   </data>
   <data name="ModelNamePlaceholder.PlaceholderText" xml:space="preserve">
-    <value>e.g. GPT-4</value>
+    <value>e.g. GPT-5</value>
   </data>
   <data name="InputPrice.Text" xml:space="preserve">
     <value>Input Price (per M tokens)</value>

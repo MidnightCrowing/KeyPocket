@@ -1,7 +1,3 @@
-using System;
-using Windows.UI;
-using Microsoft.UI;
-
 namespace KeyPocket.UI.Helpers;
 
 public static class TagHelper
@@ -46,15 +42,4 @@ public static class TagHelper
         return isDark ? "#9CA3AF" : "#6B7280"; // 灰色
     }
 
-    public static Color ParseHexColor(string hex)
-    {
-        if (string.IsNullOrWhiteSpace(hex)) return Colors.Gray;
-        var value = hex.Trim().TrimStart('#');
-        if (value.Length != 6) return Colors.Gray;
-
-        byte r = Convert.ToByte(value.Substring(0, 2), 16);
-        byte g = Convert.ToByte(value.Substring(2, 2), 16);
-        byte b = Convert.ToByte(value.Substring(4, 2), 16);
-        return Color.FromArgb(255, r, g, b);
-    }
 }
