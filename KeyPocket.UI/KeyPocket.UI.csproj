@@ -1,141 +1,150 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
-    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
-    <RootNamespace>KeyPocket.UI</RootNamespace>
-	<AssemblyName>KeyPocket</AssemblyName>
-    <PackageName>KeyPocket</PackageName>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Platforms>x86;x64;ARM64</Platforms>
-    <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
-    <PublishProfile>win-$(Platform).pubxml</PublishProfile>
-    <UseWinUI>true</UseWinUI>
-    <WinUISDKReferences>false</WinUISDKReferences>
-    <EnableMsixTooling>true</EnableMsixTooling>
-    <Nullable>enable</Nullable>
-    <LangVersion>12.0</LangVersion>
-    <ApplicationIcon>Assets\KeyPocket.ico</ApplicationIcon>
-    <Title>KeyPocket</Title>
-    <Authors>MidnightCrowing</Authors>
-    <Copyright>© 2026 MidnightCrowing</Copyright>
-    <PackageProjectUrl>https://github.com/MidnightCrowing/KeyPocket</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/MidnightCrowing/KeyPocket/blob/main/LICENSE</PackageLicenseUrl>
-    <RepositoryUrl>https://github.com/MidnightCrowing/KeyPocket</RepositoryUrl>
-    <RepositoryType>Github</RepositoryType>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+        <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+        <RootNamespace>KeyPocket.UI</RootNamespace>
+        <AssemblyName>KeyPocket</AssemblyName>
+        <PackageName>KeyPocket</PackageName>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <Platforms>x86;x64;ARM64</Platforms>
+        <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+        <PublishProfile>win-$(Platform).pubxml</PublishProfile>
+        <UseWinUI>true</UseWinUI>
+        <WinUISDKReferences>false</WinUISDKReferences>
+        <EnableMsixTooling>true</EnableMsixTooling>
+        <Nullable>enable</Nullable>
+        <LangVersion>12.0</LangVersion>
+        <ApplicationIcon>Assets\KeyPocket.ico</ApplicationIcon>
+        <Title>KeyPocket</Title>
+        <Authors>KeyPocket Community</Authors>
+        <Copyright>© 2026 KeyPocket Community</Copyright>
+        <PackageProjectUrl>https://github.com/MidnightCrowing/KeyPocket</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/MidnightCrowing/KeyPocket/blob/main/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/MidnightCrowing/KeyPocket</RepositoryUrl>
+        <RepositoryType>Github</RepositoryType>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <Content Include="Assets\SplashScreen.scale-200.png" />
-    <Content Include="Assets\LockScreenLogo.scale-200.png" />
-    <Content Include="Assets\Square150x150Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
-    <Content Include="Assets\Wide310x150Logo.scale-200.png" />
-  </ItemGroup>
+    <ItemGroup>
+        <Content Include="Assets\SplashScreen.scale-200.png" />
+        <Content Include="Assets\LockScreenLogo.scale-200.png" />
+        <Content Include="Assets\Square150x150Logo.scale-200.png" />
+        <Content Include="Assets\Square44x44Logo.scale-200.png" />
+        <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
+        <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+        <Content Include="Assets\ProviderIcons\**" />
+        <Content Include="Assets\Defaults\model_icon_mapping.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Manifest Include="$(ApplicationManifest)" />
-  </ItemGroup>
+    <ItemGroup>
+        <Manifest Include="$(ApplicationManifest)" />
+    </ItemGroup>
 
-  <!--
-    Defining the "Msix" ProjectCapability here allows the Single-project MSIX Packaging
-    Tools extension to be activated for this project even if the Windows App SDK Nuget
-    package has not yet been restored.
-  -->
-  <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
-    <ProjectCapability Include="Msix" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageReference Include="CommunityToolkit.WinUI.Controls.Primitives" Version="8.2.251219" />
-    <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.251219" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7463" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260101001" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="TitleBar.xaml.cs" />
-    <Compile Remove="AppPackages\**" />
-    <Compile Remove="BundleArtifacts\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\KeyPocket.Core\KeyPocket.Core.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Remove="AppPackages\**" />
-    <EmbeddedResource Remove="BundleArtifacts\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Assets\KeyPocket.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Remove="AppPackages\**" />
-    <None Remove="BundleArtifacts\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Remove="AppPackages\**" />
-    <Page Remove="BundleArtifacts\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Remove="AppPackages\**" />
-    <Resource Remove="BundleArtifacts\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="Assets\BadgeLogo.scale-100.png" />
-    <None Remove="Assets\BadgeLogo.scale-125.png" />
-    <None Remove="Assets\BadgeLogo.scale-150.png" />
-    <None Remove="Assets\BadgeLogo.scale-200.png" />
-    <None Remove="Assets\BadgeLogo.scale-400.png" />
-  </ItemGroup>
-  <PropertyGroup Label="Globals">
-    <WebView2DispatchAdapterNamespace>KeyPocket</WebView2DispatchAdapterNamespace>
-  </PropertyGroup>
+    <!--
+      Defining the "Msix" ProjectCapability here allows the Single-project MSIX Packaging
+      Tools extension to be activated for this project even if the Windows App SDK Nuget
+      package has not yet been restored.
+    -->
+    <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+        <ProjectCapability Include="Msix" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="CommunityToolkit.Labs.WinUI.Controls.DataTable" Version="0.1.251217-build.2433" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+        <PackageReference Include="CommunityToolkit.WinUI.Controls.HeaderedControls" Version="8.2.251219" />
+        <PackageReference Include="CommunityToolkit.WinUI.Controls.Primitives" Version="8.2.251219" />
+        <PackageReference Include="CommunityToolkit.WinUI.Controls.RangeSelector" Version="8.2.251219" />
+        <PackageReference Include="CommunityToolkit.WinUI.Controls.Segmented" Version="8.2.251219" />
+        <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.251219" />
+        <PackageReference Include="CommunityToolkit.WinUI.Controls.TokenizingTextBox" Version="8.2.251219" />
+        <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7463" />
+        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260101001" />
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Remove="TitleBar.xaml.cs" />
+        <Compile Remove="AppPackages\**" />
+        <Compile Remove="BundleArtifacts\**" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\KeyPocket.Core\KeyPocket.Core.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Update="Properties\Resources.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resources.resx</DependentUpon>
+        </Compile>
+    </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Update="Properties\Resources.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Remove="AppPackages\**" />
+        <EmbeddedResource Remove="BundleArtifacts\**" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Update="Assets\KeyPocket.png">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
+        <None Remove="AppPackages\**" />
+        <None Remove="BundleArtifacts\**" />
+    </ItemGroup>
+    <ItemGroup>
+        <Page Remove="AppPackages\**" />
+        <Page Remove="BundleArtifacts\**" />
+    </ItemGroup>
+    <ItemGroup>
+        <Resource Remove="AppPackages\**" />
+        <Resource Remove="BundleArtifacts\**" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Remove="Assets\BadgeLogo.scale-100.png" />
+        <None Remove="Assets\BadgeLogo.scale-125.png" />
+        <None Remove="Assets\BadgeLogo.scale-150.png" />
+        <None Remove="Assets\BadgeLogo.scale-200.png" />
+        <None Remove="Assets\BadgeLogo.scale-400.png" />
+    </ItemGroup>
+    <PropertyGroup Label="Globals">
+        <WebView2DispatchAdapterNamespace>KeyPocket</WebView2DispatchAdapterNamespace>
+    </PropertyGroup>
 
-  <!--
-    Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution
-    Explorer "Package and Publish" context menu entry to be enabled for this project even if
-    the Windows App SDK Nuget package has not yet been restored.
-  -->
-  <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
-    <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
-  </PropertyGroup>
+    <!--
+      Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution
+      Explorer "Package and Publish" context menu entry to be enabled for this project even if
+      the Windows App SDK Nuget package has not yet been restored.
+    -->
+    <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+        <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
+    </PropertyGroup>
 
-  <!-- Publish Properties -->
-  <PropertyGroup>
-    <PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>
-    <PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
-    <PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
-    <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">False</PublishTrimmed>
-    <AppxPackageSigningEnabled>False</AppxPackageSigningEnabled>
-    <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
-    <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
-    <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
-    <GenerateTestArtifacts>True</GenerateTestArtifacts>
-    <AppxBundle>Never</AppxBundle>
-    <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
-    <AssemblyTitle>KeyPocket</AssemblyTitle>
-    <PackageIcon>KeyPocket.png</PackageIcon>
-    <GenerateTemporaryStoreCertificate>True</GenerateTemporaryStoreCertificate>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-    <Optimize>True</Optimize>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <Optimize>True</Optimize>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-    <Optimize>True</Optimize>
-  </PropertyGroup>
+    <!-- Publish Properties -->
+    <PropertyGroup>
+        <PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>
+        <PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
+        <PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
+        <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">False</PublishTrimmed>
+        <AppxPackageSigningEnabled>False</AppxPackageSigningEnabled>
+        <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
+        <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
+        <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
+        <GenerateTestArtifacts>False</GenerateTestArtifacts>
+        <AppxBundle>Never</AppxBundle>
+        <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+        <AssemblyTitle>KeyPocket</AssemblyTitle>
+        <PackageIcon>KeyPocket.png</PackageIcon>
+        <GenerateTemporaryStoreCertificate>True</GenerateTemporaryStoreCertificate>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+        <Optimize>True</Optimize>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+        <Optimize>True</Optimize>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+        <Optimize>True</Optimize>
+    </PropertyGroup>
 </Project>

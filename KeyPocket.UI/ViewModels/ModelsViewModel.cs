@@ -1,113 +1,94 @@
 using System.Collections.ObjectModel;
 using System.Linq;
+using Windows.ApplicationModel.Resources;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 using KeyPocket.Core.Services;
+using KeyPocket.UI.Messages;
 
 namespace KeyPocket.UI.ViewModels;
 
 public partial class ModelsViewModel : ObservableObject
 {
     private readonly ObservableCollection<ModelItemViewModel> _allModels = new();
+    private readonly ModelFilterService _filterService;
     private readonly ProviderService _providerService;
 
-    [ObservableProperty] private ObservableCollection<ModelItemViewModel> _filteredModels = new();
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(InputPriceHeader))]
+    [NotifyPropertyChangedFor(nameof(OutputPriceHeader))]
+    private string _currencySymbol = "$";
 
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(ModelsCountText))]
+    private ObservableCollection<ModelItemViewModel> _filteredModels = new();
+
+    [ObservableProperty] private ObservableCollection<ProviderGroupViewModel> _groupedModels = new();
+    [ObservableProperty] private bool _isAudioSelected = true;
+    [ObservableProperty] private bool _isEmbeddingsSelected = true;
+    [ObservableProperty] private bool _isFileSelected = true;
+    [ObservableProperty] private bool _isImageSelected = true;
+
+    [ObservableProperty] private bool _isTextSelected = true;
+    [ObservableProperty] private bool _isVideoSelected = true;
+    [ObservableProperty] private int _maxPriceIndex = 6;
+
+    [ObservableProperty] private int _minPriceIndex;
     [ObservableProperty] private string _searchText = string.Empty;
-
-    [ObservableProperty] private string _selectedCapability = "All";
-
-    [ObservableProperty] private string _selectedSortOption = "Provider"; // Provider, Name, Price
-
     [ObservableProperty] private bool _showFavoritesOnly;
 
-    public ModelsViewModel(ProviderService providerService)
+    [ObservableProperty] private ModelSortOption _sortOption = ModelSortOption.NameAsc;
+
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(ViewModeIndex))]
+    private ModelsViewMode _viewMode = ModelsViewMode.List;
+
+    public ModelsViewModel(ProviderService providerService, ModelFilterService filterService)
     {
         _providerService = providerService;
+        _filterService = filterService;
         LoadData();
-    }
 
-    public ObservableCollection<string> Capabilities { get; } = new()
-    {
-        "All",
-        "Chat",
-        "Embedding"
-    };
+        WeakReferenceMessenger.Default.Register<ThemeChangedMessage>(this,
+            (r, m) => { App.MainWindow.DispatcherQueue.TryEnqueue(ApplyFilters); });
 
-    public ObservableCollection<string> SortOptions { get; } = new()
-    {
-        "Provider",
-        "Name",
-        "Price"
-    };
-
-    public void LoadData()
-    {
-        _allModels.Clear();
-        var providers = _providerService.GetAllProviders();
-
-        foreach (var provider in providers)
+        WeakReferenceMessenger.Default.Register<ProviderUpdatedMessage>(this, (r, m) =>
         {
-            if (provider.Models == null) continue;
+            App.MainWindow.DispatcherQueue.TryEnqueue(() =>
+            {
+                var group = GroupedModels.FirstOrDefault(g => g.ProviderId == m.ProviderId);
+                if (group != null)
+                {
+                    var provider = _providerService.GetAllProviders().FirstOrDefault(p => p.Id == m.ProviderId);
+                    if (provider != null)
+                        group.ProviderIcon = provider.IconPath;
+                }
+            });
+        });
 
-            foreach (var model in provider.Models)
-                _allModels.Add(new ModelItemViewModel(model, provider.Name, provider.IconPath, provider.Currency,
-                    _providerService));
-        }
-
-        ApplyFilters();
+        UpdateCurrencySymbol();
     }
 
-    partial void OnSearchTextChanged(string value)
+    public string InputPriceHeader =>
+        string.Format(ResourceLoader.GetForViewIndependentUse("Models").GetString("InputPriceFormat"), CurrencySymbol);
+
+    public string OutputPriceHeader =>
+        string.Format(ResourceLoader.GetForViewIndependentUse("Models").GetString("OutputPriceFormat"), CurrencySymbol);
+
+    public string ModelsCountText => $"{FilteredModels.Count} models";
+
+    public int ViewModeIndex
     {
-        ApplyFilters();
+        get => ViewMode == ModelsViewMode.List ? 0 : 1;
+        set => ViewMode = value == 1 ? ModelsViewMode.Card : ModelsViewMode.List;
     }
 
-    partial void OnShowFavoritesOnlyChanged(bool value)
+    partial void OnViewModeChanged(ModelsViewMode value)
     {
-        ApplyFilters();
+        OnPropertyChanged(nameof(ViewModeIndex));
     }
+}
 
-    partial void OnSelectedCapabilityChanged(string value)
-    {
-        ApplyFilters();
-    }
-
-    partial void OnSelectedSortOptionChanged(string value)
-    {
-        ApplyFilters();
-    }
-
-    private void ApplyFilters()
-    {
-        var query = _allModels.AsEnumerable();
-
-        // 1. Search Text
-        if (!string.IsNullOrWhiteSpace(SearchText))
-        {
-            var lowerSearch = SearchText.ToLowerInvariant();
-            query = query.Where(m =>
-                m.DisplayName.ToLowerInvariant().Contains(lowerSearch) ||
-                m.Id.ToLowerInvariant().Contains(lowerSearch) ||
-                m.ProviderName.ToLowerInvariant().Contains(lowerSearch));
-        }
-
-        // 2. Favorites
-        if (ShowFavoritesOnly) query = query.Where(m => m.IsFavorite);
-
-        // 3. Capability
-        if (SelectedCapability == "Chat")
-            query = query.Where(m => m.IsChatModel);
-        else if (SelectedCapability == "Embedding") query = query.Where(m => m.IsEmbeddingModel);
-
-        // 4. Sorting
-        query = SelectedSortOption switch
-        {
-            "Name" => query.OrderBy(m => m.DisplayName),
-            "Price" => query.OrderBy(m => m.ConvertedInputPrice.HasValue ? 0 : 1)
-                .ThenBy(m => m.ConvertedInputPrice ?? m.InputPrice ?? decimal.MaxValue),
-            _ => query.OrderBy(m => m.ProviderName).ThenBy(m => m.DisplayName) // Default: Provider
-        };
-
-        FilteredModels = new ObservableCollection<ModelItemViewModel>(query);
-    }
+public enum ModelsViewMode
+{
+    List,
+    Card
 }

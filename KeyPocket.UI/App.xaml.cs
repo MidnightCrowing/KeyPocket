@@ -36,6 +36,7 @@ public partial class App : Application
 
     public static Window MainWindow { get; private set; } = null!;
     public static ProviderService ProviderService { get; private set; } = null!;
+    public static ModelFilterService ModelFilterService { get; private set; } = null!;
 
     private void App_UnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
@@ -62,7 +63,6 @@ public partial class App : Application
     {
         InitializeServices();
 
-
         _window = new MainWindow();
         MainWindow = _window;
 
@@ -71,6 +71,7 @@ public partial class App : Application
 
         // Initialize helpers before showing the window
         ThemeHelper.Initialize();
+        BackdropHelper.ApplyToMainWindow(SettingsHelper.Current.SelectedBackdrop);
 
         _window.Activate();
     }
@@ -81,5 +82,6 @@ public partial class App : Application
         var storage = new JsonFileStorageProvider(storagePath);
         var protector = new DpapiSecretProtector();
         ProviderService = new ProviderService(storage, protector);
+        ModelFilterService = new ModelFilterService();
     }
 }

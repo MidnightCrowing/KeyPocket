@@ -149,6 +149,12 @@ public partial class SettingsHelper : ObservableSettings
         set => Set(value);
     }
 
+    public WindowBackdropKind SelectedBackdrop
+    {
+        get => GetOrCreateDefault(WindowBackdropKind.Mica);
+        set => Set(value);
+    }
+
     // 货币设置: 默认 USD，可切换为 CNY 等
     public string SelectedCurrency
     {

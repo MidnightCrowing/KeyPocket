@@ -1,0 +1,133 @@
+<UserControl
+    x:Class="KeyPocket.UI.Controls.ModelListItem"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:controls="using:KeyPocket.UI.Controls"
+    xmlns:converters="using:KeyPocket.UI.Converters"
+    xmlns:ctk="using:CommunityToolkit.WinUI.Controls"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVis" />
+        <converters:BoolToDoubleConverter x:Key="BoolToOpacity" />
+        <converters:FavoriteIconConverter x:Key="BoolToGlyphConverter" />
+        <converters:FavoriteColorConverter x:Key="BoolToBrushConverter" />
+    </UserControl.Resources>
+    <ctk:DataRow>
+        <!--  Provider column (Spacer)  -->
+        <TextBlock />
+
+        <!--  Model Name + Actions (Favorite/Copy)  -->
+        <Grid
+            Background="Transparent"
+            HorizontalAlignment="Stretch"
+            PointerEntered="OnPointerEntered"
+            PointerExited="OnPointerExited"
+            VerticalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!--  Derived Model Icon (Custom Avatar Style)  -->
+            <Grid
+                Height="20"
+                Margin="0,0,8,0"
+                VerticalAlignment="Center"
+                Width="20">
+                <Border
+                    Background="{ThemeResource LayerFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
+                    BorderThickness="1.5"
+                    CornerRadius="10"
+                    Visibility="{x:Bind Model.HasModelIcon, Converter={StaticResource BoolToVis}, Mode=OneWay}">
+                    <BitmapIcon
+                        Height="12"
+                        HorizontalAlignment="Center"
+                        ShowAsMonochrome="False"
+                        UriSource="{x:Bind Model.ModelIconUri, Mode=OneWay}"
+                        VerticalAlignment="Center"
+                        Width="12" />
+                </Border>
+            </Grid>
+
+            <!--  Name  -->
+            <TextBlock
+                Grid.Column="1"
+                Text="{x:Bind Model.DisplayName, Mode=OneWay}"
+                TextTrimming="CharacterEllipsis"
+                VerticalAlignment="Center" />
+
+            <!--  Actions - Copy (Next to Name)  -->
+            <controls:CopyButton
+                Background="Transparent"
+                BorderThickness="0"
+                Command="{x:Bind Model.CopyIdCommand}"
+                Grid.Column="2"
+                Height="28"
+                Margin="4,0,0,0"
+                Opacity="0"
+                Padding="4"
+                ToolTipService.ToolTip="Copy ID"
+                VerticalAlignment="Center"
+                Width="28"
+                x:Name="CopyBtn"
+                x:Uid="/Models/CopyID">
+                <FontIcon FontSize="14" Glyph="&#xE8C8;" />
+            </controls:CopyButton>
+
+            <!--  Actions - Favorite (Far Right)  -->
+            <Button
+                Background="Transparent"
+                BorderThickness="0"
+                Command="{x:Bind Model.ToggleFavoriteCommand}"
+                Grid.Column="4"
+                Height="28"
+                Opacity="{x:Bind Model.IsFavorite, Converter={StaticResource BoolToOpacity}, Mode=OneWay}"
+                Padding="4"
+                ToolTipService.ToolTip="Favorite"
+                VerticalAlignment="Center"
+                Width="28"
+                x:Name="FavoriteBtn"
+                x:Uid="/Models/Favorites">
+                <FontIcon
+                    FontSize="14"
+                    Foreground="{x:Bind Model.IsFavorite, Mode=OneWay, Converter={StaticResource BoolToBrushConverter}}"
+                    Glyph="{x:Bind Model.IsFavorite, Mode=OneWay, Converter={StaticResource BoolToGlyphConverter}, ConverterParameter='Fill'}" />
+            </Button>
+        </Grid>
+
+        <!--  Input Price  -->
+        <StackPanel
+            Orientation="Horizontal"
+            Spacing="4"
+            VerticalAlignment="Center">
+            <TextBlock
+                FontFamily="Consolas"
+                Text="{x:Bind Model.InputPriceFormatted, Mode=OneWay}"
+                VerticalAlignment="Center" />
+            <TextBlock
+                FontFamily="Consolas"
+                Opacity="0.5"
+                Text="{x:Bind Model.InputPriceOriginal, Mode=OneWay}"
+                VerticalAlignment="Center" />
+        </StackPanel>
+
+        <!--  Output Price  -->
+        <StackPanel
+            Orientation="Horizontal"
+            Spacing="4"
+            VerticalAlignment="Center">
+            <TextBlock
+                FontFamily="Consolas"
+                Text="{x:Bind Model.OutputPriceFormatted, Mode=OneWay}"
+                VerticalAlignment="Center" />
+            <TextBlock
+                FontFamily="Consolas"
+                Opacity="0.5"
+                Text="{x:Bind Model.OutputPriceOriginal, Mode=OneWay}"
+                VerticalAlignment="Center" />
+        </StackPanel>
+    </ctk:DataRow>
+</UserControl>

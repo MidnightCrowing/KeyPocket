@@ -6,6 +6,7 @@ public enum SearchResultType
 {
     Provider,
     Model,
+    KeyTag,
     SystemFile
 }
 

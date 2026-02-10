@@ -1,0 +1,21 @@
+<UserControl
+    x:Class="KeyPocket.UI.Controls.KeyTag"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Border
+        CornerRadius="{x:Bind TagCornerRadius, Mode=OneWay}"
+        Padding="{x:Bind TagPadding, Mode=OneWay}">
+        <Border.Background>
+            <SolidColorBrush Color="{x:Bind TagColor, Mode=OneWay}" Opacity="0.15" />
+        </Border.Background>
+        <TextBlock
+            FontSize="{x:Bind FontSize, Mode=OneWay}"
+            FontWeight="{x:Bind FontWeight, Mode=OneWay}"
+            Text="{x:Bind Text, Mode=OneWay}">
+            <TextBlock.Foreground>
+                <SolidColorBrush Color="{x:Bind TagColor, Mode=OneWay}" />
+            </TextBlock.Foreground>
+        </TextBlock>
+    </Border>
+</UserControl>

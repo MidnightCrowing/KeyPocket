@@ -2,8 +2,11 @@ using System;
 using Windows.ApplicationModel.DataTransfer;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using KeyPocket.Core.Models;
 using KeyPocket.Core.Services;
+using KeyPocket.UI.Helpers;
+using KeyPocket.UI.Messages;
 
 namespace KeyPocket.UI.ViewModels;
 
@@ -13,9 +16,12 @@ public partial class KeyItemViewModel : ObservableObject
     private readonly ProviderService _providerService;
 
     [ObservableProperty] private string _displayKey = string.Empty;
-
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsTagDisplayVisible))]
+    [NotifyPropertyChangedFor(nameof(IsTagRowVisible))]
+    private bool _isEditingTag;
     [ObservableProperty] private string _maskedKey = "Loading...";
-
+    private string? _originalTag;
     [ObservableProperty] private string? _providerIcon;
 
     public KeyItemViewModel(ApiKey apiKey, string providerName, string? providerIcon, ProviderService providerService)
@@ -26,21 +32,11 @@ public partial class KeyItemViewModel : ObservableObject
         _providerService = providerService;
 
         Initialize();
-    }
 
-    private void Initialize()
-    {
-        // Decrypt to generate mask
-        var rawKey = _providerService.GetDecryptedApiKey(_apiKey.ProviderId, _apiKey.Id);
-        if (string.IsNullOrEmpty(rawKey))
+        WeakReferenceMessenger.Default.Register<ThemeChangedMessage>(this, (r, m) =>
         {
-            MaskedKey = "Error: Cannot Decrypt";
-            DisplayKey = MaskedKey; // Ensure DisplayKey is set
-            return;
-        }
-
-        MaskedKey = GenerateMask(rawKey);
-        DisplayKey = MaskedKey;
+            OnPropertyChanged(nameof(IconUri));
+        });
     }
 
     public Guid Id => _apiKey.Id;
@@ -60,9 +56,22 @@ public partial class KeyItemViewModel : ObservableObject
                 _providerService.UpdateApiKeyTag(ProviderId, Id, value);
                 _apiKey.Tag = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(HasTag));
+                OnPropertyChanged(nameof(IsTagDisplayVisible));
+                OnPropertyChanged(nameof(IsTagRowVisible));
             }
         }
     }
+
+    public bool HasTag => !string.IsNullOrEmpty(Tag);
+
+    public bool IsTagDisplayVisible => HasTag && !IsEditingTag;
+
+    public bool IsTagRowVisible => HasTag || IsEditingTag;
+
+    public bool IsCustomIcon => ProviderIconHelper.HasCustomIcon(ProviderIcon);
+    public string DefaultGlyph => ProviderIconHelper.DefaultIconGlyph;
+    public Uri? IconUri => ProviderIconHelper.GetIconUri(ProviderIcon, ThemeHelper.IsDarkTheme());
 
     public bool IsFavorite
     {
@@ -94,16 +103,77 @@ public partial class KeyItemViewModel : ObservableObject
         }
     }
 
+    private void Initialize()
+    {
+        // Decrypt to generate mask
+        var rawKey = _providerService.GetDecryptedApiKey(_apiKey.ProviderId, _apiKey.Id);
+        if (string.IsNullOrEmpty(rawKey))
+        {
+            MaskedKey = "Error: Cannot Decrypt";
+            DisplayKey = MaskedKey; // Ensure DisplayKey is set
+            return;
+        }
+
+        MaskedKey = GenerateMask(rawKey);
+        DisplayKey = MaskedKey;
+    }
+
     private string GenerateMask(string key)
     {
         if (string.IsNullOrEmpty(key)) return "";
         if (key.Length <= 8) return new string('*', key.Length);
 
-        // Standard format often: sk-.......1234
-        // Keep first 3 letters (if they exist) and last 4.
-        var prefix = key.Substring(0, Math.Min(3, key.Length));
-        var suffix = key.Substring(key.Length - 4);
-        return $"{prefix}••••••••{suffix}";
+        string prefix;
+        string suffix;
+        const string mask = "............"; // 12 dots
+
+        if (key.StartsWith("sk-"))
+        {
+            // First 7 chars (sk- + 4 chars)
+            var take = Math.Min(7, key.Length);
+            prefix = key.Substring(0, take);
+        }
+        else
+        {
+            // First 4 chars
+            var take = Math.Min(4, key.Length);
+            prefix = key.Substring(0, take);
+        }
+
+        // Last 4 chars
+        suffix = key.Substring(key.Length - 4);
+
+        return $"{prefix}{mask}{suffix}";
+    }
+
+    [RelayCommand]
+    private void StartEditTag()
+    {
+        _originalTag = Tag;
+        IsEditingTag = true;
+    }
+
+    [RelayCommand]
+    private void CommitEditTag()
+    {
+        IsEditingTag = false;
+        _originalTag = null;
+    }
+
+    [RelayCommand]
+    private void CancelEditTag()
+    {
+        Tag = _originalTag;
+        IsEditingTag = false;
+        _originalTag = null;
+    }
+
+    [RelayCommand]
+    private void UpdateTag(string newTag)
+    {
+        Tag = newTag;
+        OnPropertyChanged(nameof(Tag));
+        OnPropertyChanged(nameof(HasTag));
     }
 
     private void ToggleDisableServiceCall()
@@ -132,6 +202,10 @@ public partial class KeyItemViewModel : ObservableObject
             var package = new DataPackage();
             package.SetText(rawKey);
             Clipboard.SetContent(package);
+
+            // Explicitly clear local var if possible (though string is immutable, GC handles it)
+            // The requirement was to not keep it in memory as a field. 
+            // We are using a local var 'rawKey' which will be collected.
         }
     }
 }

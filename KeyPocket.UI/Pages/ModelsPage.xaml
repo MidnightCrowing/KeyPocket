@@ -3,19 +3,71 @@
     x:Class="KeyPocket.UI.Pages.ModelsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:controls="using:KeyPocket.UI.Controls"
-    xmlns:converters="using:KeyPocket.UI.Converters"
+    xmlns:ctk="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="using:KeyPocket.UI.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:KeyPocket.UI.Pages.Models"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:vm="using:KeyPocket.UI.ViewModels"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../Controls/CopyButton.xaml" />
+                <ResourceDictionary Source="Models/ModelsPage.Resources.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <converters:BoolToVisibilityConverter x:Key="BoolToVis" />
-            <converters:NegatedBoolToVisibilityConverter x:Key="NegBoolToVis" />
+
+            <!--  Provider Group Template  -->
+            <DataTemplate x:DataType="muxc:TreeViewNode" x:Key="ProviderGroupTemplate">
+                <ctk:DataRow DoubleTapped="ProviderGroup_DoubleTapped">
+                    <!--  Provider Name & Icon  -->
+                    <StackPanel
+                        Background="Transparent"
+                        MinHeight="24"
+                        Orientation="Horizontal"
+                        Spacing="8"
+                        ToolTipService.ToolTip="Double click to edit provider settings"
+                        VerticalAlignment="Center"
+                        x:Uid="/Models/Provider_EditTooltip">
+                        <!--  Icon  -->
+                        <Grid
+                            AllowDrop="False"
+                            Height="16"
+                            Width="16">
+                            <FontIcon
+                                FontSize="16"
+                                Glyph="{x:Bind ((vm:ProviderGroupViewModel)Content).DefaultGlyph}"
+                                Visibility="{x:Bind ((vm:ProviderGroupViewModel)Content).IsCustomIcon, Converter={StaticResource NegBoolToVis}, Mode=OneWay}" />
+                            <BitmapIcon
+                                ShowAsMonochrome="False"
+                                UriSource="{x:Bind ((vm:ProviderGroupViewModel)Content).IconUri, Mode=OneWay}"
+                                Visibility="{x:Bind ((vm:ProviderGroupViewModel)Content).IsCustomIcon, Converter={StaticResource BoolToVis}, Mode=OneWay}" />
+                        </Grid>
+
+                        <TextBlock
+                            FontWeight="SemiBold"
+                            Text="{x:Bind ((vm:ProviderGroupViewModel)Content).ProviderName}"
+                            VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <!--  Empty cells for alignment  -->
+                    <TextBlock />
+                    <TextBlock />
+                    <TextBlock />
+                </ctk:DataRow>
+            </DataTemplate>
+
+            <!--  Template Selector  -->
+            <helpers:ModelsItemTemplateSelector
+                ModelTemplate="{StaticResource ModelItemTemplate}"
+                ProviderTemplate="{StaticResource ProviderGroupTemplate}"
+                x:Key="ModelsItemTemplateSelector" />
+
+            <!--  Model Item Template  -->
+            <DataTemplate x:DataType="muxc:TreeViewNode" x:Key="ModelItemTemplate">
+                <controls:ModelListItem Model="{Binding Content}" />
+            </DataTemplate>
         </ResourceDictionary>
     </Page.Resources>
 
@@ -26,239 +78,108 @@
         </Grid.RowDefinitions>
 
         <!--  Header  -->
-        <Grid ColumnSpacing="24">
+        <Grid ColumnSpacing="12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
+            <!--  Model Count  -->
+            <TextBlock
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Margin="15,15,0,0"
+                Style="{StaticResource CaptionTextBlockStyle}"
+                Text="{x:Bind ViewModel.ModelsCountText, Mode=OneWay}"
+                VerticalAlignment="Center" />
+
+            <!--  Search Box  -->
             <TextBox
-                HorizontalAlignment="Left"
+                Grid.Column="1"
+                HorizontalAlignment="Right"
                 PlaceholderText="Search models..."
                 Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                Width="300"
-                x:Uid="Models_SearchBox" />
+                Width="200"
+                x:Uid="/Models/SearchBox" />
 
-            <!--  Filters & Sort  -->
-            <!--  Capability  -->
-            <StackPanel
-                Grid.Column="1"
-                Margin="0,0,0,6"
-                Orientation="Horizontal"
-                Spacing="8"
-                VerticalAlignment="Bottom">
-                <TextBlock
-                    Style="{ThemeResource BodyTextBlockStyle}"
-                    Text="Capability:"
-                    VerticalAlignment="Center"
-                    x:Uid="Models_Capability" />
-                <ComboBox
-                    ItemsSource="{x:Bind ViewModel.Capabilities}"
-                    SelectedItem="{x:Bind ViewModel.SelectedCapability, Mode=TwoWay}"
-                    Width="140" />
-            </StackPanel>
+            <!--  Filter Button  -->
+            <models:ModelsFilterButton DataContext="{x:Bind ViewModel}" Grid.Column="2" />
 
-            <!--  Sort  -->
-            <StackPanel
-                Grid.Column="2"
-                Margin="0,0,0,6"
-                Orientation="Horizontal"
-                Spacing="8"
-                VerticalAlignment="Bottom">
-                <TextBlock
-                    Style="{ThemeResource BodyTextBlockStyle}"
-                    Text="Sort by:"
-                    VerticalAlignment="Center"
-                    x:Uid="Models_SortBy" />
-                <ComboBox
-                    ItemsSource="{x:Bind ViewModel.SortOptions}"
-                    SelectedItem="{x:Bind ViewModel.SelectedSortOption, Mode=TwoWay}"
-                    Width="140" />
-            </StackPanel>
+            <!--  Sort Button  -->
+            <models:ModelsSortButton DataContext="{x:Bind ViewModel}" Grid.Column="3" />
 
+            <!--  View Toggle  -->
+            <ctk:Segmented
+                Grid.Column="4"
+                ItemContainerStyle="{StaticResource CustomSegmentedItemStyle}"
+                SelectedIndex="{x:Bind ViewModel.ViewModeIndex, Mode=TwoWay}">
+                <ctk:SegmentedItem
+                    Height="28.8"
+                    ToolTipService.ToolTip="List view"
+                    x:Uid="/Models/View_List">
+                    <ctk:SegmentedItem.Content>
+                        <FontIcon FontSize="16" Glyph="&#xE8FD;" />
+                    </ctk:SegmentedItem.Content>
+                </ctk:SegmentedItem>
+                <ctk:SegmentedItem
+                    Height="28.8"
+                    ToolTipService.ToolTip="Card view"
+                    x:Uid="/Models/View_Card">
+                    <ctk:SegmentedItem.Content>
+                        <FontIcon FontSize="16" Glyph="&#xECA5;" />
+                    </ctk:SegmentedItem.Content>
+                </ctk:SegmentedItem>
+            </ctk:Segmented>
 
-            <ToggleButton
-                Grid.Column="3"
-                IsChecked="{x:Bind ViewModel.ShowFavoritesOnly, Mode=TwoWay}"
-                Margin="0,0,0,6"
-                VerticalAlignment="Bottom">
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <FontIcon FontSize="16" Glyph="&#xE735;" />
-                    <TextBlock Text="Favorites" x:Uid="Models_Favorites" />
-                </StackPanel>
-            </ToggleButton>
         </Grid>
 
-        <!--  Content  -->
-        <GridView
-            Grid.Row="1"
-            IsItemClickEnabled="False"
-            ItemsSource="{x:Bind ViewModel.FilteredModels, Mode=OneWay}"
-            SelectionMode="None">
-            <GridView.ItemTemplate>
-                <DataTemplate x:DataType="vm:ModelItemViewModel">
-                    <Grid
-                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        BorderThickness="1"
-                        CornerRadius="8"
-                        Height="170"
-                        Padding="0"
-                        Width="280">
-
-                        <Grid Padding="16" RowSpacing="6">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-
-                            <!--  Header: Provider Info + Favorite  -->
-                            <Grid Grid.Row="0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel
-                                    Opacity="0.7"
-                                    Orientation="Horizontal"
-                                    Spacing="6">
-                                    <TextBlock
-                                        Style="{ThemeResource CaptionTextBlockStyle}"
-                                        Text="{x:Bind ProviderName}"
-                                        VerticalAlignment="Center" />
-                                </StackPanel>
-
-                                <!--  Toggle Favorite Button  -->
-                                <Grid Grid.Column="1">
-                                    <Button
-                                        Background="Transparent"
-                                        BorderThickness="0"
-                                        Command="{x:Bind ToggleFavoriteCommand}"
-                                        Padding="4"
-                                        Visibility="{x:Bind IsFavorite, Mode=OneWay, Converter={StaticResource NegBoolToVis}}">
-                                        <FontIcon FontSize="16" Glyph="&#xE734;" />
-                                    </Button>
-                                    <Button
-                                        Background="Transparent"
-                                        BorderThickness="0"
-                                        Command="{x:Bind ToggleFavoriteCommand}"
-                                        Padding="4"
-                                        Visibility="{x:Bind IsFavorite, Mode=OneWay, Converter={StaticResource BoolToVis}}">
-                                        <FontIcon
-                                            FontSize="16"
-                                            Foreground="#F2C811"
-                                            Glyph="&#xE735;" />
-                                    </Button>
-                                </Grid>
-                            </Grid>
-
-                            <!--  Model Name  -->
-                            <TextBlock
-                                Grid.Row="1"
-                                Margin="0,2,0,0"
-                                Style="{ThemeResource SubtitleTextBlockStyle}"
-                                Text="{x:Bind DisplayName}"
-                                TextTrimming="CharacterEllipsis"
-                                ToolTipService.ToolTip="{x:Bind DisplayName}" />
-
-                            <!--  Tags Area & Price  -->
-                            <StackPanel
-                                Grid.Row="2"
-                                Spacing="6"
-                                VerticalAlignment="Center">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <Border
-                                        Background="{ThemeResource SystemFillColorSolidNeutralBackgroundBrush}"
-                                        CornerRadius="4"
-                                        Padding="6,2"
-                                        Visibility="{x:Bind IsChatModel, Converter={StaticResource BoolToVis}}">
-                                        <TextBlock
-                                            Style="{ThemeResource CaptionTextBlockStyle}"
-                                            Text="Chat"
-                                            x:Uid="Models_Tag_Chat" />
-                                    </Border>
-                                    <Border
-                                        Background="{ThemeResource SystemFillColorSolidNeutralBackgroundBrush}"
-                                        CornerRadius="4"
-                                        Padding="6,2"
-                                        Visibility="{x:Bind IsEmbeddingModel, Converter={StaticResource BoolToVis}}">
-                                        <TextBlock
-                                            Style="{ThemeResource CaptionTextBlockStyle}"
-                                            Text="Embedding"
-                                            x:Uid="Models_Tag_Embedding" />
-                                    </Border>
-                                </StackPanel>
-
-                                <StackPanel Orientation="Horizontal" Spacing="4">
-                                    <TextBlock
-                                        Opacity="0.6"
-                                        Style="{ThemeResource CaptionTextBlockStyle}"
-                                        Text="In:"
-                                        x:Uid="Models_Price_In" />
-                                    <TextBlock
-                                        FontWeight="SemiBold"
-                                        Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                        Style="{ThemeResource CaptionTextBlockStyle}"
-                                        Text="{x:Bind InputPriceFormatted}" />
-                                    <TextBlock
-                                        Opacity="0.5"
-                                        Style="{ThemeResource CaptionTextBlockStyle}"
-                                        Text="{x:Bind InputPriceOriginal}" />
-
-                                    <TextBlock
-                                        Margin="8,0,0,0"
-                                        Opacity="0.6"
-                                        Style="{ThemeResource CaptionTextBlockStyle}"
-                                        Text="Out:"
-                                        x:Uid="Models_Price_Out" />
-                                    <TextBlock
-                                        FontWeight="SemiBold"
-                                        Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                        Style="{ThemeResource CaptionTextBlockStyle}"
-                                        Text="{x:Bind OutputPriceFormatted}" />
-                                    <TextBlock
-                                        Opacity="0.5"
-                                        Style="{ThemeResource CaptionTextBlockStyle}"
-                                        Text="{x:Bind OutputPriceOriginal}" />
-                                </StackPanel>
-                            </StackPanel>
-
-                            <!--  Footer: ID  -->
-                            <Grid ColumnSpacing="8" Grid.Row="3">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <Border
-                                    Background="{ThemeResource LayerOnAcrylicFillColorDefaultBrush}"
-                                    CornerRadius="4"
-                                    Padding="8,4"
-                                    VerticalAlignment="Center">
-                                    <TextBlock
-                                        FontFamily="Consolas"
-                                        FontSize="12"
-                                        Opacity="0.8"
-                                        Text="{x:Bind Id}"
-                                        TextTrimming="CharacterEllipsis"
-                                        ToolTipService.ToolTip="{x:Bind Id}" />
-                                </Border>
-                                <controls:CopyButton
-                                    Click="CopyButton_Click"
-                                    Content="&#xE8C8;"
-                                    Grid.Column="1"
-                                    Padding="6"
-                                    Tag="{x:Bind Id, Mode=OneWay}"
-                                    ToolTipService.ToolTip="Copy ID"
-                                    x:Uid="Models_CopyID" />
-                            </Grid>
-                        </Grid>
-                    </Grid>
-                </DataTemplate>
-            </GridView.ItemTemplate>
-        </GridView>
+        <!--  List / Card Switcher  -->
+        <ctk:SwitchPresenter Grid.Row="1" Value="{x:Bind ViewModel.ViewMode, Mode=OneWay}">
+            <ctk:Case Value="{x:Bind vm:ModelsViewMode.List}">
+                <!--  HeaderedTreeView with DataTable  -->
+                <ctk:HeaderedTreeView ItemTemplateSelector="{StaticResource ModelsItemTemplateSelector}" x:Name="ModelsTreeView">
+                    <ctk:HeaderedTreeView.Header>
+                        <ctk:DataTable ColumnSpacing="16" Margin="16,0">
+                            <!--  Provider Name Column (Auto width handles indentation)  -->
+                            <ctk:DataColumn
+                                Content="Provider"
+                                DesiredWidth="Auto"
+                                x:Uid="/Models/List_Provider" />
+                            <!--  Model Name Column  -->
+                            <ctk:DataColumn
+                                Content="Model Name"
+                                DesiredWidth="*"
+                                x:Uid="/Models/List_ModelName" />
+                            <!--  Input Price Column  -->
+                            <ctk:DataColumn Content="{x:Bind ViewModel.InputPriceHeader, Mode=OneWay}" DesiredWidth="160" />
+                            <!--  Output Price Column  -->
+                            <ctk:DataColumn Content="{x:Bind ViewModel.OutputPriceHeader, Mode=OneWay}" DesiredWidth="160" />
+                        </ctk:DataTable>
+                    </ctk:HeaderedTreeView.Header>
+                </ctk:HeaderedTreeView>
+            </ctk:Case>
+            <ctk:Case Value="{x:Bind vm:ModelsViewMode.Card}">
+                <!--  Card View  -->
+                <ScrollViewer>
+                    <muxc:ItemsRepeater ItemsSource="{x:Bind ViewModel.FilteredModels, Mode=OneWay}">
+                        <muxc:ItemsRepeater.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ModelItemViewModel">
+                                <controls:ModelCardItem Model="{x:Bind}" />
+                            </DataTemplate>
+                        </muxc:ItemsRepeater.ItemTemplate>
+                        <muxc:ItemsRepeater.Layout>
+                            <muxc:UniformGridLayout
+                                ItemsStretch="Fill"
+                                MinColumnSpacing="12"
+                                MinItemWidth="300"
+                                MinRowSpacing="12"
+                                Orientation="Horizontal" />
+                        </muxc:ItemsRepeater.Layout>
+                    </muxc:ItemsRepeater>
+                </ScrollViewer>
+            </ctk:Case>
+        </ctk:SwitchPresenter>
     </Grid>
 </Page>

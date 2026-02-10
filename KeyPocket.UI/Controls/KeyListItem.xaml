@@ -1,0 +1,124 @@
+<UserControl
+    d:DataContext="{d:DesignInstance Type=vm:KeyItemViewModel,
+                                     IsDesignTimeCreatable=False}"
+    mc:Ignorable="d"
+    x:Class="KeyPocket.UI.Controls.KeyListItem"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:controls="using:KeyPocket.UI.Controls"
+    xmlns:ctk="using:CommunityToolkit.WinUI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:KeyPocket.UI.ViewModels"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="KeyItemResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <ctk:DataRow>
+        <!--  Provider column (Spacer/Indentation)  -->
+        <TextBlock />
+
+        <!--  Key Value + Actions  -->
+        <Grid
+            Background="Transparent"
+            Margin="0,0,16,0"
+            PointerEntered="OnPointerEntered"
+            PointerExited="OnPointerExited"
+            VerticalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel
+                Orientation="Horizontal"
+                Spacing="8"
+                VerticalAlignment="Center">
+                <TextBlock
+                    FontFamily="Consolas"
+                    Text="{x:Bind KeyItem.DisplayKey, Mode=OneWay}"
+                    ToolTipService.ToolTip="{x:Bind KeyItem.MaskedKey, Mode=OneWay}"
+                    VerticalAlignment="Center" />
+
+                <controls:CopyButton
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Click="OnCopyClicked"
+                    Height="24"
+                    Opacity="0"
+                    Padding="2"
+                    Tag="{x:Bind KeyItem.Id, Mode=OneWay}"
+                    ToolTipService.ToolTip="Copy Key"
+                    VerticalAlignment="Center"
+                    Width="24"
+                    x:Name="CopyBtn"
+                    x:Uid="/Keys/CopyKey">
+                    <FontIcon FontSize="12" Glyph="&#xE8C8;" />
+                </controls:CopyButton>
+            </StackPanel>
+
+            <!--  Favorite  -->
+            <Button
+                Background="Transparent"
+                BorderThickness="0"
+                Command="{x:Bind KeyItem.ToggleFavoriteCommand}"
+                Grid.Column="1"
+                Height="24"
+                Opacity="{x:Bind KeyItem.IsFavorite, Converter={StaticResource BoolToOpacity}, Mode=OneWay}"
+                Padding="2"
+                ToolTipService.ToolTip="{x:Bind KeyItem.IsFavorite, Converter={StaticResource BoolToVis}, Mode=OneWay}"
+                VerticalAlignment="Center"
+                Width="24"
+                x:Name="FavoriteBtn"
+                x:Uid="/Keys/Favorites">
+                <FontIcon
+                    FontSize="12"
+                    Foreground="{x:Bind KeyItem.IsFavorite, Mode=OneWay, Converter={StaticResource BoolToBrushConverter}}"
+                    Glyph="{x:Bind KeyItem.IsFavorite, Mode=OneWay, Converter={StaticResource BoolToGlyphConverter}, ConverterParameter='Fill'}" />
+            </Button>
+        </Grid>
+
+        <!--  Tag Column (Inline Edit)  -->
+        <Grid
+            HorizontalAlignment="Stretch"
+            Margin="0,0,16,0"
+            PointerEntered="OnTagColumnPointerEntered"
+            PointerExited="OnTagColumnPointerExited"
+            VerticalAlignment="Center">
+            <Button
+                Background="Transparent"
+                BorderThickness="0"
+                Command="{x:Bind KeyItem.StartEditTagCommand}"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Left"
+                MinHeight="28"
+                Padding="0"
+                x:Name="TagButton">
+                <controls:KeyTag
+                    TagCornerRadius="4"
+                    FontSize="12"
+                    HorizontalAlignment="Stretch"
+                    TagPadding="6,2"
+                    Text="{x:Bind KeyItem.Tag, Mode=OneWay}"
+                    Visibility="Collapsed"
+                    x:Name="TagBorder" />
+            </Button>
+
+            <TextBox
+                FontSize="12"
+                KeyDown="TagTextBox_KeyDown"
+                Loaded="TagTextBox_Loaded"
+                LostFocus="TagTextBox_LostFocus"
+                MinHeight="28"
+                Padding="8,4"
+                Text="{x:Bind KeyItem.Tag, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                Visibility="{x:Bind KeyItem.IsEditingTag, Converter={StaticResource BoolToVis}, Mode=OneWay}"
+                x:Name="TagTextBox" />
+        </Grid>
+    </ctk:DataRow>
+</UserControl>
