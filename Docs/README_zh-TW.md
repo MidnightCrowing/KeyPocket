@@ -39,6 +39,10 @@ KeyPocket 主要用於本機開發和除錯場景，適合個人開發者管理�
   <img src="./Assets/KeyPocket_CloseUp_Light.png" alt="Detail View" width="100%" />
 </p>
 
+<p align="center">
+  <img src="./Assets/KeyPocket_Models_Keys_Light_en-US.png" alt="Models Keys Interface" width="100%" />
+</p>
+
 ## 功能特性
 
 * 集中管理：在一個地方管理多平台設定（OpenAI, Claude, Ollama 等）。
