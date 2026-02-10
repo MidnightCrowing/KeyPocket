@@ -45,6 +45,10 @@ multiple AI service configurations.
   <img src="./Docs/Assets/KeyPocket_CloseUp_Light.png" alt="Detail View" width="100%" />
 </p>
 
+<p align="center">
+  <img src="./Docs/Assets/KeyPocket_Models_Keys_Light_en-US.png" alt="Models Keys Interface" width="100%" />
+</p>
+
 ## Features
 
 * Centralized Hub: Manage multi-platform configurations (OpenAI, Claude, Ollama, etc.) in one place.

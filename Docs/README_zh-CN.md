@@ -39,6 +39,10 @@ KeyPocket 主要用于本地开发和调试场景，适合个人开发者管理�
   <img src="./Assets/KeyPocket_CloseUp_Light.png" alt="Detail View" width="100%" />
 </p>
 
+<p align="center">
+  <img src="./Assets/KeyPocket_Models_Keys_Light_en-US.png" alt="Models Keys Interface" width="100%" />
+</p>
+
 ## 功能特性
 
 * 集中管理：在一个地方管理多平台配置（OpenAI, Claude, Ollama 等）。
