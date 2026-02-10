@@ -1,8 +1,9 @@
-<UserControl
+<sections:ProviderSettingsSectionBase
     x:Class="KeyPocket.UI.Pages.ProviderSettings.ProviderSettingsApiKeysContent"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:controls="using:KeyPocket.UI.Controls"
     xmlns:converters="using:KeyPocket.UI.Converters"
+    xmlns:sections="using:KeyPocket.UI.Pages.ProviderSettings"
     xmlns:vm="using:KeyPocket.UI.ViewModels"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <UserControl.Resources>
@@ -185,4 +186,4 @@
             Content="Add API Key"
             x:Uid="/ProviderSettings/AddApiKey" />
     </StackPanel>
-</UserControl>
+</sections:ProviderSettingsSectionBase>

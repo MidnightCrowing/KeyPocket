@@ -73,8 +73,7 @@ public partial class ModelsViewModel : ObservableObject
     public string OutputPriceHeader =>
         string.Format(ResourceLoader.GetForViewIndependentUse("Models").GetString("OutputPriceFormat"), CurrencySymbol);
 
-    public string ModelsCountText =>
-        string.Format(ResourceLoader.GetForViewIndependentUse("Models").GetString("CountFormat"), FilteredModels.Count);
+    public string ModelsCountText => $"{FilteredModels.Count} models";
 
     public int ViewModeIndex
     {

@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.Resources;
 using KeyPocket.UI.Helpers;
 using KeyPocket.UI.ViewModels;
@@ -97,5 +98,17 @@ public sealed partial class ProviderSettingsPage : Page, INotifyPropertyChanged
     {
         CreateStickyHeaders();
         CalculateSectionPositions();
+    }
+
+    private async void OnSaveAllClicked(object sender, RoutedEventArgs e)
+    {
+        var tasks = new[]
+        {
+            GeneralSection?.SaveAsync() ?? Task.CompletedTask,
+            ApiKeysSection?.SaveAsync() ?? Task.CompletedTask,
+            ModelsSection?.SaveAsync() ?? Task.CompletedTask
+        };
+
+        await Task.WhenAll(tasks);
     }
 }

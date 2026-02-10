@@ -12,21 +12,22 @@
     </Page.Resources>
 
     <Grid>
-        <ScrollViewer ViewChanged="OnScrollViewChanged" x:Name="MainScrollViewer">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ScrollViewer
+            Grid.Row="0"
+            ViewChanged="OnScrollViewChanged"
+            x:Name="MainScrollViewer">
             <StackPanel Padding="40,32" Spacing="0">
 
                 <!--  Page Header  -->
                 <TextBlock
-                    Margin="0,0,0,8"
-                    Style="{StaticResource TitleTextBlockStyle}"
-                    Text="Provider Settings"
-                    x:Uid="/ProviderSettings/Title" />
-                <TextBlock
-                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                     Margin="0,0,0,24"
-                    Style="{StaticResource BodyTextBlockStyle}"
-                    Text="Manage your provider details, API keys, and model configurations."
-                    x:Uid="/ProviderSettings/Subtitle" />
+                    Style="{StaticResource TitleTextBlockStyle}"
+                    Text="{x:Bind ViewModel.Name, Mode=OneWay}" />
 
                 <Border
                     Background="{ThemeResource SurfaceStrokeColorDefaultBrush}"
@@ -52,7 +53,10 @@
                             x:Uid="/ProviderSettings/GeneralDesc" />
                     </StackPanel>
 
-                    <sections:ProviderSettingsGeneralContent Grid.Column="1" ViewModel="{x:Bind ViewModel, Mode=OneWay}" />
+                    <sections:ProviderSettingsGeneralContent
+                        Grid.Column="1"
+                        ViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                        x:Name="GeneralSection" />
                 </Grid>
 
                 <Border
@@ -83,7 +87,10 @@
                             x:Uid="/ProviderSettings/ApiKeysDesc" />
                     </StackPanel>
 
-                    <sections:ProviderSettingsApiKeysContent Grid.Column="1" ViewModel="{x:Bind ViewModel, Mode=OneWay}" />
+                    <sections:ProviderSettingsApiKeysContent
+                        Grid.Column="1"
+                        ViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                        x:Name="ApiKeysSection" />
                 </Grid>
 
                 <Border
@@ -114,7 +121,10 @@
                             x:Uid="/ProviderSettings/ModelsDesc" />
                     </StackPanel>
 
-                    <sections:ProviderSettingsModelsContent Grid.Column="1" ViewModel="{x:Bind ViewModel, Mode=OneWay}" />
+                    <sections:ProviderSettingsModelsContent
+                        Grid.Column="1"
+                        ViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                        x:Name="ModelsSection" />
                 </Grid>
 
                 <Border
@@ -123,12 +133,6 @@
                     Margin="0,40,0,40" />
 
                 <StackPanel Margin="0,0,0,40" Spacing="16">
-                    <TextBlock
-                        Foreground="{ThemeResource SystemFillColorCriticalBrush}"
-                        Style="{StaticResource SubtitleTextBlockStyle}"
-                        Text="Danger Zone"
-                        x:Uid="/ProviderSettings/DangerZone" />
-
                     <Border
                         BorderBrush="{ThemeResource SystemFillColorCriticalBrush}"
                         BorderThickness="1"
@@ -168,10 +172,31 @@
 
         <!--  Sticky Headers Canvas Overlay  -->
         <Canvas
+            Grid.Row="0"
             IsHitTestVisible="False"
             VerticalAlignment="Top"
             x:Name="StickyHeadersCanvas">
             <!--  Sticky headers will be added here dynamically or via templates  -->
         </Canvas>
+
+        <Border
+            BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
+            BorderThickness="0,1,0,0"
+            Grid.Row="1"
+            Padding="16,12"
+            VerticalAlignment="Bottom">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Button
+                    Click="OnSaveAllClicked"
+                    Content="Save Changes"
+                    Grid.Column="1"
+                    Style="{StaticResource AccentButtonStyle}"
+                    x:Uid="/ProviderSettings/Save" />
+            </Grid>
+        </Border>
     </Grid>
 </Page>

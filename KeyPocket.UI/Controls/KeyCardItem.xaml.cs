@@ -99,7 +99,7 @@ public sealed partial class KeyCardItem : UserControl
             e.PropertyName == nameof(KeyItemViewModel.IsEditingTag))
         {
             UpdateTagBorderVisibility(false);
-            if (KeyItem?.IsEditingTag == true)
+            if (e.PropertyName == nameof(KeyItemViewModel.IsEditingTag) && KeyItem?.IsEditingTag == true)
                 FocusTagTextBox();
         }
     }

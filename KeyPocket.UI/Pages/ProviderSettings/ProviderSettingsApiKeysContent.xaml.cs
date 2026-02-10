@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
 using KeyPocket.UI.ViewModels;
@@ -8,24 +9,11 @@ using Microsoft.UI.Xaml.Input;
 
 namespace KeyPocket.UI.Pages.ProviderSettings;
 
-public sealed partial class ProviderSettingsApiKeysContent : UserControl
+public sealed partial class ProviderSettingsApiKeysContent : ProviderSettingsSectionBase
 {
-    public static readonly DependencyProperty ViewModelProperty =
-        DependencyProperty.Register(
-            nameof(ViewModel),
-            typeof(ProviderSettingsViewModel),
-            typeof(ProviderSettingsApiKeysContent),
-            new PropertyMetadata(null));
-
     public ProviderSettingsApiKeysContent()
     {
         InitializeComponent();
-    }
-
-    public ProviderSettingsViewModel? ViewModel
-    {
-        get => (ProviderSettingsViewModel?)GetValue(ViewModelProperty);
-        set => SetValue(ViewModelProperty, value);
     }
 
     private void OnKeyTagKeyDown(object sender, KeyRoutedEventArgs e)
@@ -70,5 +58,11 @@ public sealed partial class ProviderSettingsApiKeysContent : UserControl
             wrapper.CancelAddCommand?.Execute(null);
             e.Handled = true;
         }
+    }
+
+    public override Task SaveAsync()
+    {
+        ViewModel?.SaveApiKeys();
+        return Task.CompletedTask;
     }
 }

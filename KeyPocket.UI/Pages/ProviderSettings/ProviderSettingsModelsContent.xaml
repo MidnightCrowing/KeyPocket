@@ -1,9 +1,10 @@
-<UserControl
+<sections:ProviderSettingsSectionBase
     x:Class="KeyPocket.UI.Pages.ProviderSettings.ProviderSettingsModelsContent"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:controls="using:KeyPocket.UI.Controls"
     xmlns:converters="using:KeyPocket.UI.Converters"
     xmlns:ctk="using:CommunityToolkit.WinUI.Controls"
+    xmlns:sections="using:KeyPocket.UI.Pages.ProviderSettings"
     xmlns:vm="using:KeyPocket.UI.ViewModels"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <UserControl.Resources>
@@ -348,8 +349,8 @@
                 Command="{x:Bind ViewModel.AddModelCommand, Mode=OneWay}"
                 Content="Add Model"
                 x:Uid="/ProviderSettings/AddModel" />
-            <Button Content="Import" x:Uid="/ProviderSettings/Import">
-                <Button.Flyout>
+            <DropDownButton Content="Import" x:Uid="/ProviderSettings/Import">
+                <DropDownButton.Flyout>
                     <MenuFlyout Placement="Bottom">
                         <MenuFlyoutItem
                             Command="{x:Bind ViewModel.ImportCsvCommand, Mode=OneWay}"
@@ -360,8 +361,8 @@
                             Text="Create CSV Template"
                             x:Uid="/ProviderSettings/CreateCsvTemplate" />
                     </MenuFlyout>
-                </Button.Flyout>
-            </Button>
+                </DropDownButton.Flyout>
+            </DropDownButton>
         </StackPanel>
 
         <!--  CSV Import Result InfoBar  -->
@@ -371,4 +372,4 @@
             Margin="0,8,0,0"
             x:Name="CsvImportInfoBar" />
     </StackPanel>
-</UserControl>
+</sections:ProviderSettingsSectionBase>

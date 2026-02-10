@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
 using CommunityToolkit.Mvvm.Messaging;
@@ -12,26 +13,13 @@ using Microsoft.UI.Xaml.Input;
 
 namespace KeyPocket.UI.Pages.ProviderSettings;
 
-public sealed partial class ProviderSettingsModelsContent : UserControl
+public sealed partial class ProviderSettingsModelsContent : ProviderSettingsSectionBase
 {
-    public static readonly DependencyProperty ViewModelProperty =
-        DependencyProperty.Register(
-            nameof(ViewModel),
-            typeof(ProviderSettingsViewModel),
-            typeof(ProviderSettingsModelsContent),
-            new PropertyMetadata(null));
-
     public ProviderSettingsModelsContent()
     {
         InitializeComponent();
         Loaded += OnLoaded;
         Unloaded += OnUnloaded;
-    }
-
-    public ProviderSettingsViewModel? ViewModel
-    {
-        get => (ProviderSettingsViewModel?)GetValue(ViewModelProperty);
-        set => SetValue(ViewModelProperty, value);
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
@@ -128,5 +116,11 @@ public sealed partial class ProviderSettingsModelsContent : UserControl
     private void OnPriceValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
     {
         if (sender.DataContext is ModelWrapper wrapper) wrapper.RefreshCurrencySymbol();
+    }
+
+    public override Task SaveAsync()
+    {
+        ViewModel?.SaveModels();
+        return Task.CompletedTask;
     }
 }

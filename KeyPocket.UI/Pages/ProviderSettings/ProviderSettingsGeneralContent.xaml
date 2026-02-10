@@ -1,10 +1,11 @@
-<UserControl
+<sections:ProviderSettingsSectionBase
     mc:Ignorable="d"
     x:Class="KeyPocket.UI.Pages.ProviderSettings.ProviderSettingsGeneralContent"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:converters="using:KeyPocket.UI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sections="using:KeyPocket.UI.Pages.ProviderSettings"
     xmlns:vm="using:KeyPocket.UI.ViewModels"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <UserControl.Resources>
@@ -29,8 +30,8 @@
                 Text="Icon"
                 x:Uid="/ProviderSettings/Icon" />
             <StackPanel Orientation="Horizontal" Spacing="8">
-                <Button Content="Presets" x:Uid="/ProviderSettings/Presets">
-                    <Button.Flyout>
+                <DropDownButton Content="Presets" x:Uid="/ProviderSettings/Presets">
+                    <DropDownButton.Flyout>
                         <Flyout Placement="Bottom" x:Name="DefaultIconFlyout">
                             <GridView
                                 HorizontalAlignment="Center"
@@ -67,8 +68,8 @@
                                 </GridView.ItemTemplate>
                             </GridView>
                         </Flyout>
-                    </Button.Flyout>
-                </Button>
+                    </DropDownButton.Flyout>
+                </DropDownButton>
 
                 <Button
                     Click="OnChangeIconClicked"
@@ -146,11 +147,5 @@
                 TextWrapping="Wrap" />
         </StackPanel>
 
-        <Button
-            Command="{x:Bind ViewModel.SaveCommand, Mode=OneWay}"
-            Content="Save Changes"
-            HorizontalAlignment="Right"
-            Style="{StaticResource AccentButtonStyle}"
-            x:Uid="/ProviderSettings/Save" />
     </StackPanel>
-</UserControl>
+</sections:ProviderSettingsSectionBase>

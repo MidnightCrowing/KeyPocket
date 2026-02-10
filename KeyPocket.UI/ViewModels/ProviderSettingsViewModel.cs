@@ -118,7 +118,7 @@ public partial class ProviderSettingsViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public void Save()
+    public void SaveGeneral()
     {
         if (_providerService == null) return;
 
@@ -134,6 +134,16 @@ public partial class ProviderSettingsViewModel : ObservableObject
 
         // Notify sidebar to update
         WeakReferenceMessenger.Default.Send(new ProviderUpdatedMessage(Provider.Id));
+    }
+
+    public void SaveApiKeys()
+    {
+        // API keys are updated immediately; no-op for now.
+    }
+
+    public void SaveModels()
+    {
+        // Models are updated immediately; no-op for now.
     }
 
     public async Task UpdateIconAsync(StorageFile? file)

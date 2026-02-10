@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Windows.Storage.Pickers;
 using KeyPocket.UI.ViewModels;
 using Microsoft.UI.Xaml;
@@ -7,24 +8,11 @@ using WinRT.Interop;
 
 namespace KeyPocket.UI.Pages.ProviderSettings;
 
-public sealed partial class ProviderSettingsGeneralContent : UserControl
+public sealed partial class ProviderSettingsGeneralContent : ProviderSettingsSectionBase
 {
-    public static readonly DependencyProperty ViewModelProperty =
-        DependencyProperty.Register(
-            nameof(ViewModel),
-            typeof(ProviderSettingsViewModel),
-            typeof(ProviderSettingsGeneralContent),
-            new PropertyMetadata(null));
-
     public ProviderSettingsGeneralContent()
     {
         InitializeComponent();
-    }
-
-    public ProviderSettingsViewModel? ViewModel
-    {
-        get => (ProviderSettingsViewModel?)GetValue(ViewModelProperty);
-        set => SetValue(ViewModelProperty, value);
     }
 
     private async void OnDefaultIconItemClick(object sender, ItemClickEventArgs e)
@@ -67,5 +55,11 @@ public sealed partial class ProviderSettingsGeneralContent : UserControl
         if (ViewModel == null) return;
 
         await ViewModel.UpdateIconAsync(null);
+    }
+
+    public override Task SaveAsync()
+    {
+        ViewModel?.SaveGeneral();
+        return Task.CompletedTask;
     }
 }
