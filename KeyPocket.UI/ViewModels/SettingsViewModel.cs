@@ -11,14 +11,14 @@ public partial class SettingsViewModel : ObservableObject
 {
     public SettingsViewModel()
     {
-        _themeIndex = ThemeHelper.Theme switch
+        ThemeIndex = ThemeHelper.Theme switch
         {
             ElementTheme.Light => 0,
             ElementTheme.Dark => 1,
             _ => 2
         };
 
-        _backdropIndex = SettingsHelper.Current.SelectedBackdrop switch
+        BackdropIndex = SettingsHelper.Current.SelectedBackdrop switch
         {
             WindowBackdropKind.Mica => 0,
             WindowBackdropKind.MicaAlt => 1,
@@ -28,20 +28,20 @@ public partial class SettingsViewModel : ObservableObject
 
         var lang = ApplicationLanguages.PrimaryLanguageOverride;
         if (string.IsNullOrEmpty(lang))
-            _languageIndex = 0;
+            LanguageIndex = 0;
         else if (lang.StartsWith("en", StringComparison.OrdinalIgnoreCase))
-            _languageIndex = 1;
+            LanguageIndex = 1;
         else if (lang.StartsWith("zh-CN", StringComparison.OrdinalIgnoreCase) ||
                  lang.StartsWith("zh-Hans", StringComparison.OrdinalIgnoreCase))
-            _languageIndex = 2;
+            LanguageIndex = 2;
         else if (lang.StartsWith("zh-TW", StringComparison.OrdinalIgnoreCase) ||
                  lang.StartsWith("zh-Hant", StringComparison.OrdinalIgnoreCase))
-            _languageIndex = 3;
+            LanguageIndex = 3;
         else
-            _languageIndex = 0;
+            LanguageIndex = 0;
 
         LoadCurrencies();
-        _selectedCurrency = SettingsHelper.Current.SelectedCurrency;
+        SelectedCurrency = SettingsHelper.Current.SelectedCurrency;
 
         LoadRates();
     }

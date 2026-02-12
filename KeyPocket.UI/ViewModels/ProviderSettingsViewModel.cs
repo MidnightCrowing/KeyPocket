@@ -25,21 +25,21 @@ public partial class ProviderSettingsViewModel : ObservableObject
 {
     private readonly ProviderService _providerService;
 
-    [ObservableProperty] private string? _baseUrl;
+    [ObservableProperty] public partial string? BaseUrl { get; set; }
 
-    [ObservableProperty] private string? _description;
+    [ObservableProperty] public partial string? Description { get; set; }
 
-    [ObservableProperty] private bool _hasCustomIcon;
+    [ObservableProperty] public partial bool HasCustomIcon { get; set; }
 
     private bool _isSyncingOrder;
 
-    [ObservableProperty] private string _name = string.Empty;
+    [ObservableProperty] public partial string Name { get; set; } = string.Empty;
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(ProviderCurrencySymbol))]
-    private string _providerCurrency = "USD";
+    public partial string ProviderCurrency { get; set; } = "USD";
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(TypeIndex))]
-    private string _type = "OpenAI API";
+    public partial string Type { get; set; } = "OpenAI API";
 
     // Track the currency currently used to display model prices in this page
 
@@ -49,15 +49,15 @@ public partial class ProviderSettingsViewModel : ObservableObject
         _providerService = providerService;
 
         // Initialize fields
-        _name = provider.Name;
+        Name = provider.Name;
 
         // Ensure strictly matching string reference for ComboBox
         var typeMatch = ProviderTypes.FirstOrDefault(t => t == provider.Type);
-        _type = typeMatch ?? provider.Type;
+        Type = typeMatch ?? provider.Type;
 
-        _baseUrl = provider.ApiBaseUrl;
-        _description = provider.Description;
-        _providerCurrency = provider.Currency;
+        BaseUrl = provider.ApiBaseUrl;
+        Description = provider.Description;
+        ProviderCurrency = provider.Currency;
         LoadKeys(Provider);
         RefreshModels(Provider);
         HasCustomIcon = ProviderIconHelper.HasCustomIcon(provider.IconPath);

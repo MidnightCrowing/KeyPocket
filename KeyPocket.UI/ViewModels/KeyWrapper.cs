@@ -8,26 +8,26 @@ namespace KeyPocket.UI.ViewModels;
 public partial class KeyWrapper : ObservableObject
 {
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsReadOnly))]
-    private bool _isEditing;
+    public partial bool IsEditing { get; set; }
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(FavoriteIcon))]
-    private bool _isFavorite;
+    public partial bool IsFavorite { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsTagDisplayVisible))]
     [NotifyPropertyChangedFor(nameof(IsTagTextVisible))]
-    private bool _isTagEditing;
+    public partial bool IsTagEditing { get; set; }
 
-    [ObservableProperty] private string _maskedKey = "";
+    [ObservableProperty] public partial string MaskedKey { get; set; } = "";
 
-    [ObservableProperty] private string _newKey = "";
+    [ObservableProperty] public partial string NewKey { get; set; } = "";
     private string? _originalTag;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasTag))]
     [NotifyPropertyChangedFor(nameof(IsTagTextVisible))]
     [NotifyPropertyChangedFor(nameof(IsTagDisplayVisible))]
-    private string? _tag;
+    public partial string? Tag { get; set; }
 
     public Guid Id { get; set; }
 

@@ -15,16 +15,16 @@ public partial class KeysViewModel : ObservableObject
     private readonly ProviderService _providerService;
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(KeysCountText))]
-    private ObservableCollection<KeyItemViewModel> _filteredKeys = new();
+    public partial ObservableCollection<KeyItemViewModel> FilteredKeys { get; set; } = new();
 
-    [ObservableProperty] private ObservableCollection<KeyProviderGroupViewModel> _groupedKeys = new();
+    [ObservableProperty] public partial ObservableCollection<KeyProviderGroupViewModel> GroupedKeys { get; set; } = new();
 
-    [ObservableProperty] private string _searchText = string.Empty;
+    [ObservableProperty] public partial string SearchText { get; set; } = string.Empty;
 
-    [ObservableProperty] private bool _showFavoritesOnly;
+    [ObservableProperty] public partial bool ShowFavoritesOnly { get; set; }
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(ViewModeIndex))]
-    private KeysViewMode _viewMode = KeysViewMode.List;
+    public partial KeysViewMode ViewMode { get; set; } = KeysViewMode.List;
 
     public KeysViewModel(ProviderService providerService)
     {

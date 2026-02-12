@@ -17,29 +17,29 @@ public partial class ModelsViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(InputPriceHeader))]
     [NotifyPropertyChangedFor(nameof(OutputPriceHeader))]
-    private string _currencySymbol = "$";
+    public partial string CurrencySymbol { get; set; } = "$";
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(ModelsCountText))]
-    private ObservableCollection<ModelItemViewModel> _filteredModels = new();
+    public partial ObservableCollection<ModelItemViewModel> FilteredModels { get; set; } = new();
 
-    [ObservableProperty] private ObservableCollection<ProviderGroupViewModel> _groupedModels = new();
-    [ObservableProperty] private bool _isAudioSelected = true;
-    [ObservableProperty] private bool _isEmbeddingsSelected = true;
-    [ObservableProperty] private bool _isFileSelected = true;
-    [ObservableProperty] private bool _isImageSelected = true;
+    [ObservableProperty] public partial ObservableCollection<ProviderGroupViewModel> GroupedModels { get; set; } = new();
+    [ObservableProperty] public partial bool IsAudioSelected { get; set; } = true;
+    [ObservableProperty] public partial bool IsEmbeddingsSelected { get; set; } = true;
+    [ObservableProperty] public partial bool IsFileSelected { get; set; } = true;
+    [ObservableProperty] public partial bool IsImageSelected { get; set; } = true;
 
-    [ObservableProperty] private bool _isTextSelected = true;
-    [ObservableProperty] private bool _isVideoSelected = true;
-    [ObservableProperty] private int _maxPriceIndex = 6;
+    [ObservableProperty] public partial bool IsTextSelected { get; set; } = true;
+    [ObservableProperty] public partial bool IsVideoSelected { get; set; } = true;
+    [ObservableProperty] public partial int MaxPriceIndex { get; set; } = 6;
 
-    [ObservableProperty] private int _minPriceIndex;
-    [ObservableProperty] private string _searchText = string.Empty;
-    [ObservableProperty] private bool _showFavoritesOnly;
+    [ObservableProperty] public partial int MinPriceIndex { get; set; }
+    [ObservableProperty] public partial string SearchText { get; set; } = string.Empty;
+    [ObservableProperty] public partial bool ShowFavoritesOnly { get; set; }
 
-    [ObservableProperty] private ModelSortOption _sortOption = ModelSortOption.NameAsc;
+    [ObservableProperty] public partial ModelSortOption SortOption { get; set; } = ModelSortOption.NameAsc;
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(ViewModeIndex))]
-    private ModelsViewMode _viewMode = ModelsViewMode.List;
+    public partial ModelsViewMode ViewMode { get; set; } = ModelsViewMode.List;
 
     public ModelsViewModel(ProviderService providerService, ModelFilterService filterService)
     {

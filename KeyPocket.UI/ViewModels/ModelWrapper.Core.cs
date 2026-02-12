@@ -16,35 +16,35 @@ public partial class ModelWrapper : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ModelIconUri))]
     [NotifyPropertyChangedFor(nameof(HasModelIcon))]
-    private string _id = string.Empty;
+    public partial string Id { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ProviderSymbol))]
     [NotifyPropertyChangedFor(nameof(InputPriceDisplay))]
     [NotifyPropertyChangedFor(nameof(OutputPriceDisplay))]
-    private string _inputCurrency = "USD";
+    public partial string InputCurrency { get; set; } = "USD";
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(InputPriceDisplay))]
     [NotifyPropertyChangedFor(nameof(OutputPriceDisplay))]
     [NotifyPropertyChangedFor(nameof(HasInputPrice))]
-    private double? _inputPriceValue;
+    public partial double? InputPriceValue { get; set; }
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(FavoriteIcon))]
-    private bool _isFavorite;
+    public partial bool IsFavorite { get; set; }
 
     private bool _isSyncingFavorite;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ModelIconUri))]
     [NotifyPropertyChangedFor(nameof(HasModelIcon))]
-    private string _name = string.Empty;
+    public partial string Name { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(InputPriceDisplay))]
     [NotifyPropertyChangedFor(nameof(OutputPriceDisplay))]
     [NotifyPropertyChangedFor(nameof(HasOutputPrice))]
-    private double? _outputPriceValue;
+    public partial double? OutputPriceValue { get; set; }
 
     public ModelWrapper()
     {

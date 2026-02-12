@@ -7,13 +7,13 @@ namespace KeyPocket.UI.ViewModels;
 
 public partial class SettingsViewModel
 {
-    [ObservableProperty] private int _backdropIndex;
+    [ObservableProperty] public partial int BackdropIndex { get; set; }
 
-    [ObservableProperty] private int _languageIndex;
+    [ObservableProperty] public partial int LanguageIndex { get; set; }
 
-    [ObservableProperty] private bool _showRestartWarning;
+    [ObservableProperty] public partial bool ShowRestartWarning { get; set; }
 
-    [ObservableProperty] private int _themeIndex;
+    [ObservableProperty] public partial int ThemeIndex { get; set; }
 
     partial void OnThemeIndexChanged(int value)
     {
