@@ -98,7 +98,9 @@ public sealed partial class HomeProviderCard : UserControl
     {
         if (HomeViewModel == null || Provider == null) return;
 
-        if (!e.Data.Properties.TryGetValue("ProviderId", out var value)) return;
+        var properties = e.DataView?.Properties;
+        if (properties == null) return;
+        if (!properties.TryGetValue("ProviderId", out var value)) return;
         if (value is not string providerIdStr || !Guid.TryParse(providerIdStr, out var providerId)) return;
         if (providerId == Provider.Id) return;
 

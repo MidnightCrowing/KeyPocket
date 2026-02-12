@@ -13,22 +13,22 @@ namespace KeyPocket.UI.ViewModels;
 
 public partial class ProviderViewModel : ObservableObject
 {
-    [ObservableProperty] private string? _baseUrl;
+    [ObservableProperty] public partial string? BaseUrl { get; set; }
 
     // Manual implementation to avoid ObjectDisposedException during comparison
     private ImageSource? _customIconSource;
 
-    [ObservableProperty] private string? _description;
+    [ObservableProperty] public partial string? Description { get; set; }
 
-    [ObservableProperty] private string _icon = "\uE774"; // Globe
+    [ObservableProperty] public partial string Icon { get; set; } = "\uE774"; // Globe
 
-    [ObservableProperty] private bool _isCustomIcon;
+    [ObservableProperty] public partial bool IsCustomIcon { get; set; }
 
-    [ObservableProperty] private string _name = string.Empty;
+    [ObservableProperty] public partial string Name { get; set; } = string.Empty;
 
-    [ObservableProperty] private Brush _statusColor = new SolidColorBrush(Colors.Gray);
+    [ObservableProperty] public partial Brush StatusColor { get; set; } = new SolidColorBrush(Colors.Gray);
 
-    [ObservableProperty] private string _type = string.Empty;
+    [ObservableProperty] public partial string Type { get; set; } = string.Empty;
 
     public ProviderViewModel()
     {

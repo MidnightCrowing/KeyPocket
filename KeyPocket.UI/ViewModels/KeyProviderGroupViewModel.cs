@@ -14,7 +14,7 @@ public partial class KeyProviderGroupViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(IsCustomIcon))]
     [NotifyPropertyChangedFor(nameof(DefaultGlyph))]
     [NotifyPropertyChangedFor(nameof(IconUri))]
-    private string? _providerIcon;
+    public partial string? ProviderIcon { get; set; }
 
     public Guid ProviderId { get; set; }
     public string ProviderName { get; set; } = string.Empty;

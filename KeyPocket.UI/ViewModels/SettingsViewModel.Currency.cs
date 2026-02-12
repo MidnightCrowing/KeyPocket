@@ -7,16 +7,16 @@ namespace KeyPocket.UI.ViewModels;
 
 public partial class SettingsViewModel
 {
-    [ObservableProperty] private bool _isAddingCurrency;
+    [ObservableProperty] public partial bool IsAddingCurrency { get; set; }
 
     [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(ConfirmAddCurrencyCommand))]
-    private string _newCurrencyCode = string.Empty;
+    public partial string NewCurrencyCode { get; set; } = string.Empty;
 
     [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(ConfirmAddCurrencyCommand))]
-    private string _newCurrencySymbol = string.Empty;
+    public partial string NewCurrencySymbol { get; set; } = string.Empty;
 
     [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(DeleteSelectedCurrencyCommand))]
-    private string _selectedCurrency;
+    public partial string SelectedCurrency { get; set; }
 
     [RelayCommand]
     private void StartAddCurrency()

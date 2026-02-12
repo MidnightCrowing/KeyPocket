@@ -8,16 +8,16 @@ namespace KeyPocket.UI.ViewModels;
 
 public partial class SettingsViewModel
 {
-    [ObservableProperty] private bool _isAddingRate;
+    [ObservableProperty] public partial bool IsAddingRate { get; set; }
 
     [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(AddCustomRateCommand))]
-    private string _newRateSource = string.Empty;
+    public partial string NewRateSource { get; set; } = string.Empty;
 
     [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(AddCustomRateCommand))]
-    private string _newRateTarget = string.Empty;
+    public partial string NewRateTarget { get; set; } = string.Empty;
 
     [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(AddCustomRateCommand))]
-    private double _newRateValue = double.NaN;
+    public partial double NewRateValue { get; set; } = double.NaN;
 
     partial void OnNewRateValueChanged(double value)
     {

@@ -14,7 +14,7 @@ public partial class SearchViewModel : ObservableObject
 {
     private readonly ProviderService _providerService;
 
-    [ObservableProperty] private ObservableCollection<SearchResultItem> _searchResults = new();
+    [ObservableProperty] public partial ObservableCollection<SearchResultItem> SearchResults { get; set; } = new();
 
     public SearchViewModel(ProviderService providerService)
     {

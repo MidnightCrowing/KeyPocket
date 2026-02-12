@@ -6,16 +6,16 @@ namespace KeyPocket.UI.ViewModels;
 
 public partial class ModelWrapper
 {
-    [ObservableProperty] private string _inputPrice = string.Empty;
+    [ObservableProperty] public partial string InputPrice { get; set; } = string.Empty;
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsReadOnly))]
-    private bool _isEditing;
+    public partial bool IsEditing { get; set; }
 
-    [ObservableProperty] private string _newId = string.Empty;
+    [ObservableProperty] public partial string NewId { get; set; } = string.Empty;
 
-    [ObservableProperty] private string _newName = string.Empty;
+    [ObservableProperty] public partial string NewName { get; set; } = string.Empty;
 
-    [ObservableProperty] private string _outputPrice = string.Empty;
+    [ObservableProperty] public partial string OutputPrice { get; set; } = string.Empty;
 
     public bool IsReadOnly => !IsEditing;
 

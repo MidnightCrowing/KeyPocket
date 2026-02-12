@@ -30,16 +30,16 @@ public partial class ModelItemViewModel : ObservableObject
     private readonly string _providerCurrency;
     private readonly ProviderService _providerService;
 
-    [ObservableProperty] private string? _providerIcon; // Keep observable if needed, though mostly static for item
+    [ObservableProperty] public partial string? ProviderIcon { get; set; } // Keep observable if needed, though mostly static for item
 
-    [ObservableProperty] private string _providerName;
+    [ObservableProperty] public partial string ProviderName { get; set; }
 
     public ModelItemViewModel(ModelInfo model, string providerName, string? providerIcon, string providerCurrency,
         ProviderService providerService)
     {
         _model = model;
-        _providerName = providerName;
-        _providerIcon = providerIcon;
+        ProviderName = providerName;
+        ProviderIcon = providerIcon;
         _providerCurrency = providerCurrency ?? "USD";
         _providerService = providerService;
 
