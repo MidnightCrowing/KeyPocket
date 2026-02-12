@@ -33,11 +33,6 @@ public class ApiKey
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
     /// <summary>
-    ///     最后使用时间。
-    /// </summary>
-    public DateTime? LastUsedAt { get; set; }
-
-    /// <summary>
     ///     是否被收藏。
     /// </summary>
     public bool IsFavorite { get; set; }
