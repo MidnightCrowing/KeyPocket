@@ -11,10 +11,10 @@ public partial class ExchangeRateItem : ObservableObject
 
     public ExchangeRateItem(string source, string target, decimal rate, Action<string, decimal> onRateChanged)
     {
-        Source = source;
-        Target = target;
-        Rate = rate;
+        Source = source ?? string.Empty;
+        Target = target ?? string.Empty;
         _onRateChanged = onRateChanged;
+        Rate = rate;
     }
 
     public string Source { get; }
@@ -28,6 +28,12 @@ public partial class ExchangeRateItem : ObservableObject
 
     partial void OnRateChanged(decimal value)
     {
+        if (string.IsNullOrWhiteSpace(Source) || string.IsNullOrWhiteSpace(Target))
+        {
+            OnPropertyChanged(nameof(RateValue));
+            return;
+        }
+
         var key = $"{Source.ToUpper()}_{Target.ToUpper()}";
         _onRateChanged?.Invoke(key, value);
         OnPropertyChanged(nameof(RateValue));
