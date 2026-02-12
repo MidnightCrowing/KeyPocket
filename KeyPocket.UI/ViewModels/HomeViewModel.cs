@@ -12,7 +12,7 @@ public partial class HomeViewModel : ObservableObject
     private readonly ProviderService? _providerService; // Nullable if design-time or deferred
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsEmpty))] [NotifyPropertyChangedFor(nameof(IsNotEmpty))]
-    private ObservableCollection<ProviderViewModel> _providers = new();
+    public partial ObservableCollection<ProviderViewModel> Providers { get; set; } = new();
 
     public HomeViewModel(ProviderService providerService)
     {

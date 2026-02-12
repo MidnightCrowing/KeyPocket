@@ -15,20 +15,20 @@ public partial class KeyItemViewModel : ObservableObject
     private readonly ApiKey _apiKey;
     private readonly ProviderService _providerService;
 
-    [ObservableProperty] private string _displayKey = string.Empty;
+    [ObservableProperty] public partial string DisplayKey { get; set; } = string.Empty;
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsTagDisplayVisible))]
     [NotifyPropertyChangedFor(nameof(IsTagRowVisible))]
-    private bool _isEditingTag;
-    [ObservableProperty] private string _maskedKey = "Loading...";
+    public partial bool IsEditingTag { get; set; }
+    [ObservableProperty] public partial string MaskedKey { get; set; } = "Loading...";
     private string? _originalTag;
-    [ObservableProperty] private string? _providerIcon;
+    [ObservableProperty] public partial string? ProviderIcon { get; set; }
 
     public KeyItemViewModel(ApiKey apiKey, string providerName, string? providerIcon, ProviderService providerService)
     {
         _apiKey = apiKey;
         ProviderName = providerName;
-        _providerIcon = providerIcon;
+        ProviderIcon = providerIcon;
         _providerService = providerService;
 
         Initialize();

@@ -8,11 +8,11 @@ namespace KeyPocket.UI.ViewModels;
 /// </summary>
 public partial class SidebarProviderItem : ObservableObject
 {
-    [ObservableProperty] private string? _iconPath;
+    [ObservableProperty] public partial string? IconPath { get; set; }
 
-    [ObservableProperty] private string _name = string.Empty;
+    [ObservableProperty] public partial string Name { get; set; } = string.Empty;
 
-    [ObservableProperty] private string _type = string.Empty;
+    [ObservableProperty] public partial string Type { get; set; } = string.Empty;
 
     public Guid Id { get; set; }
 }

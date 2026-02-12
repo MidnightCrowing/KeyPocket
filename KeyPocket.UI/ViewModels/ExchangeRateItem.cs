@@ -7,13 +7,13 @@ public partial class ExchangeRateItem : ObservableObject
 {
     private readonly Action<string, decimal> _onRateChanged;
 
-    [ObservableProperty] private decimal _rate;
+    [ObservableProperty] public partial decimal Rate { get; set; }
 
     public ExchangeRateItem(string source, string target, decimal rate, Action<string, decimal> onRateChanged)
     {
         Source = source;
         Target = target;
-        _rate = rate;
+        Rate = rate;
         _onRateChanged = onRateChanged;
     }
 
