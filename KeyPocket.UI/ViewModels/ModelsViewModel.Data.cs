@@ -43,18 +43,24 @@ public partial class ModelsViewModel
     {
         var providers = _providerService.GetAllProviders();
         var providerOrderMap = providers
-            .Select((p, index) => new { p.Name, Index = index })
-            .ToDictionary(x => x.Name, x => x.Index);
+            .Select((p, index) => new { p.Id, Index = index })
+            .ToDictionary(x => x.Id, x => x.Index);
+        var providerMap = providers.ToDictionary(p => p.Id);
 
         var grouped = models
-            .GroupBy(m => new { m.ProviderName, m.ProviderIcon })
-            .OrderBy(g => providerOrderMap.TryGetValue(g.Key.ProviderName, out var index) ? index : int.MaxValue)
-            .Select(g => new ProviderGroupViewModel
+            .GroupBy(m => m.ProviderId)
+            .OrderBy(g => providerOrderMap.TryGetValue(g.Key, out var index) ? index : int.MaxValue)
+            .Select(g =>
             {
-                ProviderId = providers.FirstOrDefault(p => p.Name == g.Key.ProviderName)?.Id ?? Guid.Empty,
-                ProviderName = g.Key.ProviderName,
-                ProviderIcon = g.Key.ProviderIcon,
-                Models = g.ToList()
+                var first = g.First();
+                providerMap.TryGetValue(g.Key, out var provider);
+                return new ProviderGroupViewModel
+                {
+                    ProviderId = g.Key,
+                    ProviderName = provider?.Name ?? first.ProviderName,
+                    ProviderIcon = provider?.IconPath ?? first.ProviderIcon,
+                    Models = g.ToList()
+                };
             })
             .ToList();
 

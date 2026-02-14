@@ -77,6 +77,7 @@ public partial class ModelsViewModel
 
         var allModelsData = _allModels.Select(vm => new ModelInfo
         {
+            ProviderId = vm.ProviderId,
             Id = vm.Id,
             DisplayName = vm.DisplayName,
             Tags = new HashSet<string>(vm._model.Tags),
@@ -84,7 +85,9 @@ public partial class ModelsViewModel
         }).ToList();
 
         var filtered = _filterService.ApplyFilters(allModelsData, criteria);
-        var orderedVMs = filtered.Select(m => _allModels.First(vm => vm.Id == m.Id)).ToList();
+        var orderedVMs = filtered
+            .Select(m => _allModels.First(vm => vm.ProviderId == m.ProviderId && vm.Id == m.Id))
+            .ToList();
 
         FilteredModels = new ObservableCollection<ModelItemViewModel>(orderedVMs);
         GenerateGroupedModels(orderedVMs);
